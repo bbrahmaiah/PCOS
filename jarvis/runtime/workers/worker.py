@@ -4,7 +4,6 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from threading import Event, RLock, Thread, current_thread
-from time import sleep
 from typing import Final
 
 from jarvis.runtime.events import EventBus, RuntimeEvent
@@ -23,6 +22,9 @@ def _utc_now() -> datetime:
 class WorkerSnapshot:
     """
     Immutable diagnostic snapshot for one runtime worker.
+
+    This is used by the WorkerManager, HealthMonitor, RuntimeKernel,
+    and future runtime dashboards.
     """
 
     name: str
@@ -40,7 +42,23 @@ class BaseWorker(ABC):
     Base class for all long-running JARVIS runtime workers.
 
     Workers are independent parallel subsystems:
-    Presence, Awareness, Memory, Router, Action, Dialogue, and more.
+    - Presence
+    - Awareness
+    - Memory
+    - Router
+    - Action
+    - Dialogue
+    - Scheduler
+
+    Design guarantees:
+    - thread-backed execution
+    - clean start / stop lifecycle
+    - idempotent start / stop
+    - interruptible shutdown
+    - heartbeat tracking
+    - failure capture
+    - lifecycle event emission
+    - observability integration
     """
 
     def __init__(
@@ -116,7 +134,10 @@ class BaseWorker(ABC):
             self._emit_worker_event(EventType.WORKER_STARTING)
             self._thread.start()
 
-        self._logger.info("worker_start_requested", worker=self.name)
+        self._logger.info(
+            "worker_start_requested",
+            worker=self.name,
+        )
 
     def stop(self, *, timeout_seconds: float = 5.0) -> None:
         """
@@ -162,13 +183,17 @@ class BaseWorker(ABC):
             self._stopped_at = _utc_now()
 
         self._emit_worker_event(EventType.WORKER_STOPPED)
-        self._logger.info("worker_stopped", worker=self.name)
+
+        self._logger.info(
+            "worker_stopped",
+            worker=self.name,
+        )
 
     def request_stop(self) -> None:
         """
-        Signal the worker to stop without joining.
+        Signal the worker to stop without joining the thread.
 
-        Useful from inside run_once().
+        This is useful from inside run_once().
         """
 
         self._stop_requested.set()
@@ -177,6 +202,10 @@ class BaseWorker(ABC):
         return self._stop_requested.is_set()
 
     def join(self, *, timeout_seconds: float | None = None) -> None:
+        """
+        Wait for worker thread termination.
+        """
+
         with self._lock:
             thread = self._thread
 
@@ -184,6 +213,14 @@ class BaseWorker(ABC):
             thread.join(timeout=timeout_seconds)
 
     def snapshot(self) -> WorkerSnapshot:
+        """
+        Return immutable worker lifecycle diagnostics.
+
+        Important:
+        subclasses must not override this method with a different return type.
+        Subclass-specific diagnostics should use a different method name.
+        """
+
         with self._lock:
             return WorkerSnapshot(
                 name=self.name,
@@ -197,6 +234,10 @@ class BaseWorker(ABC):
             )
 
     def heartbeat(self) -> None:
+        """
+        Record worker heartbeat and emit health event.
+        """
+
         with self._lock:
             self._last_heartbeat_at = _utc_now()
 
@@ -232,7 +273,11 @@ class BaseWorker(ABC):
                 self._status = WorkerStatus.RUNNING
 
             self._emit_worker_event(EventType.WORKER_STARTED)
-            self._logger.info("worker_started", worker=self.name)
+
+            self._logger.info(
+                "worker_started",
+                worker=self.name,
+            )
 
             self.on_start()
 
@@ -249,7 +294,7 @@ class BaseWorker(ABC):
                     if not self._stop_requested.is_set():
                         self._status = WorkerStatus.IDLE
 
-                sleep(self.tick_interval_seconds)
+                self._stop_requested.wait(self.tick_interval_seconds)
 
         except Exception as exc:
             error = f"{type(exc).__name__}: {exc}"

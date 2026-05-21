@@ -1,14 +1,6 @@
-from jarvis.runtime.config import get_settings
+from __future__ import annotations
 
-
-def main() -> None:
-    settings = get_settings()
-
-    print(
-        f"{settings.runtime.system_name} "
-        f"{settings.runtime.version} ONLINE"
-    )
-
+from jarvis.runtime.bootstrap import main
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
