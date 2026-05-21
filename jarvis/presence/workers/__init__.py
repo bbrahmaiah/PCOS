@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from jarvis.presence.workers.stt_worker import STTWorker, STTWorkerSnapshot
 from jarvis.presence.workers.vad_worker import VADWorker, VADWorkerSnapshot
 from jarvis.presence.workers.voice_input_worker import (
     VoiceInputWorker,
@@ -11,6 +12,8 @@ from jarvis.presence.workers.wake_detector_worker import (
 )
 
 __all__ = [
+    "STTWorker",
+    "STTWorkerSnapshot",
     "VADWorker",
     "VADWorkerSnapshot",
     "VoiceInputWorker",
