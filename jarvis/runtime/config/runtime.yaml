@@ -1,0 +1,34 @@
+runtime:
+  system_name: JARVIS_OS
+  environment: development
+  debug: true
+  version: 0.1.0
+
+logging:
+  log_level: INFO
+  enable_console_logging: true
+  enable_file_logging: true
+
+workers:
+  max_concurrent_tasks: 100
+  default_worker_timeout_seconds: 30
+  event_queue_size: 1000
+  retry_count: 3
+
+security:
+  enable_permissions: true
+  enable_audit_logging: true
+  require_action_confirmation: true
+  deny_unknown_actions: true
+
+observability:
+  enable_metrics: true
+  enable_tracing: true
+  enable_performance_monitoring: true
+  health_check_interval_seconds: 5
+
+paths:
+  logs_dir: logs
+  data_dir: data
+  cache_dir: data/cache
+  models_dir: data/models
