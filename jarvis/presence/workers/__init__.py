@@ -1,3 +1,11 @@
 from __future__ import annotations
 
-__all__: list[str] = []
+from jarvis.presence.workers.voice_input_worker import (
+    VoiceInputWorker,
+    VoiceInputWorkerSnapshot,
+)
+
+__all__ = [
+    "VoiceInputWorker",
+    "VoiceInputWorkerSnapshot",
+]
