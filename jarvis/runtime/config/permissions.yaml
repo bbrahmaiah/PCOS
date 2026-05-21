@@ -1,0 +1,25 @@
+defaults:
+  deny_unknown_actions: true
+  require_confirmation: true
+  require_double_confirmation_for_high_risk: true
+
+risk_levels:
+  safe:
+    require_confirmation: false
+
+  low:
+    require_confirmation: false
+
+  medium:
+    require_confirmation: true
+
+  high:
+    require_confirmation: true
+    require_double_confirmation: true
+
+  critical:
+    require_confirmation: true
+    require_double_confirmation: true
+
+  blocked:
+    allow: false

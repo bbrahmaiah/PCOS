@@ -14,6 +14,9 @@ def test_settings_loads_from_yaml() -> None:
 
     assert settings.runtime.system_name == "JARVIS_OS"
     assert settings.runtime.environment == RuntimeEnvironment.DEVELOPMENT
+    assert settings.runtime.debug is True
+    assert settings.runtime.version == "0.1.0"
+    assert settings.logging.log_level == "INFO"
     assert settings.workers.max_concurrent_tasks == 100
 
 
@@ -52,6 +55,38 @@ runtime:
 
 workers:
   max_concurrent_tasks: 0
+""",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValidationError):
+        RuntimeSettings.from_yaml(bad_yaml)
+
+
+def test_invalid_log_level_fails(tmp_path: Path) -> None:
+    bad_yaml = tmp_path / "runtime.yaml"
+    bad_yaml.write_text(
+        """
+logging:
+  log_level: WRONG
+""",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValidationError):
+        RuntimeSettings.from_yaml(bad_yaml)
+
+
+def test_unknown_key_inside_section_fails(tmp_path: Path) -> None:
+    bad_yaml = tmp_path / "runtime.yaml"
+    bad_yaml.write_text(
+        """
+runtime:
+  system_name: JARVIS_OS
+  environment: development
+  debug: true
+  version: 0.1.0
+  unexpected_key: should_fail
 """,
         encoding="utf-8",
     )

@@ -1,10 +1,13 @@
-from rich.console import Console
-
-console = Console()
+from jarvis.runtime.config import get_settings
 
 
 def main() -> None:
-    console.print("[bold green]JARVIS_OS Boot Sequence Initialized[/bold green]")
+    settings = get_settings()
+
+    print(
+        f"{settings.runtime.system_name} "
+        f"{settings.runtime.version} ONLINE"
+    )
 
 
 if __name__ == "__main__":

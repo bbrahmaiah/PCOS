@@ -1,7 +1,5 @@
-def test_project_bootstrap() -> None:
-    """
-    Verifies the JARVIS runtime foundation
-    initializes correctly.
-    """
+import jarvis
 
-    assert True
+
+def test_project_import() -> None:
+    assert jarvis is not None

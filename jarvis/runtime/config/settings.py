@@ -42,6 +42,25 @@ class LoggingSection(BaseModel):
     enable_console_logging: bool = True
     enable_file_logging: bool = True
 
+    @field_validator("log_level")
+    @classmethod
+    def validate_log_level(cls, value: str) -> str:
+        normalized = value.strip().upper()
+
+        allowed_log_levels = {
+            "DEBUG",
+            "INFO",
+            "WARNING",
+            "ERROR",
+            "CRITICAL",
+        }
+
+        if normalized not in allowed_log_levels:
+            raise ValueError(
+                f"logging.log_level must be one of {sorted(allowed_log_levels)}."
+            )
+
+        return normalized
 
 class WorkerSection(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
