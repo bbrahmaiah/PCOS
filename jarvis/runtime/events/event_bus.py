@@ -10,13 +10,17 @@ from typing import Final
 
 from jarvis.runtime.events.event_models import RuntimeEvent
 from jarvis.runtime.events.priorities import priority_for_event
-from jarvis.runtime.events.subscriptions import EventCallback, EventSubscription
+from jarvis.runtime.events.subscriptions import (
+    EventCallback,
+    EventSubscription,
+)
 from jarvis.runtime.observability.metrics import get_metrics
-from jarvis.runtime.observability.performance_monitor import get_performance_monitor
+from jarvis.runtime.observability.performance_monitor import (
+    get_performance_monitor,
+)
 from jarvis.runtime.observability.structured_logger import get_logger
 from jarvis.runtime.observability.tracing import get_tracer
 from jarvis.runtime.shared.enums import EventPriority, EventType
-
 
 _PRIORITY_RANK: Final[dict[EventPriority, int]] = {
     EventPriority.CRITICAL: 0,
@@ -105,7 +109,10 @@ class EventBus:
         self._queue: PriorityQueue[tuple[int, int, RuntimeEvent]] = PriorityQueue()
         self._sequence = count()
 
-        self._subscriptions: dict[EventType, list[EventSubscription]] = defaultdict(list)
+        self._subscriptions: dict[
+    EventType,
+    list[EventSubscription],
+] = defaultdict(list)
         self._history: deque[RuntimeEvent] = deque(maxlen=history_limit)
         self._dead_letters: deque[DeadLetterEvent] = deque(maxlen=dead_letter_limit)
 
