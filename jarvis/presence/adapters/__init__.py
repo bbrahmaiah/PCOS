@@ -1,5 +1,14 @@
 from __future__ import annotations
 
+from jarvis.presence.adapters.fake_adapters import (
+    FakeAudioPlaybackAdapter,
+    FakeMicrophoneAdapter,
+    FakeSpeechToTextAdapter,
+    FakeTextToSpeechAdapter,
+    FakeVoiceActivityAdapter,
+    FakeWakeWordAdapter,
+    make_fake_audio_frame,
+)
 from jarvis.presence.adapters.microphone_adapter import (
     MicrophoneAdapter,
     MicrophoneDevice,
@@ -19,6 +28,12 @@ from jarvis.presence.adapters.wake_word_adapter import (
 
 __all__ = [
     "AudioPlaybackAdapter",
+    "FakeAudioPlaybackAdapter",
+    "FakeMicrophoneAdapter",
+    "FakeSpeechToTextAdapter",
+    "FakeTextToSpeechAdapter",
+    "FakeVoiceActivityAdapter",
+    "FakeWakeWordAdapter",
     "MicrophoneAdapter",
     "MicrophoneDevice",
     "PlaybackResult",
@@ -28,4 +43,5 @@ __all__ = [
     "VoiceActivityAdapter",
     "WakeWordAdapter",
     "WakeWordDetection",
+    "make_fake_audio_frame",
 ]
