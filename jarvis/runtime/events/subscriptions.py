@@ -1,12 +1,11 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Callable
 from uuid import uuid4
 
 from jarvis.runtime.events.event_models import RuntimeEvent
 from jarvis.runtime.shared.enums import EventType
-
 
 EventCallback = Callable[[RuntimeEvent], None]
 

@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Iterator
 from contextlib import contextmanager
 from time import perf_counter
-from typing import Iterator
 
 from jarvis.runtime.observability.metrics import get_metrics
 from jarvis.runtime.observability.structured_logger import get_logger

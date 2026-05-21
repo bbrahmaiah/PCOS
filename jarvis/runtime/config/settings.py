@@ -20,7 +20,6 @@ from jarvis.runtime.shared.constants import (
 )
 from jarvis.runtime.shared.enums import RuntimeEnvironment
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 CONFIG_DIR = Path(__file__).resolve().parent
 RUNTIME_YAML = CONFIG_DIR / "runtime.yaml"

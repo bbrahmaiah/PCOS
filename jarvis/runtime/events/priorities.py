@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from jarvis.runtime.shared.enums import EventPriority, EventType
 
-
 CRITICAL_EVENTS: set[EventType] = {
     EventType.INTERRUPT_REQUESTED,
     EventType.RUNTIME_STOPPING,

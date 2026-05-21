@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any, Self
 from uuid import uuid4
 
@@ -11,7 +11,7 @@ from jarvis.runtime.shared.enums import EventCategory, EventPriority, EventType
 
 
 def utc_now() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 def new_id() -> str:
