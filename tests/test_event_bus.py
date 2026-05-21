@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from datetime import timedelta
-from time import sleep
 
 import pytest
 
@@ -97,14 +96,16 @@ def test_event_bus_records_dead_letter_for_expired_event() -> None:
         lambda event: received.append(event),
     )
 
+    created_at = utc_now() - timedelta(seconds=2)
+    deadline_at = utc_now() - timedelta(seconds=1)
+
     event = RuntimeEvent(
         event_type=EventType.USER_SPOKE,
         category=EventCategory.PRESENCE,
         source="test",
-        deadline_at=utc_now() + timedelta(milliseconds=1),
+        created_at=created_at,
+        deadline_at=deadline_at,
     )
-
-    sleep(0.01)
 
     delivered = bus.publish_sync(event)
     dead_letters = bus.dead_letters()
