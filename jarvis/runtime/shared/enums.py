@@ -85,7 +85,7 @@ class EventCategory(StrEnum):
 
 
 class EventType(StrEnum):
-    # Runtime
+    # Runtime lifecycle
     RUNTIME_STARTING = "runtime.starting"
     RUNTIME_STARTED = "runtime.started"
     RUNTIME_STOPPING = "runtime.stopping"
@@ -115,12 +115,49 @@ class EventType(StrEnum):
     POLICY_EVALUATED = "security.policy_evaluated"
     AUDIT_RECORDED = "security.audit_recorded"
 
-    # Presence
+    # Presence - legacy/simple contracts.
+    # Keep these for backward compatibility with Phase 1 tests and early runtime flows.
     WAKE_WORD_DETECTED = "presence.wake_word_detected"
     USER_SPOKE = "presence.user_spoke"
     SPEECH_STARTED = "presence.speech_started"
     SPEECH_ENDED = "presence.speech_ended"
     INTERRUPT_REQUESTED = "presence.interrupt_requested"
+
+    # Presence lifecycle
+    PRESENCE_STARTED = "presence.started"
+    PRESENCE_STOPPED = "presence.stopped"
+    PRESENCE_STATE_CHANGED = "presence.state_changed"
+
+    # Presence listening and wake flow
+    PRESENCE_WAKE_DETECTED = "presence.wake_detected"
+    PRESENCE_SLEEP_REQUESTED = "presence.sleep_requested"
+    PRESENCE_LISTEN_STARTED = "presence.listen_started"
+    PRESENCE_LISTEN_STOPPED = "presence.listen_stopped"
+    PRESENCE_LISTEN_TIMEOUT = "presence.listen_timeout"
+
+    # Presence user speech flow
+    PRESENCE_USER_STARTED_SPEAKING = "presence.user_started_speaking"
+    PRESENCE_USER_STOPPED_SPEAKING = "presence.user_stopped_speaking"
+    PRESENCE_USER_INTERRUPTED = "presence.user_interrupted"
+
+    # Presence transcript flow
+    PRESENCE_TRANSCRIPT_PARTIAL = "presence.transcript_partial"
+    PRESENCE_TRANSCRIPT_FINAL = "presence.transcript_final"
+    PRESENCE_TRANSCRIPT_REJECTED = "presence.transcript_rejected"
+
+    # Presence assistant speech flow
+    PRESENCE_ASSISTANT_SPEAKING_STARTED = "presence.assistant_speaking_started"
+    PRESENCE_ASSISTANT_SPEAKING_STOPPED = "presence.assistant_speaking_stopped"
+    PRESENCE_ASSISTANT_SPEECH_CANCELLED = "presence.assistant_speech_cancelled"
+
+    # Presence audio lifecycle.
+    # These are categorized as EventCategory.PRESENCE for now.
+    AUDIO_FRAME_CAPTURED = "audio.frame_captured"
+    AUDIO_SPEECH_SEGMENT_STARTED = "audio.speech_segment_started"
+    AUDIO_SPEECH_SEGMENT_COMPLETED = "audio.speech_segment_completed"
+    AUDIO_PLAYBACK_STARTED = "audio.playback_started"
+    AUDIO_PLAYBACK_STOPPED = "audio.playback_stopped"
+    AUDIO_PLAYBACK_FAILED = "audio.playback_failed"
 
     # Awareness
     WINDOW_CHANGED = "awareness.window_changed"
