@@ -40,12 +40,6 @@ class VoiceInputWorker(BaseWorker):
     - does not perform STT
     - does not mutate Presence state
     - safe for future real-time parallel runtime
-
-    Future flow:
-        VoiceInputWorker -> AUDIO_FRAME_CAPTURED event
-        WakeDetectorWorker consumes AUDIO_FRAME_CAPTURED
-        VADWorker consumes AUDIO_FRAME_CAPTURED
-        InterruptionWorker consumes AUDIO_FRAME_CAPTURED
     """
 
     def __init__(
@@ -58,13 +52,6 @@ class VoiceInputWorker(BaseWorker):
         daemon: bool = True,
         auto_start_microphone: bool = True,
     ) -> None:
-        super().__init__(
-            name=name,
-            event_bus=event_bus,
-            tick_interval_seconds=poll_interval_seconds,
-            daemon=daemon,
-        )
-
         clean_name = name.strip()
 
         if not clean_name:
@@ -72,6 +59,13 @@ class VoiceInputWorker(BaseWorker):
 
         if poll_interval_seconds <= 0:
             raise ValueError("poll_interval_seconds must be greater than zero.")
+
+        super().__init__(
+            name=clean_name,
+            event_bus=event_bus,
+            tick_interval_seconds=poll_interval_seconds,
+            daemon=daemon,
+        )
 
         self._microphone = microphone
         self._auto_start_microphone = auto_start_microphone
@@ -135,9 +129,6 @@ class VoiceInputWorker(BaseWorker):
     def run_once(self) -> None:
         """
         Capture and publish one audio frame if available.
-
-        This method is intentionally small and deterministic so it can be
-        called directly in tests and repeatedly by BaseWorker's run loop.
         """
 
         if self._auto_start_microphone and not self._microphone.is_running:
@@ -210,6 +201,7 @@ class VoiceInputWorker(BaseWorker):
     @staticmethod
     def _build_audio_frame_payload(frame: AudioFrame) -> dict[str, Any]:
         return {
+            "frame": frame,
             "frame_id": frame.frame_id,
             "source": frame.source,
             "sample_rate": frame.sample_rate,
