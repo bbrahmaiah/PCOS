@@ -130,6 +130,11 @@ class EventType(StrEnum):
     PRESENCE_STOPPED = "presence.stopped"
     PRESENCE_STATE_CHANGED = "presence.state_changed"
 
+    # Presence engine
+    PRESENCE_ENGINE_STARTED = "presence.engine_started"
+    PRESENCE_ENGINE_STOPPED = "presence.engine_stopped"
+    PRESENCE_ENGINE_FAILED = "presence.engine_failed"
+
     # Presence listening and wake flow
     PRESENCE_WAKE_DETECTED = "presence.wake_detected"
     PRESENCE_SLEEP_REQUESTED = "presence.sleep_requested"
