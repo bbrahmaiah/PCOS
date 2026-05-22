@@ -6,6 +6,11 @@ from jarvis.presence.presence_engine import (
     PresenceEngineSnapshot,
     PresenceEngineWorkers,
 )
+from jarvis.presence.validation import (
+    PresenceIntegrationValidator,
+    PresenceValidationCheck,
+    PresenceValidationReport,
+)
 
 PRESENCE_PACKAGE_NAME = "jarvis.presence"
 
@@ -15,4 +20,7 @@ __all__ = [
     "PresenceEngineAdapters",
     "PresenceEngineSnapshot",
     "PresenceEngineWorkers",
+    "PresenceIntegrationValidator",
+    "PresenceValidationCheck",
+    "PresenceValidationReport",
 ]
