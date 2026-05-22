@@ -13,6 +13,8 @@ if str(PROJECT_ROOT) not in sys.path:
 from jarvis.presence.adapters import (
     EnergyVoiceActivityAdapter,
     EnergyVoiceActivityConfig,
+    RealAudioPlaybackAdapter,
+    RealAudioPlaybackConfig,
     RealSpeechToTextAdapter,
     RealSpeechToTextConfig,
 )
@@ -129,10 +131,17 @@ def main() -> int:
         )
     )
 
+    playback = RealAudioPlaybackAdapter(
+        config=RealAudioPlaybackConfig(
+            block_until_finished=True,
+        )
+    )
+
     report = FullVoiceSmokeHarness(
         config=config,
         vad=vad,
         stt=stt,
+        playback=playback,
     ).run()
 
     print()

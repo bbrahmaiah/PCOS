@@ -56,8 +56,14 @@ class SoundDeviceAudioPlaybackBackend:
     require speaker hardware.
     """
 
-    def __init__(self, *, dtype: str = "int16") -> None:
+    def __init__(
+        self,
+        *,
+        dtype: str = "int16",
+        block_until_finished: bool = False,
+    ) -> None:
         self._dtype = dtype
+        self._block_until_finished = block_until_finished
         self._active = False
         self._lock = Lock()
         self._logger = get_logger("presence.real_playback.sounddevice")
@@ -99,7 +105,15 @@ class SoundDeviceAudioPlaybackBackend:
             if channels > 1:
                 samples = samples.reshape(-1, channels)
 
-            sd.play(samples, samplerate=sample_rate, blocking=False)
+            sd.play(
+                samples,
+                samplerate=sample_rate,
+                blocking=self._block_until_finished,
+            )
+
+            if self._block_until_finished:
+                with self._lock:
+                    self._active = False
 
         except Exception:
             with self._lock:
@@ -156,7 +170,8 @@ class RealAudioPlaybackAdapter:
         self._config.validate()
 
         self._backend = backend or SoundDeviceAudioPlaybackBackend(
-            dtype=self._config.dtype
+            dtype=self._config.dtype,
+            block_until_finished=self._config.block_until_finished,
         )
 
         self._lock = Lock()
