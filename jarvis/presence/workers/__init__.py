@@ -6,6 +6,7 @@ from jarvis.presence.workers.dialogue_bridge_worker import (
     DialogueBridgeWorkerSnapshot,
 )
 from jarvis.presence.workers.stt_worker import STTWorker, STTWorkerSnapshot
+from jarvis.presence.workers.tts_worker import TTSWorker, TTSWorkerSnapshot
 from jarvis.presence.workers.vad_worker import VADWorker, VADWorkerSnapshot
 from jarvis.presence.workers.voice_input_worker import (
     VoiceInputWorker,
@@ -22,6 +23,8 @@ __all__ = [
     "DialogueBridgeWorkerSnapshot",
     "STTWorker",
     "STTWorkerSnapshot",
+    "TTSWorker",
+    "TTSWorkerSnapshot",
     "VADWorker",
     "VADWorkerSnapshot",
     "VoiceInputWorker",

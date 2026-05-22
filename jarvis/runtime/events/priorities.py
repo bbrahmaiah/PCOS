@@ -47,6 +47,11 @@ HIGH_PRIORITY_EVENTS: set[EventType] = {
     EventType.PRESENCE_USER_STOPPED_SPEAKING,
     EventType.PRESENCE_TRANSCRIPT_FINAL,
 
+    EventType.TTS_SYNTHESIS_STARTED,
+    EventType.TTS_SYNTHESIS_COMPLETED,
+    EventType.TTS_SYNTHESIS_FAILED,
+    EventType.AUDIO_SPEECH_CHUNK_READY,
+
     # Audio failure must surface quickly
     EventType.AUDIO_PLAYBACK_FAILED,
 }

@@ -122,6 +122,8 @@ class EventType(StrEnum):
     SPEECH_STARTED = "presence.speech_started"
     SPEECH_ENDED = "presence.speech_ended"
     INTERRUPT_REQUESTED = "presence.interrupt_requested"
+    
+    
 
     # Presence lifecycle
     PRESENCE_STARTED = "presence.started"
@@ -194,6 +196,12 @@ class EventType(StrEnum):
     ASSISTANT_RESPONSE_READY = "dialogue.response_ready"
     ASSISTANT_SPEAKING_STARTED = "dialogue.speaking_started"
     ASSISTANT_SPEAKING_STOPPED = "dialogue.speaking_stopped"
+    
+    # TTS / generated speech audio
+    TTS_SYNTHESIS_STARTED = "tts.synthesis_started"
+    TTS_SYNTHESIS_COMPLETED = "tts.synthesis_completed"
+    TTS_SYNTHESIS_FAILED = "tts.synthesis_failed"
+    AUDIO_SPEECH_CHUNK_READY = "audio.speech_chunk_ready"
 
     # Operations / observability
     METRIC_RECORDED = "operations.metric_recorded"
