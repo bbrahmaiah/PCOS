@@ -24,6 +24,12 @@ from jarvis.presence.adapters.real_microphone_adapter import (
     RealMicrophoneConfig,
     SoundDeviceRawMicrophoneBackend,
 )
+from jarvis.presence.adapters.real_playback_adapter import (
+    AudioPlaybackBackend,
+    RealAudioPlaybackAdapter,
+    RealAudioPlaybackConfig,
+    SoundDeviceAudioPlaybackBackend,
+)
 from jarvis.presence.adapters.real_stt_adapter import (
     FasterWhisperSpeechToTextBackend,
     RealSpeechToTextAdapter,
@@ -31,6 +37,16 @@ from jarvis.presence.adapters.real_stt_adapter import (
     SpeechToTextBackend,
     log_probability_to_confidence,
     pcm_to_wav_bytes,
+)
+from jarvis.presence.adapters.real_tts_adapter import (
+    Pyttsx3TextToSpeechBackend,
+    RealTextToSpeechAdapter,
+    RealTextToSpeechConfig,
+    TextToSpeechBackend,
+    wav_bytes_to_pcm,
+)
+from jarvis.presence.adapters.real_tts_adapter import (
+    pcm_to_wav_bytes as tts_pcm_to_wav_bytes,
 )
 from jarvis.presence.adapters.real_voice_activity_adapter import (
     AudioEnergyFeatures,
@@ -50,6 +66,16 @@ from jarvis.presence.adapters.wake_word_adapter import (
 
 __all__ = [
 
+    "AudioPlaybackBackend",
+    "Pyttsx3TextToSpeechBackend",
+    "RealAudioPlaybackAdapter",
+    "RealAudioPlaybackConfig",
+    "RealTextToSpeechAdapter",
+    "RealTextToSpeechConfig",
+    "SoundDeviceAudioPlaybackBackend",
+    "TextToSpeechBackend",
+    "tts_pcm_to_wav_bytes",
+    "wav_bytes_to_pcm",
     "FasterWhisperSpeechToTextBackend",
     "RealSpeechToTextAdapter",
     "RealSpeechToTextConfig",
