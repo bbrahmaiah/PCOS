@@ -24,6 +24,14 @@ from jarvis.presence.adapters.real_microphone_adapter import (
     RealMicrophoneConfig,
     SoundDeviceRawMicrophoneBackend,
 )
+from jarvis.presence.adapters.real_voice_activity_adapter import (
+    AudioEnergyFeatures,
+    EnergyVoiceActivityAdapter,
+    EnergyVoiceActivityConfig,
+    EnergyWakeWordAdapter,
+    EnergyWakeWordConfig,
+    extract_int16_audio_features,
+)
 from jarvis.presence.adapters.stt_adapter import SpeechToTextAdapter
 from jarvis.presence.adapters.tts_adapter import TextToSpeechAdapter
 from jarvis.presence.adapters.vad_adapter import VoiceActivityAdapter
@@ -34,6 +42,13 @@ from jarvis.presence.adapters.wake_word_adapter import (
 
 __all__ = [
 
+
+    "AudioEnergyFeatures",
+    "EnergyVoiceActivityAdapter",
+    "EnergyVoiceActivityConfig",
+    "EnergyWakeWordAdapter",
+    "EnergyWakeWordConfig",
+    "extract_int16_audio_features",
     "RawMicrophoneBackend",
     "RealMicrophoneAdapter",
     "RealMicrophoneConfig",
