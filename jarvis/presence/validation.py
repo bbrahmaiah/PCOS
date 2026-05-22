@@ -106,6 +106,18 @@ class PresenceIntegrationValidator:
 
             self._drive_voice_pipeline(engine)
 
+            self._wait_for(
+                lambda: self._history_contains(
+                    engine,
+                    EventType.ASSISTANT_RESPONSE_REQUESTED,
+                )
+            )
+            self._wait_for(
+                lambda: engine.workers.dialogue_bridge.dialogue_snapshot()
+                .response_requests
+                >= 1
+            )
+
             checks.append(self._check_voice_pipeline(engine))
             checks.append(self._check_dialogue_bridge(engine))
 
@@ -228,6 +240,12 @@ class PresenceIntegrationValidator:
         engine.workers.voice_input.run_once()
         engine.workers.voice_input.run_once()
 
+        self._wait_for(
+            lambda: self._history_contains(
+                engine,
+                EventType.AUDIO_SPEECH_SEGMENT_COMPLETED,
+            )
+        )
         self._wait_for(
             lambda: self._history_contains(
                 engine,
