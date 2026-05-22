@@ -16,15 +16,30 @@ class SpeechAudioSegment(Protocol):
     """
     Minimal speech-segment contract required by RealSpeechToTextAdapter.
 
-    The adapter intentionally depends on this small structural protocol instead
-    of a concrete model class. That keeps real STT independent from VAD models.
+    Read-only properties keep the adapter compatible with frozen dataclasses,
+    Pydantic models, and mutable test stubs. STT only reads segment data; it
+    must never mutate the segment.
     """
 
-    segment_id: str
-    audio_data: bytes
-    sample_rate: int
-    channels: int
-    metadata: dict[str, Any]
+    @property
+    def segment_id(self) -> str:
+        """Stable segment identifier."""
+
+    @property
+    def audio_data(self) -> bytes:
+        """Raw PCM audio bytes."""
+
+    @property
+    def sample_rate(self) -> int:
+        """Audio sample rate."""
+
+    @property
+    def channels(self) -> int:
+        """Audio channel count."""
+
+    @property
+    def metadata(self) -> dict[str, Any]:
+        """Segment metadata."""
 
 
 @runtime_checkable
