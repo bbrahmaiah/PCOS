@@ -18,6 +18,12 @@ from jarvis.presence.adapters.playback_adapter import (
     PlaybackResult,
     PlaybackStatus,
 )
+from jarvis.presence.adapters.real_microphone_adapter import (
+    RawMicrophoneBackend,
+    RealMicrophoneAdapter,
+    RealMicrophoneConfig,
+    SoundDeviceRawMicrophoneBackend,
+)
 from jarvis.presence.adapters.stt_adapter import SpeechToTextAdapter
 from jarvis.presence.adapters.tts_adapter import TextToSpeechAdapter
 from jarvis.presence.adapters.vad_adapter import VoiceActivityAdapter
@@ -27,6 +33,11 @@ from jarvis.presence.adapters.wake_word_adapter import (
 )
 
 __all__ = [
+
+    "RawMicrophoneBackend",
+    "RealMicrophoneAdapter",
+    "RealMicrophoneConfig",
+    "SoundDeviceRawMicrophoneBackend",
     "AudioPlaybackAdapter",
     "FakeAudioPlaybackAdapter",
     "FakeMicrophoneAdapter",
