@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+from jarvis.presence.workers.audio_playback_worker import (
+    AudioPlaybackWorker,
+    AudioPlaybackWorkerSnapshot,
+)
 from jarvis.presence.workers.dialogue_bridge_worker import (
     DialogueBridgePolicy,
     DialogueBridgeWorker,
@@ -18,6 +22,8 @@ from jarvis.presence.workers.wake_detector_worker import (
 )
 
 __all__ = [
+    "AudioPlaybackWorker",
+    "AudioPlaybackWorkerSnapshot",
     "DialogueBridgePolicy",
     "DialogueBridgeWorker",
     "DialogueBridgeWorkerSnapshot",

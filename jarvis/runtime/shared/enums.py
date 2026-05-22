@@ -158,6 +158,7 @@ class EventType(StrEnum):
     AUDIO_SPEECH_SEGMENT_STARTED = "audio.speech_segment_started"
     AUDIO_SPEECH_SEGMENT_COMPLETED = "audio.speech_segment_completed"
     AUDIO_PLAYBACK_STARTED = "audio.playback_started"
+    AUDIO_PLAYBACK_COMPLETED = "audio.playback_completed"
     AUDIO_PLAYBACK_STOPPED = "audio.playback_stopped"
     AUDIO_PLAYBACK_FAILED = "audio.playback_failed"
 
