@@ -46,18 +46,20 @@ class AudioPlaybackWorker(BaseWorker):
 
     Design:
     - consumes audio.speech_chunk_ready events
+    - consumes presence.interrupt_requested events
     - depends only on AudioPlaybackAdapter interface
     - publishes playback lifecycle events
     - optionally updates PresenceStateStore
     - does not synthesize speech
     - does not capture microphone audio
-    - does not perform interruption detection
+    - does not detect interruptions
     - does not call cognition/dialogue
 
-    Future flow:
-        TTSWorker -> audio.speech_chunk_ready
-        AudioPlaybackWorker -> audio.playback_started
-        InterruptionWorker -> stop_playback()
+    Runtime ownership:
+    - TTSWorker creates audio chunks.
+    - AudioPlaybackWorker plays/stops audio chunks.
+    - InterruptionWorker requests interruption.
+    - PresenceStateStore owns conversational state.
     """
 
     def __init__(
@@ -117,7 +119,7 @@ class AudioPlaybackWorker(BaseWorker):
 
     def on_start(self) -> None:
         """
-        Subscribe to speech chunk events when the worker starts.
+        Subscribe to speech chunk and interruption events when the worker starts.
         """
 
         if not self._auto_subscribe:
@@ -132,12 +134,18 @@ class AudioPlaybackWorker(BaseWorker):
                 subscriber_name=self.name,
                 callback=self.handle_speech_chunk_event,
             )
+            self.event_bus.subscribe(
+                event_type=EventType.INTERRUPT_REQUESTED,
+                subscriber_name=f"{self.name}_interrupt",
+                callback=self.handle_interrupt_requested_event,
+            )
             self._subscribed = True
 
         self._logger.info(
             "audio_playback_worker_subscribed",
             worker=self.name,
             event_type=EventType.AUDIO_SPEECH_CHUNK_READY.value,
+            interrupt_event_type=EventType.INTERRUPT_REQUESTED.value,
         )
 
     def on_stop(self) -> None:
@@ -158,7 +166,7 @@ class AudioPlaybackWorker(BaseWorker):
         """
         Event-driven worker loop placeholder.
 
-        Playback work happens through handle_speech_chunk_event().
+        Playback work happens through event callbacks.
         """
 
     def handle_speech_chunk_event(self, event: RuntimeEvent) -> None:
@@ -177,6 +185,23 @@ class AudioPlaybackWorker(BaseWorker):
             return
 
         self.process_chunk(chunk=chunk, source_event=event)
+
+    def handle_interrupt_requested_event(self, event: RuntimeEvent) -> None:
+        """
+        Stop playback when an interruption is requested.
+        """
+
+        if event.event_type != EventType.INTERRUPT_REQUESTED:
+            self._record_ignored_event()
+            return
+
+        request_id = self._extract_optional_string(event, "request_id")
+
+        self.stop_playback(
+            request_id=request_id,
+            reason="interruption",
+            source_event=event,
+        )
 
     def process_chunk(
         self,
@@ -239,7 +264,8 @@ class AudioPlaybackWorker(BaseWorker):
         """
         Stop active playback.
 
-        InterruptionWorker will use this method later.
+        InterruptionWorker requests interruption through EventBus.
+        AudioPlaybackWorker performs the actual stop through the adapter.
         """
 
         with self._lock:
@@ -250,24 +276,21 @@ class AudioPlaybackWorker(BaseWorker):
         if result is None:
             return None
 
-        chunk_id = result.chunk_id
-        active_request_id = result.request_id
-
         with self._lock:
             self._playback_stopped += 1
             self._active_request_id = None
             self._active_chunk_id = None
             self._last_result_id = result.result_id
             self._last_status = result.status.value
-            self._last_error = None
+            self._last_error = result.error
 
         self._publish_event(
             event_type=EventType.AUDIO_PLAYBACK_STOPPED,
             payload={
                 "result": result,
                 "result_id": result.result_id,
-                "request_id": active_request_id,
-                "chunk_id": chunk_id,
+                "request_id": result.request_id,
+                "chunk_id": result.chunk_id,
                 "status": result.status.value,
                 "reason": reason,
                 "played_at": result.played_at.isoformat(),
@@ -277,7 +300,7 @@ class AudioPlaybackWorker(BaseWorker):
         )
 
         self._mark_assistant_speaking_finished(
-            request_id=active_request_id,
+            request_id=result.request_id,
             source_event=source_event,
             reason=reason,
         )
@@ -285,8 +308,8 @@ class AudioPlaybackWorker(BaseWorker):
         self._logger.info(
             "audio_playback_stopped",
             worker=self.name,
-            request_id=active_request_id,
-            chunk_id=chunk_id,
+            request_id=result.request_id,
+            chunk_id=result.chunk_id,
             reason=reason,
         )
 
@@ -420,10 +443,8 @@ class AudioPlaybackWorker(BaseWorker):
         result: PlaybackResult,
         source_event: RuntimeEvent | None,
     ) -> None:
-        event_type = self._event_type_for_status(result.status)
-
         self._publish_event(
-            event_type=event_type,
+            event_type=self._event_type_for_status(result.status),
             payload={
                 "result": result,
                 "result_id": result.result_id,
@@ -510,5 +531,17 @@ class AudioPlaybackWorker(BaseWorker):
 
         if isinstance(chunk, SpeechChunk):
             return chunk
+
+        return None
+
+    @staticmethod
+    def _extract_optional_string(
+        event: RuntimeEvent,
+        key: str,
+    ) -> str | None:
+        value = event.payload.get(key)
+
+        if isinstance(value, str) and value.strip():
+            return value
 
         return None

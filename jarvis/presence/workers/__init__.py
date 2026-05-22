@@ -9,6 +9,10 @@ from jarvis.presence.workers.dialogue_bridge_worker import (
     DialogueBridgeWorker,
     DialogueBridgeWorkerSnapshot,
 )
+from jarvis.presence.workers.interruption_worker import (
+    InterruptionWorker,
+    InterruptionWorkerSnapshot,
+)
 from jarvis.presence.workers.stt_worker import STTWorker, STTWorkerSnapshot
 from jarvis.presence.workers.tts_worker import TTSWorker, TTSWorkerSnapshot
 from jarvis.presence.workers.vad_worker import VADWorker, VADWorkerSnapshot
@@ -27,6 +31,8 @@ __all__ = [
     "DialogueBridgePolicy",
     "DialogueBridgeWorker",
     "DialogueBridgeWorkerSnapshot",
+    "InterruptionWorker",
+    "InterruptionWorkerSnapshot",
     "STTWorker",
     "STTWorkerSnapshot",
     "TTSWorker",
