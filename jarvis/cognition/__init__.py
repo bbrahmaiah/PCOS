@@ -17,10 +17,21 @@ from jarvis.cognition.models import (
     CognitionTokenKind,
     SpokenResponseStyle,
 )
+from jarvis.cognition.state_store import (
+    CognitionRunState,
+    CognitionStateStore,
+    CognitionStateStoreSnapshot,
+    CognitionTransitionResult,
+)
 
 COGNITION_PACKAGE_NAME = "jarvis.cognition"
 
 __all__ = [
+
+    "CognitionRunState",
+    "CognitionStateStore",
+    "CognitionStateStoreSnapshot",
+    "CognitionTransitionResult",
     "COGNITION_PACKAGE_NAME",
     "CognitionContext",
     "CognitionContextItem",
