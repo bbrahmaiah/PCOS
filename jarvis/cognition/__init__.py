@@ -41,12 +41,21 @@ from jarvis.cognition.state_store import (
     CognitionStateStoreSnapshot,
     CognitionTransitionResult,
 )
+from jarvis.cognition.worker import (
+    CognitionWorker,
+    CognitionWorkerConfig,
+    CognitionWorkerResult,
+    CognitionWorkerSnapshot,
+)
 
 COGNITION_PACKAGE_NAME = "jarvis.cognition"
 
 __all__ = [
 
-
+    "CognitionWorker",
+    "CognitionWorkerConfig",
+    "CognitionWorkerResult",
+    "CognitionWorkerSnapshot",
     "FakeCognitionAdapter",
     "FakeCognitionConfig",
     "FakeCognitionMode",
