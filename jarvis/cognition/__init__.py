@@ -47,6 +47,15 @@ from jarvis.cognition.models import (
     CognitionTokenKind,
     SpokenResponseStyle,
 )
+from jarvis.cognition.planning import (
+    ResponseAnswerMode,
+    ResponseIntent,
+    ResponsePlanner,
+    ResponsePlannerConfig,
+    ResponsePlannerSnapshot,
+    ResponsePlanningDecision,
+    ResponseSafetyPosture,
+)
 from jarvis.cognition.response_bridge import (
     CognitionDialogueBridgeConfig,
     CognitionDialogueBridgeResult,
@@ -70,6 +79,13 @@ COGNITION_PACKAGE_NAME = "jarvis.cognition"
 
 __all__ = [
 
+    "ResponseAnswerMode",
+    "ResponseIntent",
+    "ResponsePlanner",
+    "ResponsePlannerConfig",
+    "ResponsePlannerSnapshot",
+    "ResponsePlanningDecision",
+    "ResponseSafetyPosture",
     "CognitionEngine",
     "CognitionEngineConfig",
     "CognitionEngineResult",
