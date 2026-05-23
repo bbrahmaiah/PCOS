@@ -128,6 +128,7 @@ class EventType(StrEnum):
     PRESENCE_STARTED = "presence.started"
     PRESENCE_STOPPED = "presence.stopped"
     PRESENCE_STATE_CHANGED = "presence.state_changed"
+    PRESENCE_INTERRUPT_REQUESTED = "presence.interrupt_requested"
 
     # Presence engine
     PRESENCE_ENGINE_STARTED = "presence.engine_started"

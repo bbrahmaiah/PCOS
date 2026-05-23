@@ -30,6 +30,16 @@ from jarvis.cognition.fake_adapter import (
     FakeCognitionConfig,
     FakeCognitionMode,
 )
+from jarvis.cognition.interruption import (
+    CognitionCancelWorker,
+    CognitionCancelWorkerConfig,
+    CognitionCancelWorkerResult,
+    CognitionCancelWorkerSnapshot,
+    PresenceCognitionInterruptBridgeConfig,
+    PresenceCognitionInterruptBridgeResult,
+    PresenceCognitionInterruptBridgeSnapshot,
+    PresenceCognitionInterruptBridgeWorker,
+)
 from jarvis.cognition.models import (
     CognitionContext,
     CognitionContextItem,
@@ -87,6 +97,15 @@ COGNITION_PACKAGE_NAME = "jarvis.cognition"
 
 __all__ = [
 
+
+    "CognitionCancelWorker",
+    "CognitionCancelWorkerConfig",
+    "CognitionCancelWorkerResult",
+    "CognitionCancelWorkerSnapshot",
+    "PresenceCognitionInterruptBridgeConfig",
+    "PresenceCognitionInterruptBridgeResult",
+    "PresenceCognitionInterruptBridgeSnapshot",
+    "PresenceCognitionInterruptBridgeWorker",
     "SpokenDialogueAct",
     "SpokenDialoguePolicy",
     "SpokenDialoguePolicyConfig",
