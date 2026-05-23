@@ -19,6 +19,12 @@ from jarvis.cognition.dialogue_bridge import (
     DialogueCognitionBridgeSnapshot,
     DialogueCognitionBridgeWorker,
 )
+from jarvis.cognition.engine import (
+    CognitionEngine,
+    CognitionEngineConfig,
+    CognitionEngineResult,
+    CognitionEngineSnapshot,
+)
 from jarvis.cognition.fake_adapter import (
     FakeCognitionAdapter,
     FakeCognitionConfig,
@@ -64,6 +70,10 @@ COGNITION_PACKAGE_NAME = "jarvis.cognition"
 
 __all__ = [
 
+    "CognitionEngine",
+    "CognitionEngineConfig",
+    "CognitionEngineResult",
+    "CognitionEngineSnapshot",
     "CognitionDialogueBridgeConfig",
     "CognitionDialogueBridgeResult",
     "CognitionDialogueBridgeSnapshot",
