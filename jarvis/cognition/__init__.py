@@ -86,6 +86,16 @@ from jarvis.cognition.state_store import (
     CognitionStateStoreSnapshot,
     CognitionTransitionResult,
 )
+from jarvis.cognition.streaming import (
+    CognitionStreamingState,
+    SpeechChunkAssembler,
+    SpeechChunkKind,
+    StreamedSpeechChunk,
+    StreamingTokenPipeline,
+    StreamingTokenPipelineConfig,
+    StreamingTokenPipelineResult,
+    StreamingTokenPipelineSnapshot,
+)
 from jarvis.cognition.worker import (
     CognitionWorker,
     CognitionWorkerConfig,
@@ -97,7 +107,14 @@ COGNITION_PACKAGE_NAME = "jarvis.cognition"
 
 __all__ = [
 
-
+    "CognitionStreamingState",
+    "SpeechChunkAssembler",
+    "SpeechChunkKind",
+    "StreamedSpeechChunk",
+    "StreamingTokenPipeline",
+    "StreamingTokenPipelineConfig",
+    "StreamingTokenPipelineResult",
+    "StreamingTokenPipelineSnapshot",
     "CognitionCancelWorker",
     "CognitionCancelWorkerConfig",
     "CognitionCancelWorkerResult",

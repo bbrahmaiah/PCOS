@@ -123,6 +123,17 @@ def test_cognition_token_model() -> None:
     assert token.text == "Hello"
 
 
+def test_cognition_token_preserves_streaming_whitespace() -> None:
+    token = CognitionToken(
+        request_id=" request-1 ",
+        index=0,
+        text=" am",
+    )
+
+    assert token.request_id == "request-1"
+    assert token.text == " am"
+
+
 def test_cognition_token_rejects_invalid_values() -> None:
     with pytest.raises(ValidationError):
         CognitionToken(request_id="request-1", index=-1, text="Hello")
@@ -152,7 +163,11 @@ def test_cognition_response_rejects_invalid_values() -> None:
         CognitionResponse(request_id="request-1", text="")
 
     with pytest.raises(ValidationError):
-        CognitionResponse(request_id="request-1", text="hello", confidence=-0.1)
+        CognitionResponse(
+            request_id="request-1",
+            text="hello",
+            confidence=-0.1,
+        )
 
 
 def test_cognition_failure_model() -> None:

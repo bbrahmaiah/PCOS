@@ -241,9 +241,24 @@ class CognitionToken(CognitionModel):
     """
     One streamed cognition token/chunk.
 
-    Step 1 defines the contract now. Later streaming workers will publish these
-    through cognition.token_streamed.
+    Streaming token text must preserve whitespace.
+
+    Real streaming model backends often emit token pieces like:
+        " am"
+        " the"
+        "\\nNext"
+
+    If we strip token text, final streamed output can become broken:
+        "I am" -> "Iam"
+
+    So we preserve token.text exactly, while still rejecting fully blank tokens.
     """
+
+    model_config = ConfigDict(
+        frozen=True,
+        extra="forbid",
+        str_strip_whitespace=False,
+    )
 
     token_id: str = Field(default_factory=new_id)
     request_id: str
@@ -254,11 +269,21 @@ class CognitionToken(CognitionModel):
     created_at: datetime = Field(default_factory=utc_now)
     metadata: dict[str, Any] = Field(default_factory=dict)
 
-    @field_validator("request_id", "text")
+    @field_validator("request_id")
     @classmethod
-    def _required_token_fields(cls, value: str) -> str:
+    def _request_id_required(cls, value: str) -> str:
+        cleaned = value.strip()
+
+        if not cleaned:
+            raise ValueError("request_id cannot be empty.")
+
+        return cleaned
+
+    @field_validator("text")
+    @classmethod
+    def _token_text_required(cls, value: str) -> str:
         if not value.strip():
-            raise ValueError("field cannot be empty.")
+            raise ValueError("text cannot be empty.")
 
         return value
 
