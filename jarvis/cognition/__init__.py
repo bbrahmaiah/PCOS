@@ -62,6 +62,14 @@ from jarvis.cognition.response_bridge import (
     CognitionDialogueBridgeSnapshot,
     CognitionDialogueBridgeWorker,
 )
+from jarvis.cognition.spoken_policy import (
+    SpokenDialogueAct,
+    SpokenDialoguePolicy,
+    SpokenDialoguePolicyConfig,
+    SpokenDialoguePolicyDecision,
+    SpokenDialoguePolicySnapshot,
+    SpokenDialogueTone,
+)
 from jarvis.cognition.state_store import (
     CognitionRunState,
     CognitionStateStore,
@@ -79,6 +87,12 @@ COGNITION_PACKAGE_NAME = "jarvis.cognition"
 
 __all__ = [
 
+    "SpokenDialogueAct",
+    "SpokenDialoguePolicy",
+    "SpokenDialoguePolicyConfig",
+    "SpokenDialoguePolicyDecision",
+    "SpokenDialoguePolicySnapshot",
+    "SpokenDialogueTone",
     "ResponseAnswerMode",
     "ResponseIntent",
     "ResponsePlanner",
