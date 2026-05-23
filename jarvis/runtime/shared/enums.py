@@ -191,6 +191,7 @@ class EventType(StrEnum):
     COGNITION_FAILED = "cognition.failed"
     COGNITION_CANCEL_REQUESTED = "cognition.cancel_requested"
     DIALOGUE_RESPONSE_REQUESTED = "dialogue.response_requested"
+    DIALOGUE_RESPONSE_READY = "dialogue.response_ready"
     COGNITION_CANCELLED = "cognition.cancelled"
     PLAN_CREATED = "cognition.plan_created"
 

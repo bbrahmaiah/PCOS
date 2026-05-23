@@ -41,6 +41,12 @@ from jarvis.cognition.models import (
     CognitionTokenKind,
     SpokenResponseStyle,
 )
+from jarvis.cognition.response_bridge import (
+    CognitionDialogueBridgeConfig,
+    CognitionDialogueBridgeResult,
+    CognitionDialogueBridgeSnapshot,
+    CognitionDialogueBridgeWorker,
+)
 from jarvis.cognition.state_store import (
     CognitionRunState,
     CognitionStateStore,
@@ -58,6 +64,10 @@ COGNITION_PACKAGE_NAME = "jarvis.cognition"
 
 __all__ = [
 
+    "CognitionDialogueBridgeConfig",
+    "CognitionDialogueBridgeResult",
+    "CognitionDialogueBridgeSnapshot",
+    "CognitionDialogueBridgeWorker",
     "DialogueCognitionBridgeConfig",
     "DialogueCognitionBridgeResult",
     "DialogueCognitionBridgeSnapshot",
