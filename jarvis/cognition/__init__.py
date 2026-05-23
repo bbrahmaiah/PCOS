@@ -81,6 +81,14 @@ from jarvis.cognition.response_bridge import (
     CognitionDialogueBridgeSnapshot,
     CognitionDialogueBridgeWorker,
 )
+from jarvis.cognition.session_context import (
+    ConversationSessionConfig,
+    ConversationSessionSnapshot,
+    ConversationSessionState,
+    ConversationSessionStore,
+    ConversationTurn,
+    ConversationTurnRole,
+)
 from jarvis.cognition.spoken_policy import (
     SpokenDialogueAct,
     SpokenDialoguePolicy,
@@ -116,6 +124,12 @@ COGNITION_PACKAGE_NAME = "jarvis.cognition"
 
 __all__ = [
 
+    "ConversationSessionConfig",
+    "ConversationSessionSnapshot",
+    "ConversationSessionState",
+    "ConversationSessionStore",
+    "ConversationTurn",
+    "ConversationTurnRole",
     "LocalLLMAdapter",
     "LocalLLMAdapterConfig",
     "LocalLLMBackend",
