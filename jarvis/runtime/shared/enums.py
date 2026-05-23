@@ -187,7 +187,11 @@ class EventType(StrEnum):
     # Cognition
     COGNITION_REQUESTED = "cognition.requested"
     COGNITION_STARTED = "cognition.started"
+    COGNITION_TOKEN_STREAMED = "cognition.token_streamed"
     COGNITION_COMPLETED = "cognition.completed"
+    COGNITION_FAILED = "cognition.failed"
+    COGNITION_CANCEL_REQUESTED = "cognition.cancel_requested"
+    COGNITION_CANCELLED = "cognition.cancelled"
     PLAN_CREATED = "cognition.plan_created"
 
     # Actions

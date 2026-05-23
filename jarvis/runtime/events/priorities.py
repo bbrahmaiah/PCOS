@@ -61,6 +61,12 @@ HIGH_PRIORITY_EVENTS: set[EventType] = {
     EventType.AUDIO_PLAYBACK_STOPPED,
     EventType.AUDIO_PLAYBACK_FAILED,
 
+    EventType.COGNITION_REQUESTED,
+    EventType.COGNITION_COMPLETED,
+    EventType.COGNITION_FAILED,
+    EventType.COGNITION_CANCEL_REQUESTED,
+    EventType.COGNITION_CANCELLED,
+
     # Audio failure must surface quickly
     EventType.AUDIO_PLAYBACK_FAILED,
 }
