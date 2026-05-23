@@ -90,6 +90,13 @@ from jarvis.cognition.models import (
     CognitionTokenKind,
     SpokenResponseStyle,
 )
+from jarvis.cognition.ollama_backend import (
+    OllamaBackendConfig,
+    OllamaHttpClient,
+    OllamaLocalLLMBackend,
+    UrllibOllamaHttpClient,
+    is_ollama_connection_error,
+)
 from jarvis.cognition.phase3_validation import (
     CognitionPhase3ValidationReport,
     CognitionPhase3Validator,
@@ -155,6 +162,11 @@ COGNITION_PACKAGE_NAME = "jarvis.cognition"
 
 __all__ = [
 
+    "OllamaBackendConfig",
+    "OllamaHttpClient",
+    "OllamaLocalLLMBackend",
+    "UrllibOllamaHttpClient",
+    "is_ollama_connection_error",
     "CognitionPhase3ValidationReport",
     "CognitionPhase3Validator",
     "CognitionValidationCheck",
