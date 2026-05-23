@@ -1,5 +1,18 @@
 from __future__ import annotations
 
+from jarvis.cognition.adapters import (
+    CancellableCognitionAdapter,
+    CognitionAdapter,
+    CognitionAdapterCapability,
+    CognitionAdapterResult,
+    CognitionAdapterSnapshot,
+    CognitionAdapterStatus,
+    StreamingCognitionAdapter,
+    adapter_failure_result,
+    adapter_success_result,
+    adapter_supports,
+    duration_ms_between,
+)
 from jarvis.cognition.models import (
     CognitionContext,
     CognitionContextItem,
@@ -28,6 +41,18 @@ COGNITION_PACKAGE_NAME = "jarvis.cognition"
 
 __all__ = [
 
+
+    "CancellableCognitionAdapter",
+    "CognitionAdapter",
+    "CognitionAdapterCapability",
+    "CognitionAdapterResult",
+    "CognitionAdapterSnapshot",
+    "CognitionAdapterStatus",
+    "StreamingCognitionAdapter",
+    "adapter_failure_result",
+    "adapter_success_result",
+    "adapter_supports",
+    "duration_ms_between",
     "CognitionRunState",
     "CognitionStateStore",
     "CognitionStateStoreSnapshot",
