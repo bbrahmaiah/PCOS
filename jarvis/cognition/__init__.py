@@ -40,6 +40,15 @@ from jarvis.cognition.interruption import (
     PresenceCognitionInterruptBridgeSnapshot,
     PresenceCognitionInterruptBridgeWorker,
 )
+from jarvis.cognition.local_llm_adapter import (
+    LocalLLMAdapter,
+    LocalLLMAdapterConfig,
+    LocalLLMBackend,
+    LocalLLMBackendResult,
+    LocalLLMBackendSnapshot,
+    LocalLLMBackendStatus,
+    LocalLLMBackendToken,
+)
 from jarvis.cognition.models import (
     CognitionContext,
     CognitionContextItem,
@@ -107,6 +116,13 @@ COGNITION_PACKAGE_NAME = "jarvis.cognition"
 
 __all__ = [
 
+    "LocalLLMAdapter",
+    "LocalLLMAdapterConfig",
+    "LocalLLMBackend",
+    "LocalLLMBackendResult",
+    "LocalLLMBackendSnapshot",
+    "LocalLLMBackendStatus",
+    "LocalLLMBackendToken",
     "CognitionStreamingState",
     "SpeechChunkAssembler",
     "SpeechChunkKind",
