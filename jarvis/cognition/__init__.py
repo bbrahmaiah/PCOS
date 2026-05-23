@@ -1,5 +1,18 @@
 from __future__ import annotations
 
+from jarvis.cognition.action_planning import (
+    ToolActionParameter,
+    ToolActionPermissionMode,
+    ToolActionPlan,
+    ToolActionPlanner,
+    ToolActionPlannerConfig,
+    ToolActionPlannerSnapshot,
+    ToolActionProposal,
+    ToolActionRiskLevel,
+    ToolActionSafetyDecision,
+    ToolActionTargetKind,
+    ToolActionType,
+)
 from jarvis.cognition.adapters import (
     CancellableCognitionAdapter,
     CognitionAdapter,
@@ -135,6 +148,17 @@ COGNITION_PACKAGE_NAME = "jarvis.cognition"
 
 __all__ = [
 
+    "ToolActionParameter",
+    "ToolActionPermissionMode",
+    "ToolActionPlan",
+    "ToolActionPlanner",
+    "ToolActionPlannerConfig",
+    "ToolActionPlannerSnapshot",
+    "ToolActionProposal",
+    "ToolActionRiskLevel",
+    "ToolActionSafetyDecision",
+    "ToolActionTargetKind",
+    "ToolActionType",
     "InMemoryShortTermMemoryConfig",
     "InMemoryShortTermMemoryStore",
     "ShortTermMemoryItem",
