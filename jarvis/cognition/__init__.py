@@ -13,6 +13,12 @@ from jarvis.cognition.adapters import (
     adapter_supports,
     duration_ms_between,
 )
+from jarvis.cognition.dialogue_bridge import (
+    DialogueCognitionBridgeConfig,
+    DialogueCognitionBridgeResult,
+    DialogueCognitionBridgeSnapshot,
+    DialogueCognitionBridgeWorker,
+)
 from jarvis.cognition.fake_adapter import (
     FakeCognitionAdapter,
     FakeCognitionConfig,
@@ -52,6 +58,10 @@ COGNITION_PACKAGE_NAME = "jarvis.cognition"
 
 __all__ = [
 
+    "DialogueCognitionBridgeConfig",
+    "DialogueCognitionBridgeResult",
+    "DialogueCognitionBridgeSnapshot",
+    "DialogueCognitionBridgeWorker",
     "CognitionWorker",
     "CognitionWorkerConfig",
     "CognitionWorkerResult",

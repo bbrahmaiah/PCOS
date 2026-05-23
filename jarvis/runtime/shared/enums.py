@@ -123,7 +123,6 @@ class EventType(StrEnum):
     SPEECH_ENDED = "presence.speech_ended"
     INTERRUPT_REQUESTED = "presence.interrupt_requested"
     
-    
 
     # Presence lifecycle
     PRESENCE_STARTED = "presence.started"
@@ -191,6 +190,7 @@ class EventType(StrEnum):
     COGNITION_COMPLETED = "cognition.completed"
     COGNITION_FAILED = "cognition.failed"
     COGNITION_CANCEL_REQUESTED = "cognition.cancel_requested"
+    DIALOGUE_RESPONSE_REQUESTED = "dialogue.response_requested"
     COGNITION_CANCELLED = "cognition.cancelled"
     PLAN_CREATED = "cognition.plan_created"
 
