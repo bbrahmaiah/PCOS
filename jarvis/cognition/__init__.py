@@ -49,6 +49,17 @@ from jarvis.cognition.local_llm_adapter import (
     LocalLLMBackendStatus,
     LocalLLMBackendToken,
 )
+from jarvis.cognition.memory import (
+    InMemoryShortTermMemoryConfig,
+    InMemoryShortTermMemoryStore,
+    ShortTermMemoryItem,
+    ShortTermMemoryKind,
+    ShortTermMemoryPriority,
+    ShortTermMemoryQuery,
+    ShortTermMemoryResult,
+    ShortTermMemorySnapshot,
+    ShortTermMemoryStore,
+)
 from jarvis.cognition.models import (
     CognitionContext,
     CognitionContextItem,
@@ -124,6 +135,15 @@ COGNITION_PACKAGE_NAME = "jarvis.cognition"
 
 __all__ = [
 
+    "InMemoryShortTermMemoryConfig",
+    "InMemoryShortTermMemoryStore",
+    "ShortTermMemoryItem",
+    "ShortTermMemoryKind",
+    "ShortTermMemoryPriority",
+    "ShortTermMemoryQuery",
+    "ShortTermMemoryResult",
+    "ShortTermMemorySnapshot",
+    "ShortTermMemoryStore",
     "ConversationSessionConfig",
     "ConversationSessionSnapshot",
     "ConversationSessionState",
