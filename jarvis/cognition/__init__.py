@@ -119,6 +119,14 @@ from jarvis.cognition.response_bridge import (
     CognitionDialogueBridgeSnapshot,
     CognitionDialogueBridgeWorker,
 )
+from jarvis.cognition.runtime import (
+    CognitionRuntime,
+    CognitionRuntimeComponents,
+    CognitionRuntimeConfig,
+    CognitionRuntimeSnapshot,
+    CognitionRuntimeTurnResult,
+    create_cognition_runtime,
+)
 from jarvis.cognition.session_context import (
     ConversationSessionConfig,
     ConversationSessionSnapshot,
@@ -151,6 +159,14 @@ from jarvis.cognition.streaming import (
     StreamingTokenPipelineResult,
     StreamingTokenPipelineSnapshot,
 )
+from jarvis.cognition.voice_cognition_smoke import (
+    VoiceCognitionIO,
+    VoiceCognitionPlaybackResult,
+    VoiceCognitionSmokeConfig,
+    VoiceCognitionSmokeReport,
+    VoiceCognitionSmokeRunner,
+    VoiceCognitionTranscript,
+)
 from jarvis.cognition.worker import (
     CognitionWorker,
     CognitionWorkerConfig,
@@ -162,6 +178,18 @@ COGNITION_PACKAGE_NAME = "jarvis.cognition"
 
 __all__ = [
 
+    "CognitionRuntime",
+    "CognitionRuntimeComponents",
+    "CognitionRuntimeConfig",
+    "CognitionRuntimeSnapshot",
+    "CognitionRuntimeTurnResult",
+    "create_cognition_runtime",
+    "VoiceCognitionIO",
+    "VoiceCognitionPlaybackResult",
+    "VoiceCognitionSmokeConfig",
+    "VoiceCognitionSmokeReport",
+    "VoiceCognitionSmokeRunner",
+    "VoiceCognitionTranscript",
     "OllamaBackendConfig",
     "OllamaHttpClient",
     "OllamaLocalLLMBackend",
