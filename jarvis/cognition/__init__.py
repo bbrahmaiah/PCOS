@@ -97,6 +97,13 @@ from jarvis.cognition.ollama_backend import (
     UrllibOllamaHttpClient,
     is_ollama_connection_error,
 )
+from jarvis.cognition.phase3_completion import (
+    Phase3CompletionCheck,
+    Phase3CompletionGate,
+    Phase3CompletionReport,
+    Phase3CompletionVoiceIO,
+    complete_phase3_cognition,
+)
 from jarvis.cognition.phase3_validation import (
     CognitionPhase3ValidationReport,
     CognitionPhase3Validator,
@@ -178,6 +185,11 @@ COGNITION_PACKAGE_NAME = "jarvis.cognition"
 
 __all__ = [
 
+    "Phase3CompletionCheck",
+    "Phase3CompletionGate",
+    "Phase3CompletionReport",
+    "Phase3CompletionVoiceIO",
+    "complete_phase3_cognition",
     "CognitionRuntime",
     "CognitionRuntimeComponents",
     "CognitionRuntimeConfig",
