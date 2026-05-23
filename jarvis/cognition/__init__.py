@@ -90,6 +90,13 @@ from jarvis.cognition.models import (
     CognitionTokenKind,
     SpokenResponseStyle,
 )
+from jarvis.cognition.phase3_validation import (
+    CognitionPhase3ValidationReport,
+    CognitionPhase3Validator,
+    CognitionValidationCheck,
+    ValidationLocalLLMBackend,
+    validate_phase3_cognition,
+)
 from jarvis.cognition.planning import (
     ResponseAnswerMode,
     ResponseIntent,
@@ -148,6 +155,11 @@ COGNITION_PACKAGE_NAME = "jarvis.cognition"
 
 __all__ = [
 
+    "CognitionPhase3ValidationReport",
+    "CognitionPhase3Validator",
+    "CognitionValidationCheck",
+    "ValidationLocalLLMBackend",
+    "validate_phase3_cognition",
     "ToolActionParameter",
     "ToolActionPermissionMode",
     "ToolActionPlan",
