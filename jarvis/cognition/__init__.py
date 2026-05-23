@@ -13,6 +13,11 @@ from jarvis.cognition.adapters import (
     adapter_supports,
     duration_ms_between,
 )
+from jarvis.cognition.fake_adapter import (
+    FakeCognitionAdapter,
+    FakeCognitionConfig,
+    FakeCognitionMode,
+)
 from jarvis.cognition.models import (
     CognitionContext,
     CognitionContextItem,
@@ -42,6 +47,9 @@ COGNITION_PACKAGE_NAME = "jarvis.cognition"
 __all__ = [
 
 
+    "FakeCognitionAdapter",
+    "FakeCognitionConfig",
+    "FakeCognitionMode",
     "CancellableCognitionAdapter",
     "CognitionAdapter",
     "CognitionAdapterCapability",
