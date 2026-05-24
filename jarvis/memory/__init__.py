@@ -1,3 +1,10 @@
+from jarvis.memory.cognition_integration import (
+    MemoryCognitionBridge,
+    MemoryCognitionBridgeConfig,
+    MemoryCognitionBridgeSnapshot,
+    MemoryCognitionContextResult,
+    MemoryCognitionQuery,
+)
 from jarvis.memory.context import (
     MemoryContext,
     MemoryContextBuilder,
@@ -115,7 +122,11 @@ from jarvis.memory.write_policy import (
 
 __all__ = [
 
-
+    "MemoryCognitionBridge",
+    "MemoryCognitionBridgeConfig",
+    "MemoryCognitionBridgeSnapshot",
+    "MemoryCognitionContextResult",
+    "MemoryCognitionQuery",
     "MemoryContext",
     "MemoryContextBuildRequest",
     "MemoryContextBuildStatus",
