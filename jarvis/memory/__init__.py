@@ -16,6 +16,16 @@ from jarvis.memory.context import (
     MemoryContextItem,
     MemoryContextItemKind,
 )
+from jarvis.memory.diagnostics import (
+    MemoryDiagnosticCategory,
+    MemoryDiagnosticCheck,
+    MemoryDiagnosticsCollector,
+    MemoryDiagnosticsCollectorConfig,
+    MemoryDiagnosticsCollectorSnapshot,
+    MemoryDiagnosticStatus,
+    MemoryRuntimeDiagnostics,
+    MemorySnapshotProvider,
+)
 from jarvis.memory.episodic import (
     EpisodicMemoryActor,
     EpisodicMemoryEvent,
@@ -122,6 +132,15 @@ from jarvis.memory.write_policy import (
 
 __all__ = [
 
+
+    "MemoryDiagnosticCategory",
+    "MemoryDiagnosticCheck",
+    "MemoryDiagnosticStatus",
+    "MemoryDiagnosticsCollector",
+    "MemoryDiagnosticsCollectorConfig",
+    "MemoryDiagnosticsCollectorSnapshot",
+    "MemoryRuntimeDiagnostics",
+    "MemorySnapshotProvider",
     "MemoryCognitionBridge",
     "MemoryCognitionBridgeConfig",
     "MemoryCognitionBridgeSnapshot",
