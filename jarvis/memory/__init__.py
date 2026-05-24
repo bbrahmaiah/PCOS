@@ -94,6 +94,16 @@ from jarvis.memory.retrieval import (
     MemoryRetrievalScorer,
     MemoryRetrievalScorerConfig,
 )
+from jarvis.memory.safety_audit import (
+    MemorySafetyAuditCheck,
+    MemorySafetyAuditor,
+    MemorySafetyAuditorConfig,
+    MemorySafetyAuditorSnapshot,
+    MemorySafetyAuditResult,
+    MemorySafetyAuditStatus,
+    MemorySafetyRiskLevel,
+    audit_phase4_memory_safety,
+)
 from jarvis.memory.semantic import (
     SemanticMemoryDomain,
     SemanticMemoryFact,
@@ -160,6 +170,14 @@ from jarvis.memory.write_policy import (
 
 __all__ = [
 
+    "MemorySafetyAuditCheck",
+    "MemorySafetyAuditResult",
+    "MemorySafetyAuditStatus",
+    "MemorySafetyAuditor",
+    "MemorySafetyAuditorConfig",
+    "MemorySafetyAuditorSnapshot",
+    "MemorySafetyRiskLevel",
+    "audit_phase4_memory_safety",
     "MemoryPhase4ValidationCheck",
     "MemoryPhase4ValidationResult",
     "MemoryPhase4ValidationStatus",
