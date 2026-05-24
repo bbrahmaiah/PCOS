@@ -1,3 +1,12 @@
+from jarvis.memory.episodic import (
+    EpisodicMemoryActor,
+    EpisodicMemoryEvent,
+    EpisodicMemoryEventKind,
+    EpisodicMemoryQuery,
+    EpisodicMemoryRuntime,
+    EpisodicMemoryRuntimeConfig,
+    EpisodicMemoryRuntimeSnapshot,
+)
 from jarvis.memory.gateway import (
     GovernedMemoryGateway,
     MemoryGateway,
@@ -65,6 +74,13 @@ from jarvis.memory.write_policy import (
 
 __all__ = [
 
+    "EpisodicMemoryActor",
+    "EpisodicMemoryEvent",
+    "EpisodicMemoryEventKind",
+    "EpisodicMemoryQuery",
+    "EpisodicMemoryRuntime",
+    "EpisodicMemoryRuntimeConfig",
+    "EpisodicMemoryRuntimeSnapshot",
     "MemoryLifecycleDecision",
     "MemoryLifecycleDecisionKind",
     "MemoryLifecyclePolicy",
