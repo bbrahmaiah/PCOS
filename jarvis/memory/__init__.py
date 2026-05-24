@@ -1,3 +1,14 @@
+from jarvis.memory.context import (
+    MemoryContext,
+    MemoryContextBuilder,
+    MemoryContextBuilderConfig,
+    MemoryContextBuilderProtocol,
+    MemoryContextBuilderSnapshot,
+    MemoryContextBuildRequest,
+    MemoryContextBuildStatus,
+    MemoryContextItem,
+    MemoryContextItemKind,
+)
 from jarvis.memory.episodic import (
     EpisodicMemoryActor,
     EpisodicMemoryEvent,
@@ -104,6 +115,16 @@ from jarvis.memory.write_policy import (
 
 __all__ = [
 
+
+    "MemoryContext",
+    "MemoryContextBuildRequest",
+    "MemoryContextBuildStatus",
+    "MemoryContextBuilder",
+    "MemoryContextBuilderConfig",
+    "MemoryContextBuilderProtocol",
+    "MemoryContextBuilderSnapshot",
+    "MemoryContextItem",
+    "MemoryContextItemKind",
     "ExtractiveMemorySummarizer",
     "ExtractiveMemorySummarizerConfig",
     "MemorySummarizer",

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import datetime
 from enum import StrEnum
 from threading import RLock
 from typing import Protocol, runtime_checkable
@@ -106,7 +107,7 @@ class MemorySummary(MemoryModel):
     summary_kind: MemorySummaryKind
     sources: tuple[MemorySummarySource, ...]
     confidence: float = Field(ge=0.0, le=1.0)
-    created_at: object = Field(default_factory=utc_now)
+    created_at: datetime = Field(default_factory=utc_now)
     policy_classification: MemoryPolicyClassification = (
         MemoryPolicyClassification.ALLOWED
     )
