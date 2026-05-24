@@ -1,3 +1,16 @@
+from jarvis.conversation.attention import (
+    AttentionDecision,
+    AttentionDisposition,
+    AttentionPriority,
+    AttentionRuntime,
+    AttentionRuntimeConfig,
+    AttentionRuntimeSnapshot,
+    AttentionSignal,
+    AttentionSignalKind,
+    AttentionTarget,
+    AttentionTargetKind,
+    AttentionTargetStatus,
+)
 from jarvis.conversation.endpointing import (
     AdaptiveEndpointingEngine,
     AdaptiveEndpointingEngineConfig,
@@ -74,6 +87,17 @@ from jarvis.conversation.turn_detection import (
 
 __all__ = [
 
+    "AttentionDecision",
+    "AttentionDisposition",
+    "AttentionPriority",
+    "AttentionRuntime",
+    "AttentionRuntimeConfig",
+    "AttentionRuntimeSnapshot",
+    "AttentionSignal",
+    "AttentionSignalKind",
+    "AttentionTarget",
+    "AttentionTargetKind",
+    "AttentionTargetStatus",
     "ConversationContinuityStatus",
     "ConversationFollowUpExpectation",
     "ConversationSessionRuntime",

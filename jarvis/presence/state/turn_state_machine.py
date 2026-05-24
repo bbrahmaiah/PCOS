@@ -69,7 +69,6 @@ class TurnTransitionResult:
 TransitionKey = tuple[PresenceMode, TurnPhase, TurnTrigger]
 
 _TRANSITIONS: Final[dict[TransitionKey, tuple[PresenceMode, TurnPhase]]] = {
-    # Idle / sleeping into listening
     (
         PresenceMode.IDLE,
         TurnPhase.NONE,
@@ -94,8 +93,6 @@ _TRANSITIONS: Final[dict[TransitionKey, tuple[PresenceMode, TurnPhase]]] = {
         PresenceMode.LISTENING,
         TurnPhase.LISTENING_FOR_USER,
     ),
-
-    # User speech capture
     (
         PresenceMode.LISTENING,
         TurnPhase.LISTENING_FOR_USER,
@@ -112,8 +109,6 @@ _TRANSITIONS: Final[dict[TransitionKey, tuple[PresenceMode, TurnPhase]]] = {
         PresenceMode.PROCESSING_SPEECH,
         TurnPhase.TRANSCRIBING,
     ),
-
-    # STT / cognition wait
     (
         PresenceMode.PROCESSING_SPEECH,
         TurnPhase.TRANSCRIBING,
@@ -122,8 +117,6 @@ _TRANSITIONS: Final[dict[TransitionKey, tuple[PresenceMode, TurnPhase]]] = {
         PresenceMode.PROCESSING_SPEECH,
         TurnPhase.WAITING_FOR_RESPONSE,
     ),
-
-    # Assistant speech
     (
         PresenceMode.PROCESSING_SPEECH,
         TurnPhase.WAITING_FOR_RESPONSE,
@@ -140,8 +133,6 @@ _TRANSITIONS: Final[dict[TransitionKey, tuple[PresenceMode, TurnPhase]]] = {
         PresenceMode.LISTENING,
         TurnPhase.LISTENING_FOR_USER,
     ),
-
-    # Barge-in / interruption
     (
         PresenceMode.ASSISTANT_SPEAKING,
         TurnPhase.SPEAKING_RESPONSE,
@@ -166,8 +157,6 @@ _TRANSITIONS: Final[dict[TransitionKey, tuple[PresenceMode, TurnPhase]]] = {
         PresenceMode.LISTENING,
         TurnPhase.LISTENING_FOR_USER,
     ),
-
-    # Recovery from error
     (
         PresenceMode.ERROR,
         TurnPhase.FAILED,
@@ -183,18 +172,8 @@ class TurnStateMachine:
     """
     Pure state transition engine for real-time Presence.
 
-    This class owns transition rules only.
-
-    It does not:
-    - capture audio
-    - transcribe speech
-    - speak audio
-    - call workers
-    - mutate shared state
-    - publish events
-
-    Future PresenceStateStore will call this class under a lock, then emit
-    runtime events using the EventBus.
+    It owns transition rules only. It does not capture audio, transcribe speech,
+    speak audio, call workers, mutate shared state, or publish events.
     """
 
     def transition(
@@ -233,7 +212,6 @@ class TurnStateMachine:
             )
 
         next_mode, next_phase = target
-
         next_state = self._build_state(
             previous=state,
             trigger=trigger,
@@ -248,7 +226,7 @@ class TurnStateMachine:
             previous_state=state,
             next_state=next_state,
             trigger=trigger,
-            changed=True,
+            changed=next_state != state,
         )
 
     def start_listening(self, state: PresenceState) -> TurnTransitionResult:
@@ -338,13 +316,22 @@ class TurnStateMachine:
         return self.transition(state, TurnTrigger.RECOVER)
 
     def _reset(self, state: PresenceState) -> TurnTransitionResult:
+        """
+        Reset must erase all runtime presence state.
+
+        Keep this intentionally strict. Reset returns the exact default
+        PresenceState so tests and runtime invariants can trust that no old
+        turn id, speech id, cancellation token, timestamps, or error survive.
+        """
+
         next_state = PresenceState()
 
         return TurnTransitionResult(
             previous_state=state,
             next_state=next_state,
             trigger=TurnTrigger.RESET,
-            changed=next_state != state,
+            changed=state != next_state,
+            reason="presence state reset to default",
         )
 
     def _sleep(self, state: PresenceState) -> TurnTransitionResult:
