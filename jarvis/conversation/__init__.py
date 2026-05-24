@@ -46,6 +46,15 @@ from jarvis.conversation.models import (
     new_conversation_id,
     utc_now,
 )
+from jarvis.conversation.runtime import (
+    RealConversationInput,
+    RealConversationRuntime,
+    RealConversationRuntimeAction,
+    RealConversationRuntimeConfig,
+    RealConversationRuntimeOutput,
+    RealConversationRuntimeSnapshot,
+    RealConversationRuntimeStatus,
+)
 from jarvis.conversation.session_runtime import (
     ConversationContinuityStatus,
     ConversationFollowUpExpectation,
@@ -87,6 +96,13 @@ from jarvis.conversation.turn_detection import (
 
 __all__ = [
 
+    "RealConversationInput",
+    "RealConversationRuntime",
+    "RealConversationRuntimeAction",
+    "RealConversationRuntimeConfig",
+    "RealConversationRuntimeOutput",
+    "RealConversationRuntimeSnapshot",
+    "RealConversationRuntimeStatus",
     "AttentionDecision",
     "AttentionDisposition",
     "AttentionPriority",
