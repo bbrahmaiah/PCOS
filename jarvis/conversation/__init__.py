@@ -8,6 +8,17 @@ from jarvis.conversation.endpointing import (
     EndpointingInput,
     EndpointPacing,
 )
+from jarvis.conversation.interrupt_controller import (
+    InterruptAction,
+    InterruptController,
+    InterruptControllerConfig,
+    InterruptControllerSnapshot,
+    InterruptDecision,
+    InterruptPriority,
+    InterruptReason,
+    InterruptRequest,
+    InterruptScope,
+)
 from jarvis.conversation.models import (
     ConversationMode,
     ConversationModel,
@@ -52,6 +63,15 @@ from jarvis.conversation.turn_detection import (
 
 __all__ = [
 
+    "InterruptAction",
+    "InterruptController",
+    "InterruptControllerConfig",
+    "InterruptControllerSnapshot",
+    "InterruptDecision",
+    "InterruptPriority",
+    "InterruptReason",
+    "InterruptRequest",
+    "InterruptScope",
     "SpeechChunkKind",
     "StreamingConversationCoordinator",
     "StreamingConversationCoordinatorConfig",
