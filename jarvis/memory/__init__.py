@@ -81,6 +81,18 @@ from jarvis.memory.store import (
     MemoryStore,
     MemoryStoreSnapshot,
 )
+from jarvis.memory.summarization import (
+    ExtractiveMemorySummarizer,
+    ExtractiveMemorySummarizerConfig,
+    MemorySummarizer,
+    MemorySummarizerSnapshot,
+    MemorySummary,
+    MemorySummaryKind,
+    MemorySummaryRequest,
+    MemorySummaryResult,
+    MemorySummarySource,
+    MemorySummaryStatus,
+)
 from jarvis.memory.write_policy import (
     MemoryWriteDecisionKind,
     MemoryWritePolicy,
@@ -92,6 +104,16 @@ from jarvis.memory.write_policy import (
 
 __all__ = [
 
+    "ExtractiveMemorySummarizer",
+    "ExtractiveMemorySummarizerConfig",
+    "MemorySummarizer",
+    "MemorySummarizerSnapshot",
+    "MemorySummary",
+    "MemorySummaryKind",
+    "MemorySummaryRequest",
+    "MemorySummaryResult",
+    "MemorySummarySource",
+    "MemorySummaryStatus",
     "UserProfileMemoryCategory",
     "UserProfileMemoryConfidence",
     "UserProfileMemoryFact",
