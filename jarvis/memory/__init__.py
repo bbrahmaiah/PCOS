@@ -125,6 +125,15 @@ from jarvis.memory.summarization import (
     MemorySummarySource,
     MemorySummaryStatus,
 )
+from jarvis.memory.validation import (
+    MemoryPhase4ValidationCheck,
+    MemoryPhase4ValidationResult,
+    MemoryPhase4ValidationStatus,
+    MemoryPhase4Validator,
+    MemoryPhase4ValidatorConfig,
+    MemoryPhase4ValidatorSnapshot,
+    validate_phase4_memory,
+)
 from jarvis.memory.vector import (
     DeterministicEmbeddingProvider,
     DeterministicEmbeddingProviderConfig,
@@ -151,6 +160,13 @@ from jarvis.memory.write_policy import (
 
 __all__ = [
 
+    "MemoryPhase4ValidationCheck",
+    "MemoryPhase4ValidationResult",
+    "MemoryPhase4ValidationStatus",
+    "MemoryPhase4Validator",
+    "MemoryPhase4ValidatorConfig",
+    "MemoryPhase4ValidatorSnapshot",
+    "validate_phase4_memory",
     "DeterministicEmbeddingProvider",
     "DeterministicEmbeddingProviderConfig",
     "InMemoryVectorIndex",
