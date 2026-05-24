@@ -12,6 +12,16 @@ from jarvis.conversation.models import (
     new_conversation_id,
     utc_now,
 )
+from jarvis.conversation.state_machine import (
+    ConversationState,
+    ConversationStateEvent,
+    ConversationStateEventKind,
+    ConversationStateMachine,
+    ConversationStateMachineConfig,
+    ConversationStateMachineSnapshot,
+    ConversationStateTransition,
+    ConversationStateTransitionStatus,
+)
 from jarvis.conversation.turn_detection import (
     AdaptiveTurnDetector,
     AdaptiveTurnDetectorConfig,
@@ -19,6 +29,14 @@ from jarvis.conversation.turn_detection import (
 )
 
 __all__ = [
+    "ConversationState",
+    "ConversationStateEvent",
+    "ConversationStateEventKind",
+    "ConversationStateMachine",
+    "ConversationStateMachineConfig",
+    "ConversationStateMachineSnapshot",
+    "ConversationStateTransition",
+    "ConversationStateTransitionStatus",
     "AdaptiveTurnDetector",
     "AdaptiveTurnDetectorConfig",
     "AdaptiveTurnDetectorSnapshot",
