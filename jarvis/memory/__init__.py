@@ -1,3 +1,11 @@
+from jarvis.memory.gateway import (
+    GovernedMemoryGateway,
+    MemoryGateway,
+    MemoryGatewayConfig,
+    MemoryGatewayRetrievalResult,
+    MemoryGatewaySnapshot,
+    MemoryGatewayWriteResult,
+)
 from jarvis.memory.models import (
     MemoryImportance,
     MemoryKind,
@@ -31,6 +39,12 @@ from jarvis.memory.store import (
 
 __all__ = [
 
+    "GovernedMemoryGateway",
+    "MemoryGateway",
+    "MemoryGatewayConfig",
+    "MemoryGatewayRetrievalResult",
+    "MemoryGatewaySnapshot",
+    "MemoryGatewayWriteResult",
     "MemoryRetrievalMatchKind",
     "MemoryRetrievalScoreBreakdown",
     "MemoryRetrievalScorer",
