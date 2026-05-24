@@ -24,6 +24,15 @@ from jarvis.memory.models import (
     new_id,
     utc_now,
 )
+from jarvis.memory.privacy_policy import (
+    MemoryPrivacyDecisionKind,
+    MemoryPrivacyPolicy,
+    MemoryPrivacyPolicyConfig,
+    MemoryPrivacyPolicyDecision,
+    MemoryPrivacyPolicySnapshot,
+    MemoryPrivacyRiskLevel,
+    MemoryPrivacySubject,
+)
 from jarvis.memory.retrieval import (
     MemoryRetrievalMatchKind,
     MemoryRetrievalScoreBreakdown,
@@ -47,6 +56,13 @@ from jarvis.memory.write_policy import (
 
 __all__ = [
 
+    "MemoryPrivacyDecisionKind",
+    "MemoryPrivacyPolicy",
+    "MemoryPrivacyPolicyConfig",
+    "MemoryPrivacyPolicyDecision",
+    "MemoryPrivacyPolicySnapshot",
+    "MemoryPrivacyRiskLevel",
+    "MemoryPrivacySubject",
     "MemoryWriteDecisionKind",
     "MemoryWritePolicy",
     "MemoryWritePolicyConfig",
