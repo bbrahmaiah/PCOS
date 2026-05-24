@@ -57,6 +57,15 @@ from jarvis.memory.retrieval import (
     MemoryRetrievalScorer,
     MemoryRetrievalScorerConfig,
 )
+from jarvis.memory.semantic import (
+    SemanticMemoryDomain,
+    SemanticMemoryFact,
+    SemanticMemoryFactType,
+    SemanticMemoryQuery,
+    SemanticMemoryRuntime,
+    SemanticMemoryRuntimeConfig,
+    SemanticMemoryRuntimeSnapshot,
+)
 from jarvis.memory.store import (
     InMemoryMemoryStore,
     InMemoryMemoryStoreConfig,
@@ -74,6 +83,13 @@ from jarvis.memory.write_policy import (
 
 __all__ = [
 
+    "SemanticMemoryDomain",
+    "SemanticMemoryFact",
+    "SemanticMemoryFactType",
+    "SemanticMemoryQuery",
+    "SemanticMemoryRuntime",
+    "SemanticMemoryRuntimeConfig",
+    "SemanticMemoryRuntimeSnapshot",
     "EpisodicMemoryActor",
     "EpisodicMemoryEvent",
     "EpisodicMemoryEventKind",
