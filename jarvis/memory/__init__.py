@@ -70,6 +70,16 @@ from jarvis.memory.models import (
     new_id,
     utc_now,
 )
+from jarvis.memory.phase4_completion import (
+    Phase4CompletionCheck,
+    Phase4CompletionCheckKind,
+    Phase4CompletionGate,
+    Phase4CompletionGateConfig,
+    Phase4CompletionGateSnapshot,
+    Phase4CompletionResult,
+    Phase4CompletionStatus,
+    complete_phase4_memory,
+)
 from jarvis.memory.privacy_policy import (
     MemoryPrivacyDecisionKind,
     MemoryPrivacyPolicy,
@@ -170,6 +180,14 @@ from jarvis.memory.write_policy import (
 
 __all__ = [
 
+    "Phase4CompletionCheck",
+    "Phase4CompletionCheckKind",
+    "Phase4CompletionGate",
+    "Phase4CompletionGateConfig",
+    "Phase4CompletionGateSnapshot",
+    "Phase4CompletionResult",
+    "Phase4CompletionStatus",
+    "complete_phase4_memory",
     "MemorySafetyAuditCheck",
     "MemorySafetyAuditResult",
     "MemorySafetyAuditStatus",
