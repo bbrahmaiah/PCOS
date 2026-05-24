@@ -1,3 +1,13 @@
+from jarvis.conversation.endpointing import (
+    AdaptiveEndpointingEngine,
+    AdaptiveEndpointingEngineConfig,
+    AdaptiveEndpointingEngineSnapshot,
+    EndpointAction,
+    EndpointConfidenceBand,
+    EndpointingDecision,
+    EndpointingInput,
+    EndpointPacing,
+)
 from jarvis.conversation.models import (
     ConversationMode,
     ConversationModel,
@@ -29,6 +39,15 @@ from jarvis.conversation.turn_detection import (
 )
 
 __all__ = [
+
+    "AdaptiveEndpointingEngine",
+    "AdaptiveEndpointingEngineConfig",
+    "AdaptiveEndpointingEngineSnapshot",
+    "EndpointAction",
+    "EndpointConfidenceBand",
+    "EndpointingDecision",
+    "EndpointingInput",
+    "EndpointPacing",
     "ConversationState",
     "ConversationStateEvent",
     "ConversationStateEventKind",
