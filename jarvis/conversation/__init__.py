@@ -32,6 +32,18 @@ from jarvis.conversation.state_machine import (
     ConversationStateTransition,
     ConversationStateTransitionStatus,
 )
+from jarvis.conversation.streaming import (
+    SpeechChunkKind,
+    StreamingConversationCoordinator,
+    StreamingConversationCoordinatorConfig,
+    StreamingConversationCoordinatorSnapshot,
+    StreamingConversationEvent,
+    StreamingCoordinatorAction,
+    StreamingCoordinatorOutput,
+    StreamingEventKind,
+    StreamingLifecycle,
+    StreamingSpeechChunk,
+)
 from jarvis.conversation.turn_detection import (
     AdaptiveTurnDetector,
     AdaptiveTurnDetectorConfig,
@@ -40,6 +52,16 @@ from jarvis.conversation.turn_detection import (
 
 __all__ = [
 
+    "SpeechChunkKind",
+    "StreamingConversationCoordinator",
+    "StreamingConversationCoordinatorConfig",
+    "StreamingConversationCoordinatorSnapshot",
+    "StreamingConversationEvent",
+    "StreamingCoordinatorAction",
+    "StreamingCoordinatorOutput",
+    "StreamingEventKind",
+    "StreamingLifecycle",
+    "StreamingSpeechChunk",
     "AdaptiveEndpointingEngine",
     "AdaptiveEndpointingEngineConfig",
     "AdaptiveEndpointingEngineSnapshot",
