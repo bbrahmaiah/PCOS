@@ -51,6 +51,15 @@ from jarvis.memory.privacy_policy import (
     MemoryPrivacyRiskLevel,
     MemoryPrivacySubject,
 )
+from jarvis.memory.profile import (
+    UserProfileMemoryCategory,
+    UserProfileMemoryConfidence,
+    UserProfileMemoryFact,
+    UserProfileMemoryQuery,
+    UserProfileMemoryRuntime,
+    UserProfileMemoryRuntimeConfig,
+    UserProfileMemoryRuntimeSnapshot,
+)
 from jarvis.memory.retrieval import (
     MemoryRetrievalMatchKind,
     MemoryRetrievalScoreBreakdown,
@@ -83,6 +92,13 @@ from jarvis.memory.write_policy import (
 
 __all__ = [
 
+    "UserProfileMemoryCategory",
+    "UserProfileMemoryConfidence",
+    "UserProfileMemoryFact",
+    "UserProfileMemoryQuery",
+    "UserProfileMemoryRuntime",
+    "UserProfileMemoryRuntimeConfig",
+    "UserProfileMemoryRuntimeSnapshot",
     "SemanticMemoryDomain",
     "SemanticMemoryFact",
     "SemanticMemoryFactType",
