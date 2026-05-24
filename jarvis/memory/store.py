@@ -6,16 +6,14 @@ from typing import Protocol, runtime_checkable
 
 from jarvis.memory.models import (
     MemoryImportance,
-    MemoryPolicyClassification,
     MemoryQuery,
     MemoryRecord,
-    MemoryRetrievalExplanation,
     MemoryRetrievalResult,
     MemorySearchResult,
     MemorySensitivity,
     MemoryWriteRequest,
-    utc_now,
 )
+from jarvis.memory.retrieval import MemoryRetrievalScorer
 from jarvis.runtime.observability.structured_logger import get_logger
 
 
@@ -97,7 +95,7 @@ class InMemoryMemoryStore:
     Responsibilities:
     - store typed MemoryRecord objects
     - retrieve records by query constraints
-    - rank results deterministically
+    - rank results through MemoryRetrievalScorer
     - return retrieval explanations for every result
     - enforce bounded capacity
     - expose diagnostics
@@ -120,6 +118,7 @@ class InMemoryMemoryStore:
 
         self._lock = RLock()
         self._logger = get_logger("memory.in_memory_store")
+        self._scorer = MemoryRetrievalScorer()
         self._records: dict[str, MemoryRecord] = {}
 
         self._write_count = 0
@@ -192,6 +191,7 @@ class InMemoryMemoryStore:
         - confidence
         - timestamp
         - policy classification
+        - score breakdown
         """
 
         with self._lock:
@@ -334,10 +334,9 @@ class InMemoryMemoryStore:
         if query.text is None:
             return True
 
-        return self._text_relevance_score(
-            query_text=query.text,
-            record_text=record.text,
-        ) > 0.0
+        breakdown = self._scorer.score(record=record, query=query)
+
+        return breakdown.text_score > 0.0
 
     def _to_search_result(
         self,
@@ -345,103 +344,22 @@ class InMemoryMemoryStore:
         record: MemoryRecord,
         query: MemoryQuery,
     ) -> MemorySearchResult:
-        score = self._score(record=record, query=query)
-        explanation = MemoryRetrievalExplanation(
-            source=record.source,
-            reason=self._reason(record=record, query=query, score=score),
-            confidence=min(record.confidence, score),
-            retrieved_at=utc_now(),
-            policy_classification=self._policy_classification(record),
-            metadata={
-                "store": self.name,
-                "memory_id": record.memory_id,
-                "query_id": query.query_id,
-                "importance": record.importance.value,
-                "sensitivity": record.sensitivity.value,
-            },
+        breakdown = self._scorer.score(record=record, query=query)
+        explanation = self._scorer.explain(
+            record=record,
+            query=query,
+            breakdown=breakdown,
         )
 
         return MemorySearchResult(
             record=record,
-            score=score,
+            score=breakdown.final_score,
             explanation=explanation,
             metadata={
                 "store": self.name,
+                "score_breakdown": explanation.metadata["score_breakdown"],
             },
         )
-
-    def _score(
-        self,
-        *,
-        record: MemoryRecord,
-        query: MemoryQuery,
-    ) -> float:
-        text_score = (
-            1.0
-            if query.text is None
-            else self._text_relevance_score(
-                query_text=query.text,
-                record_text=record.text,
-            )
-        )
-        importance_score = self._importance_score(record.importance)
-        confidence_score = record.confidence
-        tag_score = self._tag_score(record=record, query=query)
-
-        weighted = (
-            text_score * 0.45
-            + importance_score * 0.25
-            + confidence_score * 0.20
-            + tag_score * 0.10
-        )
-
-        return max(0.0, min(1.0, weighted))
-
-    def _reason(
-        self,
-        *,
-        record: MemoryRecord,
-        query: MemoryQuery,
-        score: float,
-    ) -> str:
-        reasons: list[str] = []
-
-        if query.text is not None:
-            overlap = self._term_overlap(query.text, record.text)
-
-            if overlap:
-                reasons.append(
-                    "matched query terms: " + ", ".join(sorted(overlap))
-                )
-
-        if query.kinds:
-            reasons.append(f"matched memory kind: {record.kind.value}")
-
-        if query.scopes:
-            reasons.append(f"matched memory scope: {record.scope.value}")
-
-        if query.tags:
-            reasons.append("matched tags: " + ", ".join(query.tags))
-
-        reasons.append(f"importance={record.importance.value}")
-        reasons.append(f"score={score:.2f}")
-
-        return "; ".join(reasons)
-
-    @staticmethod
-    def _policy_classification(
-        record: MemoryRecord,
-    ) -> MemoryPolicyClassification:
-        if record.sensitivity == MemorySensitivity.SENSITIVE:
-            return MemoryPolicyClassification.RESTRICTED
-
-        if record.sensitivity == MemorySensitivity.PRIVATE:
-            return MemoryPolicyClassification.ALLOWED
-
-        if record.sensitivity == MemorySensitivity.INTERNAL:
-            return MemoryPolicyClassification.ALLOWED
-
-        return MemoryPolicyClassification.ALLOWED
 
     def _evict_if_needed_locked(self) -> None:
         if len(self._records) <= self._config.max_records:
@@ -451,7 +369,7 @@ class InMemoryMemoryStore:
         evictable = sorted(
             self._records.values(),
             key=lambda record: (
-                self._importance_score(record.importance),
+                self._importance_eviction_score(record.importance),
                 record.created_at,
             ),
         )
@@ -460,52 +378,7 @@ class InMemoryMemoryStore:
             self._records.pop(record.memory_id, None)
 
     @staticmethod
-    def _text_relevance_score(
-        *,
-        query_text: str,
-        record_text: str,
-    ) -> float:
-        query_terms = InMemoryMemoryStore._terms(query_text)
-        record_terms = InMemoryMemoryStore._terms(record_text)
-
-        if not query_terms:
-            return 1.0
-
-        overlap = query_terms & record_terms
-
-        if not overlap:
-            return 0.0
-
-        return len(overlap) / len(query_terms)
-
-    @staticmethod
-    def _term_overlap(
-        query_text: str,
-        record_text: str,
-    ) -> set[str]:
-        return InMemoryMemoryStore._terms(query_text) & InMemoryMemoryStore._terms(
-            record_text
-        )
-
-    @staticmethod
-    def _tag_score(
-        *,
-        record: MemoryRecord,
-        query: MemoryQuery,
-    ) -> float:
-        if not query.tags:
-            return 0.0
-
-        query_tags = set(query.tags)
-        record_tags = set(record.tags)
-
-        if not query_tags:
-            return 0.0
-
-        return len(query_tags & record_tags) / len(query_tags)
-
-    @staticmethod
-    def _importance_score(importance: MemoryImportance) -> float:
+    def _importance_eviction_score(importance: MemoryImportance) -> float:
         scores = {
             MemoryImportance.LOW: 0.25,
             MemoryImportance.NORMAL: 0.5,
@@ -514,11 +387,3 @@ class InMemoryMemoryStore:
         }
 
         return scores[importance]
-
-    @staticmethod
-    def _terms(text: str) -> set[str]:
-        return {
-            term.strip(".,!?;:()[]{}\"'").casefold()
-            for term in text.split()
-            if term.strip(".,!?;:()[]{}\"'")
-        }

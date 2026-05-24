@@ -16,6 +16,12 @@ from jarvis.memory.models import (
     new_id,
     utc_now,
 )
+from jarvis.memory.retrieval import (
+    MemoryRetrievalMatchKind,
+    MemoryRetrievalScoreBreakdown,
+    MemoryRetrievalScorer,
+    MemoryRetrievalScorerConfig,
+)
 from jarvis.memory.store import (
     InMemoryMemoryStore,
     InMemoryMemoryStoreConfig,
@@ -24,6 +30,11 @@ from jarvis.memory.store import (
 )
 
 __all__ = [
+
+    "MemoryRetrievalMatchKind",
+    "MemoryRetrievalScoreBreakdown",
+    "MemoryRetrievalScorer",
+    "MemoryRetrievalScorerConfig",
     "InMemoryMemoryStore",
     "InMemoryMemoryStoreConfig",
     "MemoryImportance",
