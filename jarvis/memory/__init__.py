@@ -125,6 +125,21 @@ from jarvis.memory.summarization import (
     MemorySummarySource,
     MemorySummaryStatus,
 )
+from jarvis.memory.vector import (
+    DeterministicEmbeddingProvider,
+    DeterministicEmbeddingProviderConfig,
+    InMemoryVectorIndex,
+    InMemoryVectorIndexConfig,
+    MemoryEmbedding,
+    MemoryEmbeddingProvider,
+    MemoryEmbeddingProviderSnapshot,
+    MemoryVectorDocument,
+    MemoryVectorIndex,
+    MemoryVectorIndexSnapshot,
+    MemoryVectorSearchQuery,
+    MemoryVectorSearchResponse,
+    MemoryVectorSearchResult,
+)
 from jarvis.memory.write_policy import (
     MemoryWriteDecisionKind,
     MemoryWritePolicy,
@@ -136,6 +151,19 @@ from jarvis.memory.write_policy import (
 
 __all__ = [
 
+    "DeterministicEmbeddingProvider",
+    "DeterministicEmbeddingProviderConfig",
+    "InMemoryVectorIndex",
+    "InMemoryVectorIndexConfig",
+    "MemoryEmbedding",
+    "MemoryEmbeddingProvider",
+    "MemoryEmbeddingProviderSnapshot",
+    "MemoryVectorDocument",
+    "MemoryVectorIndex",
+    "MemoryVectorIndexSnapshot",
+    "MemoryVectorSearchQuery",
+    "MemoryVectorSearchResponse",
+    "MemoryVectorSearchResult",
     "SQLiteMemoryStore",
     "SQLiteMemoryStoreConfig",
     "MemoryDiagnosticCategory",
