@@ -16,8 +16,16 @@ from jarvis.memory.models import (
     new_id,
     utc_now,
 )
+from jarvis.memory.store import (
+    InMemoryMemoryStore,
+    InMemoryMemoryStoreConfig,
+    MemoryStore,
+    MemoryStoreSnapshot,
+)
 
 __all__ = [
+    "InMemoryMemoryStore",
+    "InMemoryMemoryStoreConfig",
     "MemoryImportance",
     "MemoryKind",
     "MemoryModel",
@@ -31,6 +39,8 @@ __all__ = [
     "MemorySearchResult",
     "MemorySensitivity",
     "MemorySource",
+    "MemoryStore",
+    "MemoryStoreSnapshot",
     "MemoryWriteRequest",
     "new_id",
     "utc_now",
