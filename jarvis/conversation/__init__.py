@@ -46,6 +46,16 @@ from jarvis.conversation.models import (
     new_conversation_id,
     utc_now,
 )
+from jarvis.conversation.phase45_completion import (
+    Phase45CompletionCheck,
+    Phase45CompletionCheckKind,
+    Phase45CompletionGate,
+    Phase45CompletionGateConfig,
+    Phase45CompletionGateSnapshot,
+    Phase45CompletionResult,
+    Phase45CompletionStatus,
+    complete_phase45_conversation,
+)
 from jarvis.conversation.runtime import (
     RealConversationInput,
     RealConversationRuntime,
@@ -96,6 +106,15 @@ from jarvis.conversation.turn_detection import (
 
 __all__ = [
 
+
+    "Phase45CompletionCheck",
+    "Phase45CompletionCheckKind",
+    "Phase45CompletionGate",
+    "Phase45CompletionGateConfig",
+    "Phase45CompletionGateSnapshot",
+    "Phase45CompletionResult",
+    "Phase45CompletionStatus",
+    "complete_phase45_conversation",
     "RealConversationInput",
     "RealConversationRuntime",
     "RealConversationRuntimeAction",
