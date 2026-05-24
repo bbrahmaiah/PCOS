@@ -103,6 +103,10 @@ from jarvis.memory.semantic import (
     SemanticMemoryRuntimeConfig,
     SemanticMemoryRuntimeSnapshot,
 )
+from jarvis.memory.sqlite_store import (
+    SQLiteMemoryStore,
+    SQLiteMemoryStoreConfig,
+)
 from jarvis.memory.store import (
     InMemoryMemoryStore,
     InMemoryMemoryStoreConfig,
@@ -132,7 +136,8 @@ from jarvis.memory.write_policy import (
 
 __all__ = [
 
-
+    "SQLiteMemoryStore",
+    "SQLiteMemoryStoreConfig",
     "MemoryDiagnosticCategory",
     "MemoryDiagnosticCheck",
     "MemoryDiagnosticStatus",
