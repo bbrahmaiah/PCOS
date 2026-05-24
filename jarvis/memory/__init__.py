@@ -6,6 +6,15 @@ from jarvis.memory.gateway import (
     MemoryGatewaySnapshot,
     MemoryGatewayWriteResult,
 )
+from jarvis.memory.lifecycle import (
+    MemoryLifecycleDecision,
+    MemoryLifecycleDecisionKind,
+    MemoryLifecyclePolicy,
+    MemoryLifecyclePolicyConfig,
+    MemoryLifecyclePolicySnapshot,
+    MemoryLifecycleReason,
+    MemoryLifecycleSweepResult,
+)
 from jarvis.memory.models import (
     MemoryImportance,
     MemoryKind,
@@ -56,6 +65,13 @@ from jarvis.memory.write_policy import (
 
 __all__ = [
 
+    "MemoryLifecycleDecision",
+    "MemoryLifecycleDecisionKind",
+    "MemoryLifecyclePolicy",
+    "MemoryLifecyclePolicyConfig",
+    "MemoryLifecyclePolicySnapshot",
+    "MemoryLifecycleReason",
+    "MemoryLifecycleSweepResult",
     "MemoryPrivacyDecisionKind",
     "MemoryPrivacyPolicy",
     "MemoryPrivacyPolicyConfig",
