@@ -33,6 +33,17 @@ from jarvis.conversation.models import (
     new_conversation_id,
     utc_now,
 )
+from jarvis.conversation.session_runtime import (
+    ConversationContinuityStatus,
+    ConversationFollowUpExpectation,
+    ConversationSessionRuntime,
+    ConversationSessionRuntimeConfig,
+    ConversationSessionRuntimeSnapshot,
+    ConversationSessionSnapshotModel,
+    ConversationSessionTurn,
+    ConversationTopicShift,
+    ConversationTurnRole,
+)
 from jarvis.conversation.state_machine import (
     ConversationState,
     ConversationStateEvent,
@@ -63,6 +74,15 @@ from jarvis.conversation.turn_detection import (
 
 __all__ = [
 
+    "ConversationContinuityStatus",
+    "ConversationFollowUpExpectation",
+    "ConversationSessionRuntime",
+    "ConversationSessionRuntimeConfig",
+    "ConversationSessionRuntimeSnapshot",
+    "ConversationSessionSnapshotModel",
+    "ConversationSessionTurn",
+    "ConversationTopicShift",
+    "ConversationTurnRole",
     "InterruptAction",
     "InterruptController",
     "InterruptControllerConfig",
