@@ -36,9 +36,23 @@ from jarvis.memory.store import (
     MemoryStore,
     MemoryStoreSnapshot,
 )
+from jarvis.memory.write_policy import (
+    MemoryWriteDecisionKind,
+    MemoryWritePolicy,
+    MemoryWritePolicyConfig,
+    MemoryWritePolicyDecision,
+    MemoryWritePolicySnapshot,
+    MemoryWriteRiskLevel,
+)
 
 __all__ = [
 
+    "MemoryWriteDecisionKind",
+    "MemoryWritePolicy",
+    "MemoryWritePolicyConfig",
+    "MemoryWritePolicyDecision",
+    "MemoryWritePolicySnapshot",
+    "MemoryWriteRiskLevel",
     "GovernedMemoryGateway",
     "MemoryGateway",
     "MemoryGatewayConfig",

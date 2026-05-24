@@ -14,17 +14,24 @@ from jarvis.memory.models import (
     MemoryRecord,
     MemoryRetrievalResult,
     MemorySearchResult,
-    MemorySensitivity,
     MemoryWriteRequest,
     utc_now,
 )
 from jarvis.memory.store import MemoryStore, MemoryStoreSnapshot
+from jarvis.memory.write_policy import (
+    MemoryWritePolicy,
+    MemoryWritePolicyConfig,
+    MemoryWritePolicySnapshot,
+)
 from jarvis.runtime.observability.structured_logger import get_logger
 
 
 class MemoryGatewayWriteResult(MemoryModel):
     """
     Result of one governed memory write request.
+
+    This is returned by the gateway, not the raw store, so cognition can see
+    whether the memory write was allowed, blocked, or transformed by policy.
     """
 
     request: MemoryWriteRequest
@@ -91,9 +98,10 @@ class MemoryGatewayConfig:
     Configuration for GovernedMemoryGateway.
 
     Defaults are conservative:
-    - sensitive writes are blocked until explicit policy is added
-    - sensitive retrieval is not allowed unless explicitly enabled
-    - delete is allowed through the gateway because direct store access is banned
+    - sensitive writes are blocked through MemoryWritePolicy
+    - sensitive retrieval is filtered unless explicitly enabled
+    - delete is allowed through gateway
+    - clear is blocked by default
     """
 
     name: str = "memory_gateway"
@@ -128,6 +136,7 @@ class MemoryGatewaySnapshot:
     last_query_id: str | None
     last_error: str | None
     store_snapshot: MemoryStoreSnapshot
+    write_policy_snapshot: MemoryWritePolicySnapshot
 
 
 @runtime_checkable
@@ -167,7 +176,7 @@ class GovernedMemoryGateway:
 
     Responsibilities:
     - be the only cognition-facing memory entry point
-    - govern writes before reaching store
+    - govern writes through MemoryWritePolicy
     - govern retrieval before reaching store
     - preserve explainable retrieval results
     - keep diagnostics and audit-friendly counters
@@ -175,7 +184,7 @@ class GovernedMemoryGateway:
 
     Non-responsibilities:
     - no embeddings
-    - no persistence
+    - no persistence implementation
     - no vector search
     - no LLM calls
     - no cognition logic
@@ -191,6 +200,11 @@ class GovernedMemoryGateway:
         self._config.validate()
 
         self._store = store
+        self._write_policy = MemoryWritePolicy(
+            config=MemoryWritePolicyConfig(
+                allow_sensitive_writes=self._config.allow_sensitive_writes,
+            )
+        )
         self._lock = RLock()
         self._logger = get_logger("memory.gateway")
 
@@ -222,6 +236,14 @@ class GovernedMemoryGateway:
 
         return self._store
 
+    @property
+    def write_policy(self) -> MemoryWritePolicy:
+        """
+        Expose write policy for diagnostics and tests only.
+        """
+
+        return self._write_policy
+
     def remember(self, request: MemoryWriteRequest) -> MemoryGatewayWriteResult:
         """
         Govern and write one memory request.
@@ -231,24 +253,28 @@ class GovernedMemoryGateway:
             self._write_count += 1
             self._last_error = None
 
-        if self._write_blocked_by_policy(request):
+        decision = self._write_policy.evaluate(request)
+
+        if decision.blocked or not decision.allowed:
             result = MemoryGatewayWriteResult(
                 request=request,
                 record=None,
                 allowed=False,
                 blocked=True,
-                reason="blocked sensitive memory write by gateway policy",
-                policy_classification=MemoryPolicyClassification.BLOCKED,
+                reason=decision.reason,
+                policy_classification=decision.policy_classification,
             )
             self._record_write_blocked(request=request, reason=result.reason)
 
             return result
 
-        record = self._store.write(request)
+        effective_request = decision.effective_request or request
+        record = self._store.write(effective_request)
 
         with self._lock:
             self._write_allowed_count += 1
             self._last_memory_id = record.memory_id
+            self._last_error = None
 
         self._logger.info(
             "memory_gateway_write_allowed",
@@ -256,6 +282,7 @@ class GovernedMemoryGateway:
             memory_id=record.memory_id,
             kind=record.kind.value,
             sensitivity=record.sensitivity.value,
+            reason=decision.reason,
         )
 
         return MemoryGatewayWriteResult(
@@ -263,8 +290,8 @@ class GovernedMemoryGateway:
             record=record,
             allowed=True,
             blocked=False,
-            reason="memory write allowed by gateway policy",
-            policy_classification=MemoryPolicyClassification.ALLOWED,
+            reason=decision.reason,
+            policy_classification=decision.policy_classification,
         )
 
     def retrieve(self, query: MemoryQuery) -> MemoryGatewayRetrievalResult:
@@ -338,6 +365,12 @@ class GovernedMemoryGateway:
                 self._last_memory_id = cleaned
                 self._last_error = None
 
+            self._logger.info(
+                "memory_gateway_delete_allowed",
+                gateway=self.name,
+                memory_id=cleaned,
+            )
+
         return deleted
 
     def clear(self) -> None:
@@ -385,13 +418,8 @@ class GovernedMemoryGateway:
                 last_query_id=self._last_query_id,
                 last_error=self._last_error,
                 store_snapshot=self._store.snapshot(),
+                write_policy_snapshot=self._write_policy.snapshot(),
             )
-
-    def _write_blocked_by_policy(self, request: MemoryWriteRequest) -> bool:
-        return (
-            request.sensitivity == MemorySensitivity.SENSITIVE
-            and not self._config.allow_sensitive_writes
-        )
 
     def _record_write_blocked(
         self,
