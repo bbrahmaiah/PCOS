@@ -201,6 +201,15 @@ from jarvis.tools.models import (
     ToolId,
     ToolModel,
 )
+from jarvis.tools.phase5_completion import (
+    Phase5CompletionCheck,
+    Phase5CompletionCheckKind,
+    Phase5CompletionGate,
+    Phase5CompletionGateConfig,
+    Phase5CompletionGateSnapshot,
+    Phase5CompletionReport,
+    Phase5CompletionStatus,
+)
 from jarvis.tools.planner import (
     ActionPlanningDecision,
     ActionPlanningIntentKind,
@@ -299,6 +308,13 @@ from jarvis.tools.validation import (
 
 __all__ = [
 
+    "Phase5CompletionCheck",
+    "Phase5CompletionCheckKind",
+    "Phase5CompletionGate",
+    "Phase5CompletionGateConfig",
+    "Phase5CompletionGateSnapshot",
+    "Phase5CompletionReport",
+    "Phase5CompletionStatus",
     "SecurityAuditDecision",
     "SecurityAuditFinding",
     "SecurityAuditFindingKind",
