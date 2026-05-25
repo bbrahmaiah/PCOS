@@ -206,6 +206,20 @@ from jarvis.tools.registry import (
     ToolRegistryConfig,
     ToolRegistrySnapshot,
 )
+from jarvis.tools.scheduler import (
+    ActionScheduleDecision,
+    ActionSchedulePriority,
+    ActionScheduleReason,
+    ActionScheduleState,
+    ParallelActionScheduler,
+    ParallelActionSchedulerConfig,
+    ParallelActionSchedulerSnapshot,
+    ResourceLockKind,
+    ResourceLockMode,
+    ScheduledAction,
+    ScheduledActionLock,
+    SchedulingResult,
+)
 from jarvis.tools.shell import (
     SafeShellRuntime,
     SafeShellRuntimeConfig,
@@ -233,6 +247,18 @@ from jarvis.tools.validation import (
 
 __all__ = [
 
+    "ActionScheduleDecision",
+    "ActionSchedulePriority",
+    "ActionScheduleReason",
+    "ActionScheduleState",
+    "ParallelActionScheduler",
+    "ParallelActionSchedulerConfig",
+    "ParallelActionSchedulerSnapshot",
+    "ResourceLockKind",
+    "ResourceLockMode",
+    "ScheduledAction",
+    "ScheduledActionLock",
+    "SchedulingResult",
     "MemoryGatewayWriter",
     "NullMemoryGatewayWriter",
     "ToolMemoryDecision",
