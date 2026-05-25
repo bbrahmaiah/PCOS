@@ -234,6 +234,17 @@ from jarvis.tools.shell import (
     ShellProcessRunner,
     SubprocessShellRunner,
 )
+from jarvis.tools.smoke_runtime import (
+    RealActionSmokeReason,
+    RealActionSmokeRequest,
+    RealActionSmokeResult,
+    RealActionSmokeRuntime,
+    RealActionSmokeRuntimeConfig,
+    RealActionSmokeRuntimeSnapshot,
+    RealActionSmokeStatus,
+    SmokeDispatchKind,
+    SmokeDispatchResult,
+)
 from jarvis.tools.validation import (
     ActionValidationDecision,
     ActionValidationFinding,
@@ -247,6 +258,15 @@ from jarvis.tools.validation import (
 
 __all__ = [
 
+    "RealActionSmokeReason",
+    "RealActionSmokeRequest",
+    "RealActionSmokeResult",
+    "RealActionSmokeRuntime",
+    "RealActionSmokeRuntimeConfig",
+    "RealActionSmokeRuntimeSnapshot",
+    "RealActionSmokeStatus",
+    "SmokeDispatchKind",
+    "SmokeDispatchResult",
     "ActionScheduleDecision",
     "ActionSchedulePriority",
     "ActionScheduleReason",
