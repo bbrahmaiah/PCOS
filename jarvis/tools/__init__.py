@@ -249,6 +249,18 @@ from jarvis.tools.scheduler import (
     ScheduledActionLock,
     SchedulingResult,
 )
+from jarvis.tools.security_audit import (
+    SecurityAuditDecision,
+    SecurityAuditFinding,
+    SecurityAuditFindingKind,
+    SecurityAuditResult,
+    SecurityAuditSeverity,
+    SecurityAuditSubject,
+    SecurityAuditSubjectKind,
+    SecurityHardeningAudit,
+    SecurityHardeningAuditConfig,
+    SecurityHardeningAuditSnapshot,
+)
 from jarvis.tools.shell import (
     SafeShellRuntime,
     SafeShellRuntimeConfig,
@@ -287,6 +299,16 @@ from jarvis.tools.validation import (
 
 __all__ = [
 
+    "SecurityAuditDecision",
+    "SecurityAuditFinding",
+    "SecurityAuditFindingKind",
+    "SecurityAuditResult",
+    "SecurityAuditSeverity",
+    "SecurityAuditSubject",
+    "SecurityAuditSubjectKind",
+    "SecurityHardeningAudit",
+    "SecurityHardeningAuditConfig",
+    "SecurityHardeningAuditSnapshot",
     "AutonomousRunner",
     "CognitionToolBridge",
     "CognitionToolBridgeConfig",
