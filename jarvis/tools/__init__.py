@@ -138,6 +138,22 @@ from jarvis.tools.interruption import (
     RollbackStepKind,
     RollbackStepResult,
 )
+from jarvis.tools.memory_integration import (
+    MemoryGatewayWriter,
+    NullMemoryGatewayWriter,
+    ToolMemoryDecision,
+    ToolMemoryEvent,
+    ToolMemoryEventKind,
+    ToolMemoryImportance,
+    ToolMemoryIntegrationConfig,
+    ToolMemoryIntegrationRuntime,
+    ToolMemoryIntegrationSnapshot,
+    ToolMemoryPolicy,
+    ToolMemoryPolicyClass,
+    ToolMemoryReason,
+    ToolMemoryWriteProposal,
+    ToolMemoryWriteResult,
+)
 from jarvis.tools.models import (
     ActionContext,
     ActionError,
@@ -217,6 +233,20 @@ from jarvis.tools.validation import (
 
 __all__ = [
 
+    "MemoryGatewayWriter",
+    "NullMemoryGatewayWriter",
+    "ToolMemoryDecision",
+    "ToolMemoryEvent",
+    "ToolMemoryEventKind",
+    "ToolMemoryImportance",
+    "ToolMemoryIntegrationConfig",
+    "ToolMemoryIntegrationRuntime",
+    "ToolMemoryIntegrationSnapshot",
+    "ToolMemoryPolicy",
+    "ToolMemoryPolicyClass",
+    "ToolMemoryReason",
+    "ToolMemoryWriteProposal",
+    "ToolMemoryWriteResult",
     "ApprovalCheckResult",
     "ApprovalDecision",
     "ApprovalEvaluation",
