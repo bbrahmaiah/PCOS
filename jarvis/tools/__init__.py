@@ -38,8 +38,31 @@ from jarvis.tools.models import (
     ToolId,
     ToolModel,
 )
+from jarvis.tools.registry import (
+    ToolAvailability,
+    ToolDescriptor,
+    ToolHealth,
+    ToolLookupResult,
+    ToolLookupStatus,
+    ToolRegistrationResult,
+    ToolRegistrationStatus,
+    ToolRegistry,
+    ToolRegistryConfig,
+    ToolRegistrySnapshot,
+)
 
 __all__ = [
+
+    "ToolAvailability",
+    "ToolDescriptor",
+    "ToolHealth",
+    "ToolLookupResult",
+    "ToolLookupStatus",
+    "ToolRegistrationResult",
+    "ToolRegistrationStatus",
+    "ToolRegistry",
+    "ToolRegistryConfig",
+    "ToolRegistrySnapshot",
     "ActionContext",
     "ActionError",
     "ActionId",
