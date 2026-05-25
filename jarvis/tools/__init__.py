@@ -71,9 +71,28 @@ from jarvis.tools.registry import (
     ToolRegistryConfig,
     ToolRegistrySnapshot,
 )
+from jarvis.tools.validation import (
+    ActionValidationDecision,
+    ActionValidationFinding,
+    ActionValidationReason,
+    ActionValidationResult,
+    ActionValidationSeverity,
+    ActionValidator,
+    ActionValidatorConfig,
+    ActionValidatorSnapshot,
+)
 
 __all__ = [
 
+
+    "ActionValidationDecision",
+    "ActionValidationFinding",
+    "ActionValidationReason",
+    "ActionValidationResult",
+    "ActionValidationSeverity",
+    "ActionValidator",
+    "ActionValidatorConfig",
+    "ActionValidatorSnapshot",
     "PermissionPolicy",
     "PermissionPolicyConfig",
     "PermissionPolicyEvaluation",
