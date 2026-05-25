@@ -1,5 +1,19 @@
 from __future__ import annotations
 
+from jarvis.tools.browser import (
+    BrowserActionDecision,
+    BrowserActionKind,
+    BrowserActionPolicyResult,
+    BrowserActionReason,
+    BrowserActionRequest,
+    BrowserActionResult,
+    BrowserLauncher,
+    BrowserPolicy,
+    BrowserRuntime,
+    BrowserRuntimeConfig,
+    BrowserRuntimeSnapshot,
+    WebBrowserLauncher,
+)
 from jarvis.tools.errors import (
     ToolApprovalError,
     ToolCancellationError,
@@ -110,6 +124,18 @@ from jarvis.tools.validation import (
 
 __all__ = [
 
+    "WebBrowserLauncher",
+    "BrowserActionDecision",
+    "BrowserActionKind",
+    "BrowserActionPolicyResult",
+    "BrowserActionReason",
+    "BrowserActionRequest",
+    "BrowserActionResult",
+    "BrowserLauncher",
+    "BrowserPolicy",
+    "BrowserRuntime",
+    "BrowserRuntimeConfig",
+    "BrowserRuntimeSnapshot",
     "FileOperationDecision",
     "FileOperationKind",
     "FileOperationPolicyResult",
