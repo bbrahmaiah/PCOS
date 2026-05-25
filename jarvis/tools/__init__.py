@@ -21,6 +21,18 @@ from jarvis.tools.execution import (
     ActionExecutionState,
     ActionExecutionTransition,
 )
+from jarvis.tools.filesystem import (
+    FileOperationDecision,
+    FileOperationKind,
+    FileOperationPolicyResult,
+    FileOperationReason,
+    FileOperationRequest,
+    FileOperationResult,
+    FileSystemPolicy,
+    FileSystemRuntime,
+    FileSystemRuntimeConfig,
+    FileSystemRuntimeSnapshot,
+)
 from jarvis.tools.ids import (
     new_action_error_id,
     new_action_id,
@@ -98,6 +110,16 @@ from jarvis.tools.validation import (
 
 __all__ = [
 
+    "FileOperationDecision",
+    "FileOperationKind",
+    "FileOperationPolicyResult",
+    "FileOperationReason",
+    "FileOperationRequest",
+    "FileOperationResult",
+    "FileSystemPolicy",
+    "FileSystemRuntime",
+    "FileSystemRuntimeConfig",
+    "FileSystemRuntimeSnapshot",
     "SafeShellRuntime",
     "SafeShellRuntimeConfig",
     "SafeShellRuntimeSnapshot",
