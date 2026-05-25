@@ -44,8 +44,35 @@ from jarvis.orchestration.models import (
     WorkerContract,
     WorkerState,
 )
+from jarvis.orchestration.registry import (
+    WorkerAvailability,
+    WorkerDescriptor,
+    WorkerHealthState,
+    WorkerLoad,
+    WorkerLookupDecision,
+    WorkerLookupResult,
+    WorkerRegistrationDecision,
+    WorkerRegistrationResult,
+    WorkerRegistry,
+    WorkerRegistryConfig,
+    WorkerRegistryReason,
+    WorkerRegistrySnapshot,
+)
 
 __all__ = [
+
+    "WorkerAvailability",
+    "WorkerDescriptor",
+    "WorkerHealthState",
+    "WorkerLoad",
+    "WorkerLookupDecision",
+    "WorkerLookupResult",
+    "WorkerRegistrationDecision",
+    "WorkerRegistrationResult",
+    "WorkerRegistry",
+    "WorkerRegistryConfig",
+    "WorkerRegistryReason",
+    "WorkerRegistrySnapshot",
     "BudgetPolicy",
     "InvalidTaskStateError",
     "JobId",
