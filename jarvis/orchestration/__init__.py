@@ -58,9 +58,29 @@ from jarvis.orchestration.registry import (
     WorkerRegistryReason,
     WorkerRegistrySnapshot,
 )
+from jarvis.orchestration.task_graph import (
+    TaskGraph,
+    TaskGraphBuilder,
+    TaskGraphDecision,
+    TaskGraphMutationResult,
+    TaskGraphNode,
+    TaskGraphReason,
+    TaskGraphValidationResult,
+    TaskReadinessDecision,
+    TaskReadinessResult,
+)
 
 __all__ = [
 
+    "TaskGraph",
+    "TaskGraphBuilder",
+    "TaskGraphDecision",
+    "TaskGraphMutationResult",
+    "TaskGraphNode",
+    "TaskGraphReason",
+    "TaskGraphValidationResult",
+    "TaskReadinessDecision",
+    "TaskReadinessResult",
     "WorkerAvailability",
     "WorkerDescriptor",
     "WorkerHealthState",
