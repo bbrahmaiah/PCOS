@@ -71,6 +71,20 @@ from jarvis.tools.registry import (
     ToolRegistryConfig,
     ToolRegistrySnapshot,
 )
+from jarvis.tools.shell import (
+    SafeShellRuntime,
+    SafeShellRuntimeConfig,
+    SafeShellRuntimeSnapshot,
+    ShellCommandDecision,
+    ShellCommandPolicy,
+    ShellCommandPolicyResult,
+    ShellCommandReason,
+    ShellCommandRequest,
+    ShellCommandResult,
+    ShellProcessOutcome,
+    ShellProcessRunner,
+    SubprocessShellRunner,
+)
 from jarvis.tools.validation import (
     ActionValidationDecision,
     ActionValidationFinding,
@@ -84,7 +98,18 @@ from jarvis.tools.validation import (
 
 __all__ = [
 
-
+    "SafeShellRuntime",
+    "SafeShellRuntimeConfig",
+    "SafeShellRuntimeSnapshot",
+    "ShellCommandDecision",
+    "ShellCommandPolicy",
+    "ShellCommandPolicyResult",
+    "ShellCommandReason",
+    "ShellCommandRequest",
+    "ShellCommandResult",
+    "ShellProcessOutcome",
+    "ShellProcessRunner",
+    "SubprocessShellRunner",
     "ActionValidationDecision",
     "ActionValidationFinding",
     "ActionValidationReason",
