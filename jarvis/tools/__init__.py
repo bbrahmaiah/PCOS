@@ -47,6 +47,20 @@ from jarvis.tools.filesystem import (
     FileSystemRuntimeConfig,
     FileSystemRuntimeSnapshot,
 )
+from jarvis.tools.ide import (
+    EditorLauncher,
+    IdeActionDecision,
+    IdeActionKind,
+    IdeActionPolicyResult,
+    IdeActionReason,
+    IdeActionRequest,
+    IdeActionResult,
+    IdePolicy,
+    IdeRuntime,
+    IdeRuntimeConfig,
+    IdeRuntimeSnapshot,
+    LoggingEditorLauncher,
+)
 from jarvis.tools.ids import (
     new_action_error_id,
     new_action_id,
@@ -124,6 +138,18 @@ from jarvis.tools.validation import (
 
 __all__ = [
 
+    "EditorLauncher",
+    "IdeActionDecision",
+    "IdeActionKind",
+    "IdeActionPolicyResult",
+    "IdeActionReason",
+    "IdeActionRequest",
+    "IdeActionResult",
+    "IdePolicy",
+    "IdeRuntime",
+    "IdeRuntimeConfig",
+    "IdeRuntimeSnapshot",
+    "LoggingEditorLauncher",
     "WebBrowserLauncher",
     "BrowserActionDecision",
     "BrowserActionKind",
