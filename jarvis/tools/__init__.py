@@ -23,6 +23,21 @@ from jarvis.tools.audit import (
     ActionAuditRecord,
     ActionAuditSensitivity,
 )
+from jarvis.tools.autonomy import (
+    AutonomousStepKind,
+    AutonomousStepResult,
+    AutonomousTaskDecision,
+    AutonomousTaskMode,
+    AutonomousTaskReason,
+    AutonomousTaskRequest,
+    AutonomousTaskResult,
+    AutonomousTaskState,
+    AutonomousTaskStep,
+    SafeAutonomousTaskRuntime,
+    SafeAutonomousTaskRuntimeConfig,
+    SafeAutonomousTaskRuntimeSnapshot,
+    SmokeRuntimeRunner,
+)
 from jarvis.tools.browser import (
     BrowserActionDecision,
     BrowserActionKind,
@@ -258,6 +273,19 @@ from jarvis.tools.validation import (
 
 __all__ = [
 
+    "SmokeRuntimeRunner",
+    "AutonomousStepKind",
+    "AutonomousStepResult",
+    "AutonomousTaskDecision",
+    "AutonomousTaskMode",
+    "AutonomousTaskReason",
+    "AutonomousTaskRequest",
+    "AutonomousTaskResult",
+    "AutonomousTaskState",
+    "AutonomousTaskStep",
+    "SafeAutonomousTaskRuntime",
+    "SafeAutonomousTaskRuntimeConfig",
+    "SafeAutonomousTaskRuntimeSnapshot",
     "RealActionSmokeReason",
     "RealActionSmokeRequest",
     "RealActionSmokeResult",
