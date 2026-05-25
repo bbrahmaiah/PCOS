@@ -52,6 +52,20 @@ from jarvis.tools.browser import (
     BrowserRuntimeSnapshot,
     WebBrowserLauncher,
 )
+from jarvis.tools.cognition_bridge import (
+    AutonomousRunner,
+    CognitionToolBridge,
+    CognitionToolBridgeConfig,
+    CognitionToolBridgeResult,
+    CognitionToolBridgeSnapshot,
+    CognitionToolDecision,
+    CognitionToolIntent,
+    CognitionToolMode,
+    CognitionToolReason,
+    CognitionToolSource,
+    PlannerRunner,
+    SmokeRunner,
+)
 from jarvis.tools.desktop_awareness import (
     ActiveWindowSnapshot,
     AppCapabilityDescriptor,
@@ -273,6 +287,18 @@ from jarvis.tools.validation import (
 
 __all__ = [
 
+    "AutonomousRunner",
+    "CognitionToolBridge",
+    "CognitionToolBridgeConfig",
+    "CognitionToolBridgeResult",
+    "CognitionToolBridgeSnapshot",
+    "CognitionToolDecision",
+    "CognitionToolIntent",
+    "CognitionToolMode",
+    "CognitionToolReason",
+    "CognitionToolSource",
+    "PlannerRunner",
+    "SmokeRunner",
     "SmokeRuntimeRunner",
     "AutonomousStepKind",
     "AutonomousStepResult",
