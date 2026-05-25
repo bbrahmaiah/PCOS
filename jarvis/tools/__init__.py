@@ -1,5 +1,15 @@
 from __future__ import annotations
 
+from jarvis.tools.audit import (
+    ActionAuditActor,
+    ActionAuditEventKind,
+    ActionAuditLog,
+    ActionAuditLogConfig,
+    ActionAuditLogSnapshot,
+    ActionAuditOutcome,
+    ActionAuditRecord,
+    ActionAuditSensitivity,
+)
 from jarvis.tools.browser import (
     BrowserActionDecision,
     BrowserActionKind,
@@ -194,6 +204,14 @@ from jarvis.tools.validation import (
 
 __all__ = [
 
+    "ActionAuditActor",
+    "ActionAuditEventKind",
+    "ActionAuditLog",
+    "ActionAuditLogConfig",
+    "ActionAuditLogSnapshot",
+    "ActionAuditOutcome",
+    "ActionAuditRecord",
+    "ActionAuditSensitivity",
     "ActionPlanningDecision",
     "ActionPlanningIntentKind",
     "ActionPlanningReason",
