@@ -49,6 +49,16 @@ from jarvis.tools.models import (
     ToolId,
     ToolModel,
 )
+from jarvis.tools.policy import (
+    PermissionPolicy,
+    PermissionPolicyConfig,
+    PermissionPolicyEvaluation,
+    PermissionPolicySnapshot,
+    PermissionReason,
+    PermissionScope,
+    RiskClassifier,
+    RiskClassifierResult,
+)
 from jarvis.tools.registry import (
     ToolAvailability,
     ToolDescriptor,
@@ -64,6 +74,14 @@ from jarvis.tools.registry import (
 
 __all__ = [
 
+    "PermissionPolicy",
+    "PermissionPolicyConfig",
+    "PermissionPolicyEvaluation",
+    "PermissionPolicySnapshot",
+    "PermissionReason",
+    "PermissionScope",
+    "RiskClassifier",
+    "RiskClassifierResult",
     "ActionExecutionDisposition",
     "ActionExecutionEvent",
     "ActionExecutionEventKind",
