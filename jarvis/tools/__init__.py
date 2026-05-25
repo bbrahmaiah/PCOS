@@ -1,5 +1,18 @@
 from __future__ import annotations
 
+from jarvis.tools.approval import (
+    ApprovalCheckResult,
+    ApprovalDecision,
+    ApprovalEvaluation,
+    ApprovalReason,
+    ApprovalRecord,
+    ApprovalRequest,
+    ApprovalRequirement,
+    ApprovalScope,
+    HumanApprovalRuntime,
+    HumanApprovalRuntimeConfig,
+    HumanApprovalRuntimeSnapshot,
+)
 from jarvis.tools.audit import (
     ActionAuditActor,
     ActionAuditEventKind,
@@ -204,6 +217,17 @@ from jarvis.tools.validation import (
 
 __all__ = [
 
+    "ApprovalCheckResult",
+    "ApprovalDecision",
+    "ApprovalEvaluation",
+    "ApprovalReason",
+    "ApprovalRecord",
+    "ApprovalRequest",
+    "ApprovalRequirement",
+    "ApprovalScope",
+    "HumanApprovalRuntime",
+    "HumanApprovalRuntimeConfig",
+    "HumanApprovalRuntimeSnapshot",
     "ActionAuditActor",
     "ActionAuditEventKind",
     "ActionAuditLog",
