@@ -10,6 +10,17 @@ from jarvis.tools.errors import (
     ToolRuntimeError,
     ToolValidationError,
 )
+from jarvis.tools.execution import (
+    ActionExecutionDisposition,
+    ActionExecutionEvent,
+    ActionExecutionEventKind,
+    ActionExecutionPriority,
+    ActionExecutionProtocol,
+    ActionExecutionProtocolConfig,
+    ActionExecutionProtocolSnapshot,
+    ActionExecutionState,
+    ActionExecutionTransition,
+)
 from jarvis.tools.ids import (
     new_action_error_id,
     new_action_id,
@@ -53,6 +64,15 @@ from jarvis.tools.registry import (
 
 __all__ = [
 
+    "ActionExecutionDisposition",
+    "ActionExecutionEvent",
+    "ActionExecutionEventKind",
+    "ActionExecutionPriority",
+    "ActionExecutionProtocol",
+    "ActionExecutionProtocolConfig",
+    "ActionExecutionProtocolSnapshot",
+    "ActionExecutionState",
+    "ActionExecutionTransition",
     "ToolAvailability",
     "ToolDescriptor",
     "ToolHealth",
