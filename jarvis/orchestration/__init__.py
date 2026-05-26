@@ -72,6 +72,18 @@ from jarvis.orchestration.circuit_breakers import (
     WorkerFailureKind,
     WorkerFailureRecord,
 )
+from jarvis.orchestration.completion_gate import (
+    Phase6CompletionCertificate,
+    Phase6CompletionCheckKind,
+    Phase6CompletionCheckResult,
+    Phase6CompletionGateConfig,
+    Phase6CompletionGateReport,
+    Phase6CompletionGateRuntime,
+    Phase6CompletionGateSnapshot,
+    Phase6GateReason,
+    Phase6GateStatus,
+    Phase6SealLevel,
+)
 from jarvis.orchestration.coordination import (
     CoordinationActorKind,
     ResultCollection,
@@ -363,6 +375,16 @@ from jarvis.orchestration.task_graph import (
 
 __all__ = [
 
+    "Phase6CompletionCertificate",
+    "Phase6CompletionCheckKind",
+    "Phase6CompletionCheckResult",
+    "Phase6CompletionGateConfig",
+    "Phase6CompletionGateReport",
+    "Phase6CompletionGateRuntime",
+    "Phase6CompletionGateSnapshot",
+    "Phase6GateReason",
+    "Phase6GateStatus",
+    "Phase6SealLevel",
     "SecurityAttackKind",
     "SecurityAttackVector",
     "SecurityAuditFinding",
