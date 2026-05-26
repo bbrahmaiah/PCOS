@@ -232,6 +232,22 @@ from jarvis.orchestration.observability import (
     TaskGraphView,
     WorkerHealthView,
 )
+from jarvis.orchestration.proactive import (
+    ProactiveDecision,
+    ProactiveEngine,
+    ProactiveOrchestrationConfig,
+    ProactiveOrchestrationSnapshot,
+    ProactiveReason,
+    ProactiveResult,
+    ProactiveRiskLevel,
+    ProactiveStatus,
+    ProactiveSuggestion,
+    ProactiveTaskEnvelope,
+    ProactiveTrigger,
+    ProactiveTriggerKind,
+    ProactiveWorkKind,
+    TriggerPolicy,
+)
 from jarvis.orchestration.recovery import (
     ReconstructedState,
     RecoverableTaskRecord,
@@ -325,6 +341,20 @@ from jarvis.orchestration.task_graph import (
 
 __all__ = [
 
+    "ProactiveDecision",
+    "ProactiveEngine",
+    "ProactiveOrchestrationConfig",
+    "ProactiveOrchestrationSnapshot",
+    "ProactiveReason",
+    "ProactiveResult",
+    "ProactiveRiskLevel",
+    "ProactiveStatus",
+    "ProactiveSuggestion",
+    "ProactiveTaskEnvelope",
+    "ProactiveTrigger",
+    "ProactiveTriggerKind",
+    "ProactiveWorkKind",
+    "TriggerPolicy",
     "AttentionPhaseAdapter",
     "BackgroundPhaseAdapter",
     "BoundaryViolationKind",
