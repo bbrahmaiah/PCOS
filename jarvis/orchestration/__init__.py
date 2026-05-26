@@ -297,6 +297,16 @@ from jarvis.orchestration.scheduler import (
     TaskScheduleResult,
     TaskSchedulerSnapshot,
 )
+from jarvis.orchestration.smoke import (
+    OrchestrationSmokeConfig,
+    OrchestrationSmokeReport,
+    OrchestrationSmokeRuntime,
+    OrchestrationSmokeSnapshot,
+    SmokeCheckKind,
+    SmokeCheckResult,
+    SmokeCheckStatus,
+    SmokeReason,
+)
 from jarvis.orchestration.snapshots import (
     ContextSnapshot,
     ContextSnapshotReason,
@@ -341,6 +351,14 @@ from jarvis.orchestration.task_graph import (
 
 __all__ = [
 
+    "OrchestrationSmokeConfig",
+    "OrchestrationSmokeReport",
+    "OrchestrationSmokeRuntime",
+    "OrchestrationSmokeSnapshot",
+    "SmokeCheckKind",
+    "SmokeCheckResult",
+    "SmokeCheckStatus",
+    "SmokeReason",
     "ProactiveDecision",
     "ProactiveEngine",
     "ProactiveOrchestrationConfig",
