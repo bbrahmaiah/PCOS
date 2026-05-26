@@ -95,6 +95,19 @@ from jarvis.orchestration.registry import (
     WorkerRegistryReason,
     WorkerRegistrySnapshot,
 )
+from jarvis.orchestration.state_machine import (
+    OrchestrationEventKind,
+    OrchestrationGuardReason,
+    OrchestrationState,
+    OrchestrationStateContext,
+    OrchestrationStateMachine,
+    OrchestrationStateMachineConfig,
+    OrchestrationStateMachineSnapshot,
+    OrchestrationTransition,
+    OrchestrationTransitionDecision,
+    OrchestrationTransitionReason,
+    OrchestrationTransitionResult,
+)
 from jarvis.orchestration.task_graph import (
     TaskGraph,
     TaskGraphBuilder,
@@ -109,7 +122,17 @@ from jarvis.orchestration.task_graph import (
 
 __all__ = [
 
-
+    "OrchestrationEventKind",
+    "OrchestrationGuardReason",
+    "OrchestrationState",
+    "OrchestrationStateContext",
+    "OrchestrationStateMachine",
+    "OrchestrationStateMachineConfig",
+    "OrchestrationStateMachineSnapshot",
+    "OrchestrationTransition",
+    "OrchestrationTransitionDecision",
+    "OrchestrationTransitionReason",
+    "OrchestrationTransitionResult",
     "BudgetDecision",
     "BudgetEvaluation",
     "BudgetReason",
