@@ -297,6 +297,18 @@ from jarvis.orchestration.scheduler import (
     TaskScheduleResult,
     TaskSchedulerSnapshot,
 )
+from jarvis.orchestration.security_audit import (
+    SecurityAttackKind,
+    SecurityAttackVector,
+    SecurityAuditFinding,
+    SecurityAuditReason,
+    SecurityAuditReport,
+    SecurityAuditStatus,
+    SecurityControl,
+    SecurityHardeningAuditConfig,
+    SecurityHardeningAuditRuntime,
+    SecurityHardeningAuditSnapshot,
+)
 from jarvis.orchestration.smoke import (
     OrchestrationSmokeConfig,
     OrchestrationSmokeReport,
@@ -351,6 +363,16 @@ from jarvis.orchestration.task_graph import (
 
 __all__ = [
 
+    "SecurityAttackKind",
+    "SecurityAttackVector",
+    "SecurityAuditFinding",
+    "SecurityAuditReason",
+    "SecurityAuditReport",
+    "SecurityAuditStatus",
+    "SecurityControl",
+    "SecurityHardeningAuditConfig",
+    "SecurityHardeningAuditRuntime",
+    "SecurityHardeningAuditSnapshot",
     "OrchestrationSmokeConfig",
     "OrchestrationSmokeReport",
     "OrchestrationSmokeRuntime",
