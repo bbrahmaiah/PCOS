@@ -95,6 +95,19 @@ from jarvis.orchestration.registry import (
     WorkerRegistryReason,
     WorkerRegistrySnapshot,
 )
+from jarvis.orchestration.scheduler import (
+    DeadlineTracker,
+    DependencyResolver,
+    PriorityQueue,
+    ScheduledTask,
+    TaskScheduleBatchResult,
+    TaskScheduleDecision,
+    TaskScheduler,
+    TaskSchedulerConfig,
+    TaskScheduleReason,
+    TaskScheduleResult,
+    TaskSchedulerSnapshot,
+)
 from jarvis.orchestration.state_machine import (
     OrchestrationEventKind,
     OrchestrationGuardReason,
@@ -122,6 +135,17 @@ from jarvis.orchestration.task_graph import (
 
 __all__ = [
 
+    "DeadlineTracker",
+    "DependencyResolver",
+    "PriorityQueue",
+    "ScheduledTask",
+    "TaskScheduleBatchResult",
+    "TaskScheduleDecision",
+    "TaskScheduleReason",
+    "TaskScheduleResult",
+    "TaskScheduler",
+    "TaskSchedulerConfig",
+    "TaskSchedulerSnapshot",
     "OrchestrationEventKind",
     "OrchestrationGuardReason",
     "OrchestrationState",
