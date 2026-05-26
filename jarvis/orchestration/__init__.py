@@ -174,6 +174,24 @@ from jarvis.orchestration.models import (
     WorkerContract,
     WorkerState,
 )
+from jarvis.orchestration.observability import (
+    BottleneckDetector,
+    BottleneckKind,
+    BottleneckReport,
+    BottleneckSeverity,
+    CoordinationEventView,
+    ObservabilityReason,
+    ObservabilityResult,
+    OrchestrationDashboard,
+    OrchestrationHealth,
+    OrchestrationObservabilityConfig,
+    OrchestrationObservabilityRuntime,
+    OrchestrationObservabilitySnapshot,
+    ResourceUtilizationView,
+    RuntimeMetricSample,
+    TaskGraphView,
+    WorkerHealthView,
+)
 from jarvis.orchestration.registry import (
     WorkerAvailability,
     WorkerDescriptor,
@@ -245,6 +263,22 @@ from jarvis.orchestration.task_graph import (
 
 __all__ = [
 
+    "BottleneckDetector",
+    "BottleneckKind",
+    "BottleneckReport",
+    "BottleneckSeverity",
+    "CoordinationEventView",
+    "ObservabilityReason",
+    "ObservabilityResult",
+    "OrchestrationDashboard",
+    "OrchestrationHealth",
+    "OrchestrationObservabilityConfig",
+    "OrchestrationObservabilityRuntime",
+    "OrchestrationObservabilitySnapshot",
+    "ResourceUtilizationView",
+    "RuntimeMetricSample",
+    "TaskGraphView",
+    "WorkerHealthView",
     "BreakerState",
     "CircuitBreaker",
     "CircuitBreakerDecision",
