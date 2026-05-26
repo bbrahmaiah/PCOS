@@ -155,6 +155,22 @@ from jarvis.orchestration.interrupts import (
     new_interrupt_id,
     propagation_target_for_capability,
 )
+from jarvis.orchestration.load_manager import (
+    CognitiveLoadAssessment,
+    CognitiveLoadLevel,
+    CognitiveLoadManagerConfig,
+    CognitiveLoadManagerRuntime,
+    CognitiveLoadManagerSnapshot,
+    CognitiveLoadMonitor,
+    LoadDecisionReason,
+    LoadManagerResult,
+    LoadPolicy,
+    LoadSheddingAction,
+    LoadSheddingDecision,
+    LoadSheddingStrategy,
+    LoadSheddingTarget,
+    LoadSignal,
+)
 from jarvis.orchestration.models import (
     BudgetPolicy,
     JobRequest,
@@ -263,6 +279,21 @@ from jarvis.orchestration.task_graph import (
 
 __all__ = [
 
+
+    "CognitiveLoadAssessment",
+    "CognitiveLoadLevel",
+    "CognitiveLoadManagerConfig",
+    "CognitiveLoadManagerRuntime",
+    "CognitiveLoadManagerSnapshot",
+    "CognitiveLoadMonitor",
+    "LoadDecisionReason",
+    "LoadManagerResult",
+    "LoadPolicy",
+    "LoadSheddingAction",
+    "LoadSheddingDecision",
+    "LoadSheddingStrategy",
+    "LoadSheddingTarget",
+    "LoadSignal",
     "BottleneckDetector",
     "BottleneckKind",
     "BottleneckReport",
