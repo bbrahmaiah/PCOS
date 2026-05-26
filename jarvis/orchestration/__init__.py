@@ -1,5 +1,20 @@
 from __future__ import annotations
 
+from jarvis.orchestration.attention import (
+    AttentionContext,
+    AttentionDecision,
+    AttentionEvaluation,
+    AttentionFocusKind,
+    AttentionPolicy,
+    AttentionReason,
+    AttentionRuntime,
+    AttentionRuntimeConfig,
+    AttentionRuntimeSnapshot,
+    AttentionScore,
+    AttentionUrgency,
+    FocusFrame,
+    FocusStack,
+)
 from jarvis.orchestration.errors import (
     InvalidTaskStateError,
     OrchestrationContractError,
@@ -72,6 +87,19 @@ from jarvis.orchestration.task_graph import (
 
 __all__ = [
 
+    "AttentionContext",
+    "AttentionDecision",
+    "AttentionEvaluation",
+    "AttentionFocusKind",
+    "AttentionPolicy",
+    "AttentionReason",
+    "AttentionRuntime",
+    "AttentionRuntimeConfig",
+    "AttentionRuntimeSnapshot",
+    "AttentionScore",
+    "AttentionUrgency",
+    "FocusFrame",
+    "FocusStack",
     "TaskGraph",
     "TaskGraphBuilder",
     "TaskGraphDecision",
