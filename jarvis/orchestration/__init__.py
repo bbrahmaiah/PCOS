@@ -37,6 +37,23 @@ from jarvis.orchestration.budgets import (
     wall_time_ms,
     worker_slots,
 )
+from jarvis.orchestration.coordination import (
+    CoordinationActorKind,
+    ResultCollection,
+    TaskAssignment,
+    WorkerCoordinationDecision,
+    WorkerCoordinationMessage,
+    WorkerCoordinationMessageKind,
+    WorkerCoordinationReason,
+    WorkerCoordinationResult,
+    WorkerCoordinator,
+    WorkerCoordinatorConfig,
+    WorkerCoordinatorSnapshot,
+    WorkerHealthBroadcast,
+    WorkerProgressUpdate,
+    new_coordination_message_id,
+    new_task_assignment_id,
+)
 from jarvis.orchestration.errors import (
     InvalidTaskStateError,
     OrchestrationContractError,
@@ -152,6 +169,21 @@ from jarvis.orchestration.task_graph import (
 
 __all__ = [
 
+    "CoordinationActorKind",
+    "ResultCollection",
+    "TaskAssignment",
+    "WorkerCoordinationDecision",
+    "WorkerCoordinationMessage",
+    "WorkerCoordinationMessageKind",
+    "WorkerCoordinationReason",
+    "WorkerCoordinationResult",
+    "WorkerCoordinator",
+    "WorkerCoordinatorConfig",
+    "WorkerCoordinatorSnapshot",
+    "WorkerHealthBroadcast",
+    "WorkerProgressUpdate",
+    "new_coordination_message_id",
+    "new_task_assignment_id",
     "ContextSnapshot",
     "ContextSnapshotReason",
     "ContextSnapshotResult",
