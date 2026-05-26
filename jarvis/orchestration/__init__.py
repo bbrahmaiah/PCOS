@@ -57,6 +57,21 @@ from jarvis.orchestration.budgets import (
     wall_time_ms,
     worker_slots,
 )
+from jarvis.orchestration.circuit_breakers import (
+    BreakerState,
+    CircuitBreaker,
+    CircuitBreakerDecision,
+    CircuitBreakerReason,
+    CircuitBreakerResult,
+    CircuitBreakerRuntime,
+    CircuitBreakerRuntimeConfig,
+    CircuitBreakerRuntimeSnapshot,
+    FailureThreshold,
+    FallbackMode,
+    RecoveryProbe,
+    WorkerFailureKind,
+    WorkerFailureRecord,
+)
 from jarvis.orchestration.coordination import (
     CoordinationActorKind,
     ResultCollection,
@@ -230,6 +245,19 @@ from jarvis.orchestration.task_graph import (
 
 __all__ = [
 
+    "BreakerState",
+    "CircuitBreaker",
+    "CircuitBreakerDecision",
+    "CircuitBreakerReason",
+    "CircuitBreakerResult",
+    "CircuitBreakerRuntime",
+    "CircuitBreakerRuntimeConfig",
+    "CircuitBreakerRuntimeSnapshot",
+    "FailureThreshold",
+    "FallbackMode",
+    "RecoveryProbe",
+    "WorkerFailureKind",
+    "WorkerFailureRecord",
     "DeadlockDetectionDecision",
     "DeadlockDetectionReason",
     "DeadlockDetectionResult",
