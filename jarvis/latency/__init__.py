@@ -1,3 +1,16 @@
+from jarvis.latency.budget_allocation import (
+    LatencyBudgetAllocationReason,
+    LatencyBudgetAllocationReport,
+    LatencyBudgetAllocationStatus,
+    LatencyBudgetAllocator,
+    LatencyBudgetAllocatorConfig,
+    LatencyBudgetAllocatorSnapshot,
+    LatencyBudgetPlan,
+    LatencyBudgetSlice,
+    LatencyBudgetSliceEvaluation,
+    LatencyBudgetSliceKind,
+    default_first_word_latency_budget_plan,
+)
 from jarvis.latency.budgets import (
     LatencyBudgetRegistry,
     LatencyBudgetRegistryConfig,
@@ -61,6 +74,17 @@ from jarvis.latency.voice_baseline import (
 )
 
 __all__ = [
+    "LatencyBudgetAllocationReason",
+    "LatencyBudgetAllocationReport",
+    "LatencyBudgetAllocationStatus",
+    "LatencyBudgetAllocator",
+    "LatencyBudgetAllocatorConfig",
+    "LatencyBudgetAllocatorSnapshot",
+    "LatencyBudgetPlan",
+    "LatencyBudgetSlice",
+    "LatencyBudgetSliceEvaluation",
+    "LatencyBudgetSliceKind",
+    "default_first_word_latency_budget_plan",
     "VoiceBaselineAggregate",
     "VoiceBaselineProfilerConfig",
     "VoiceBaselineReason",
