@@ -58,6 +58,21 @@ from jarvis.latency.profiler import (
     PipelineTrace,
     PipelineTraceStatus,
 )
+from jarvis.latency.streaming_audit import (
+    CriticalPathRank,
+    StreamingArchitectureAuditConfig,
+    StreamingArchitectureAuditReport,
+    StreamingArchitectureAuditRuntime,
+    StreamingArchitectureAuditSnapshot,
+    StreamingAuditFinding,
+    StreamingAuditFlow,
+    StreamingAuditFlowEvaluation,
+    StreamingAuditFlowSpec,
+    StreamingAuditReason,
+    StreamingDebtSeverity,
+    StreamingReadiness,
+    default_streaming_audit_flow_specs,
+)
 from jarvis.latency.voice_baseline import (
     VoiceBaselineAggregate,
     VoiceBaselineProfilerConfig,
@@ -74,6 +89,19 @@ from jarvis.latency.voice_baseline import (
 )
 
 __all__ = [
+    "CriticalPathRank",
+    "StreamingArchitectureAuditConfig",
+    "StreamingArchitectureAuditReport",
+    "StreamingArchitectureAuditRuntime",
+    "StreamingArchitectureAuditSnapshot",
+    "StreamingAuditFinding",
+    "StreamingAuditFlow",
+    "StreamingAuditFlowEvaluation",
+    "StreamingAuditFlowSpec",
+    "StreamingAuditReason",
+    "StreamingDebtSeverity",
+    "StreamingReadiness",
+    "default_streaming_audit_flow_specs",
     "LatencyBudgetAllocationReason",
     "LatencyBudgetAllocationReport",
     "LatencyBudgetAllocationStatus",
