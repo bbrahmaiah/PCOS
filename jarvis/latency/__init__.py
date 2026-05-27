@@ -73,6 +73,24 @@ from jarvis.latency.streaming_audit import (
     StreamingReadiness,
     default_streaming_audit_flow_specs,
 )
+from jarvis.latency.streaming_tts import (
+    AudioChunk,
+    FakeStreamingTTSAdapter,
+    SpeechBoundaryKind,
+    SpeechChunk,
+    StreamingTTSEvent,
+    StreamingTTSEventKind,
+    StreamingTTSReason,
+    StreamingTTSReport,
+    StreamingTTSResult,
+    StreamingTTSRuntime,
+    StreamingTTSRuntimeConfig,
+    StreamingTTSRuntimeSnapshot,
+    StreamingTTSSessionState,
+    StreamingTTSStatus,
+    TextToSpeechAdapter,
+    token_chunk,
+)
 from jarvis.latency.token_streaming import (
     TokenChunk,
     TokenStability,
@@ -104,6 +122,23 @@ from jarvis.latency.voice_baseline import (
 )
 
 __all__ = [
+
+    "AudioChunk",
+    "FakeStreamingTTSAdapter",
+    "SpeechBoundaryKind",
+    "SpeechChunk",
+    "StreamingTTSReason",
+    "StreamingTTSReport",
+    "StreamingTTSResult",
+    "StreamingTTSRuntime",
+    "StreamingTTSRuntimeConfig",
+    "StreamingTTSRuntimeSnapshot",
+    "StreamingTTSEvent",
+    "StreamingTTSEventKind",
+    "StreamingTTSSessionState",
+    "StreamingTTSStatus",
+    "TextToSpeechAdapter",
+    "token_chunk",
     "TokenChunk",
     "TokenStability",
     "TokenStreamChunkKind",
