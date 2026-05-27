@@ -136,9 +136,12 @@ def test_reset_returns_to_default_state() -> None:
     state = machine.wake_detected(PresenceState()).next_state
 
     result = machine.reset(state)
+    default_state = PresenceState()
 
     assert result.changed is True
-    assert result.next_state == PresenceState()
+    assert result.next_state.model_dump(exclude={"updated_at"}) == (
+        default_state.model_dump(exclude={"updated_at"})
+    )
 
 
 def test_error_and_recover_flow() -> None:
