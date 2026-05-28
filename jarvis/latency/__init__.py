@@ -53,6 +53,23 @@ from jarvis.latency.interruption_recovery import (
     RecoveryContextSnapshot,
     RecoverySnapshotKind,
 )
+from jarvis.latency.latency_regression import (
+    LatencyRegressionContract,
+    LatencyRegressionEvaluation,
+    LatencyRegressionEvent,
+    LatencyRegressionEventKind,
+    LatencyRegressionMachineProfile,
+    LatencyRegressionMetric,
+    LatencyRegressionReason,
+    LatencyRegressionReport,
+    LatencyRegressionResult,
+    LatencyRegressionRuntime,
+    LatencyRegressionRuntimeConfig,
+    LatencyRegressionRuntimeSnapshot,
+    LatencyRegressionSample,
+    LatencyRegressionSessionState,
+    LatencyRegressionStatus,
+)
 from jarvis.latency.measurements import (
     LatencyMeasurementRuntime,
     LatencyMeasurementRuntimeConfig,
@@ -312,6 +329,21 @@ from jarvis.latency.voice_baseline import (
 
 __all__ = [
 
+    "LatencyRegressionContract",
+    "LatencyRegressionEvaluation",
+    "LatencyRegressionEvent",
+    "LatencyRegressionEventKind",
+    "LatencyRegressionMachineProfile",
+    "LatencyRegressionMetric",
+    "LatencyRegressionReason",
+    "LatencyRegressionReport",
+    "LatencyRegressionResult",
+    "LatencyRegressionRuntime",
+    "LatencyRegressionRuntimeConfig",
+    "LatencyRegressionRuntimeSnapshot",
+    "LatencyRegressionSample",
+    "LatencyRegressionSessionState",
+    "LatencyRegressionStatus",
     "FillerKind",
     "NaturalnessEvent",
     "NaturalnessEventKind",
