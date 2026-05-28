@@ -108,6 +108,24 @@ from jarvis.latency.parallel_pipeline import (
     ParallelStageTiming,
     PipelineBranchStatus,
 )
+from jarvis.latency.perceptual_latency import (
+    PerceptualFailureMode,
+    PerceptualHumanScore,
+    PerceptualInteractionRecording,
+    PerceptualLatencyEvaluation,
+    PerceptualLatencyEvent,
+    PerceptualLatencyEventKind,
+    PerceptualLatencyInteractionSet,
+    PerceptualLatencyReason,
+    PerceptualLatencyReport,
+    PerceptualLatencyResult,
+    PerceptualLatencyRuntimeConfig,
+    PerceptualLatencyRuntimeSnapshot,
+    PerceptualLatencySessionState,
+    PerceptualLatencySmokeRuntime,
+    PerceptualLatencyStatus,
+    PerceptualQuestion,
+)
 from jarvis.latency.predictive_context import (
     ContextBuildRequest,
     ContextBuildStrategy,
@@ -329,6 +347,22 @@ from jarvis.latency.voice_baseline import (
 
 __all__ = [
 
+    "PerceptualFailureMode",
+    "PerceptualHumanScore",
+    "PerceptualInteractionRecording",
+    "PerceptualLatencyEvaluation",
+    "PerceptualLatencyEvent",
+    "PerceptualLatencyEventKind",
+    "PerceptualLatencyInteractionSet",
+    "PerceptualLatencyReason",
+    "PerceptualLatencyReport",
+    "PerceptualLatencyResult",
+    "PerceptualLatencyRuntimeConfig",
+    "PerceptualLatencyRuntimeSnapshot",
+    "PerceptualLatencySessionState",
+    "PerceptualLatencySmokeRuntime",
+    "PerceptualLatencyStatus",
+    "PerceptualQuestion",
     "LatencyRegressionContract",
     "LatencyRegressionEvaluation",
     "LatencyRegressionEvent",
