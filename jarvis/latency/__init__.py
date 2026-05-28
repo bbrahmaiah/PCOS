@@ -61,6 +61,24 @@ from jarvis.latency.predictive_context import (
     PredictiveContextSessionState,
     PredictiveContextStatus,
 )
+from jarvis.latency.prewarming import (
+    HotCache,
+    HotCacheConfig,
+    PrewarmConnectionPoolRuntime,
+    PrewarmEvent,
+    PrewarmEventKind,
+    PrewarmPoolState,
+    PrewarmReason,
+    PrewarmReport,
+    PrewarmResult,
+    PrewarmRuntimeConfig,
+    PrewarmRuntimeSnapshot,
+    PrewarmSessionState,
+    PrewarmStatus,
+    PrewarmTarget,
+    WarmResource,
+    WarmResourceRole,
+)
 from jarvis.latency.profiler import (
     PipelineFinding,
     PipelineFindingKind,
@@ -210,6 +228,22 @@ from jarvis.latency.voice_baseline import (
 
 __all__ = [
 
+    "HotCache",
+    "HotCacheConfig",
+    "PrewarmConnectionPoolRuntime",
+    "PrewarmEvent",
+    "PrewarmEventKind",
+    "PrewarmPoolState",
+    "PrewarmReason",
+    "PrewarmReport",
+    "PrewarmResult",
+    "PrewarmRuntimeConfig",
+    "PrewarmRuntimeSnapshot",
+    "PrewarmSessionState",
+    "PrewarmStatus",
+    "PrewarmTarget",
+    "WarmResource",
+    "WarmResourceRole",
     "ContextBuildRequest",
     "ContextBuildStrategy",
     "ContextCompressionPolicy",
