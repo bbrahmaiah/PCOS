@@ -57,6 +57,21 @@ from jarvis.latency.models import (
     LatencyViolation,
     PercentileSnapshot,
 )
+from jarvis.latency.parallel_pipeline import (
+    ParallelPipelineEvent,
+    ParallelPipelineEventKind,
+    ParallelPipelineReason,
+    ParallelPipelineReport,
+    ParallelPipelineResult,
+    ParallelPipelineRuntime,
+    ParallelPipelineRuntimeConfig,
+    ParallelPipelineRuntimeSnapshot,
+    ParallelPipelineSessionState,
+    ParallelPipelineStageKind,
+    ParallelPipelineStatus,
+    ParallelStageTiming,
+    PipelineBranchStatus,
+)
 from jarvis.latency.predictive_context import (
     ContextBuildRequest,
     ContextBuildStrategy,
@@ -244,6 +259,19 @@ from jarvis.latency.voice_baseline import (
 
 __all__ = [
 
+    "ParallelPipelineEvent",
+    "ParallelPipelineEventKind",
+    "ParallelPipelineReason",
+    "ParallelPipelineReport",
+    "ParallelPipelineResult",
+    "ParallelPipelineRuntime",
+    "ParallelPipelineRuntimeConfig",
+    "ParallelPipelineRuntimeSnapshot",
+    "ParallelPipelineSessionState",
+    "ParallelPipelineStageKind",
+    "ParallelPipelineStatus",
+    "ParallelStageTiming",
+    "PipelineBranchStatus",
     "InterruptionContextDelta",
     "InterruptionRecoveryEvent",
     "InterruptionRecoveryEventKind",
