@@ -147,6 +147,21 @@ from jarvis.latency.speculative_execution import (
     SpeculativeWorkItem,
     SpeculativeWorkType,
 )
+from jarvis.latency.streaming_action_feedback import (
+    ActionFeedbackChunk,
+    ActionFeedbackEvent,
+    ActionFeedbackEventKind,
+    ActionFeedbackReason,
+    ActionFeedbackReport,
+    ActionFeedbackResult,
+    ActionFeedbackRuntimeSnapshot,
+    ActionFeedbackSessionState,
+    ActionFeedbackStatus,
+    ActionFeedbackType,
+    FeedbackDeliveryTarget,
+    StreamingActionFeedbackConfig,
+    StreamingActionFeedbackRuntime,
+)
 from jarvis.latency.streaming_audit import (
     CriticalPathRank,
     StreamingArchitectureAuditConfig,
@@ -259,6 +274,19 @@ from jarvis.latency.voice_baseline import (
 
 __all__ = [
 
+    "ActionFeedbackChunk",
+    "ActionFeedbackEvent",
+    "ActionFeedbackEventKind",
+    "ActionFeedbackReason",
+    "ActionFeedbackReport",
+    "ActionFeedbackResult",
+    "ActionFeedbackRuntimeSnapshot",
+    "ActionFeedbackSessionState",
+    "ActionFeedbackStatus",
+    "ActionFeedbackType",
+    "FeedbackDeliveryTarget",
+    "StreamingActionFeedbackConfig",
+    "StreamingActionFeedbackRuntime",
     "ParallelPipelineEvent",
     "ParallelPipelineEventKind",
     "ParallelPipelineReason",
