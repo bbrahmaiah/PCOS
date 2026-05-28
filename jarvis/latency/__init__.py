@@ -70,6 +70,23 @@ from jarvis.latency.latency_regression import (
     LatencyRegressionSessionState,
     LatencyRegressionStatus,
 )
+from jarvis.latency.load_degradation import (
+    DegradationMode,
+    LoadDegradationRuntimeConfig,
+    LoadDegradationValidationRuntime,
+    LoadSample,
+    LoadScenarioConfig,
+    LoadScenarioEvaluation,
+    LoadScenarioKind,
+    LoadValidationEvent,
+    LoadValidationEventKind,
+    LoadValidationReason,
+    LoadValidationReport,
+    LoadValidationResult,
+    LoadValidationRuntimeSnapshot,
+    LoadValidationSessionState,
+    LoadValidationStatus,
+)
 from jarvis.latency.measurements import (
     LatencyMeasurementRuntime,
     LatencyMeasurementRuntimeConfig,
@@ -347,6 +364,21 @@ from jarvis.latency.voice_baseline import (
 
 __all__ = [
 
+    "DegradationMode",
+    "LoadDegradationRuntimeConfig",
+    "LoadDegradationValidationRuntime",
+    "LoadSample",
+    "LoadScenarioConfig",
+    "LoadScenarioEvaluation",
+    "LoadScenarioKind",
+    "LoadValidationEvent",
+    "LoadValidationEventKind",
+    "LoadValidationReason",
+    "LoadValidationReport",
+    "LoadValidationResult",
+    "LoadValidationRuntimeSnapshot",
+    "LoadValidationSessionState",
+    "LoadValidationStatus",
     "PerceptualFailureMode",
     "PerceptualHumanScore",
     "PerceptualInteractionRecording",
