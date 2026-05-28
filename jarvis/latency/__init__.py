@@ -143,6 +143,20 @@ from jarvis.latency.perceptual_latency import (
     PerceptualLatencyStatus,
     PerceptualQuestion,
 )
+from jarvis.latency.phase7_completion_gate import (
+    Phase7CompletionComponent,
+    Phase7CompletionEvent,
+    Phase7CompletionEventKind,
+    Phase7CompletionGateConfig,
+    Phase7CompletionGateRuntime,
+    Phase7CompletionReason,
+    Phase7CompletionReport,
+    Phase7CompletionResult,
+    Phase7CompletionRuntimeSnapshot,
+    Phase7CompletionSessionState,
+    Phase7CompletionStatus,
+    Phase7GateCheck,
+)
 from jarvis.latency.predictive_context import (
     ContextBuildRequest,
     ContextBuildStrategy,
@@ -364,6 +378,18 @@ from jarvis.latency.voice_baseline import (
 
 __all__ = [
 
+    "Phase7CompletionComponent",
+    "Phase7CompletionEvent",
+    "Phase7CompletionEventKind",
+    "Phase7CompletionGateConfig",
+    "Phase7CompletionGateRuntime",
+    "Phase7CompletionReason",
+    "Phase7CompletionReport",
+    "Phase7CompletionResult",
+    "Phase7CompletionRuntimeSnapshot",
+    "Phase7CompletionSessionState",
+    "Phase7CompletionStatus",
+    "Phase7GateCheck",
     "DegradationMode",
     "LoadDegradationRuntimeConfig",
     "LoadDegradationValidationRuntime",
