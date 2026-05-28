@@ -18,6 +18,22 @@ from jarvis.latency.budgets import (
     latency_budget,
     latency_target,
 )
+from jarvis.latency.interruption_recovery import (
+    InterruptionContextDelta,
+    InterruptionRecoveryEvent,
+    InterruptionRecoveryEventKind,
+    InterruptionRecoveryReason,
+    InterruptionRecoveryReport,
+    InterruptionRecoveryResult,
+    InterruptionRecoveryRuntime,
+    InterruptionRecoveryRuntimeConfig,
+    InterruptionRecoveryRuntimeSnapshot,
+    InterruptionRecoverySessionState,
+    InterruptionRecoveryStatus,
+    ReconstructedInterruptionContext,
+    RecoveryContextSnapshot,
+    RecoverySnapshotKind,
+)
 from jarvis.latency.measurements import (
     LatencyMeasurementRuntime,
     LatencyMeasurementRuntimeConfig,
@@ -228,6 +244,20 @@ from jarvis.latency.voice_baseline import (
 
 __all__ = [
 
+    "InterruptionContextDelta",
+    "InterruptionRecoveryEvent",
+    "InterruptionRecoveryEventKind",
+    "InterruptionRecoveryReason",
+    "InterruptionRecoveryReport",
+    "InterruptionRecoveryResult",
+    "InterruptionRecoveryRuntime",
+    "InterruptionRecoveryRuntimeConfig",
+    "InterruptionRecoveryRuntimeSnapshot",
+    "InterruptionRecoverySessionState",
+    "InterruptionRecoveryStatus",
+    "ReconstructedInterruptionContext",
+    "RecoveryContextSnapshot",
+    "RecoverySnapshotKind",
     "HotCache",
     "HotCacheConfig",
     "PrewarmConnectionPoolRuntime",
