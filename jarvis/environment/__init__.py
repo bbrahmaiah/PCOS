@@ -70,6 +70,22 @@ from jarvis.environment.models import (
     WindowState,
     WorkspaceMemoryEntry,
 )
+from jarvis.environment.timeline import (
+    ChangeCause,
+    EnvironmentTimelineRuntime,
+    EnvironmentTimelineSession,
+    StateTransition,
+    StateTransitionKind,
+    TimelineEventKind,
+    TimelineOperationResult,
+    TimelineQuery,
+    TimelineQueryKind,
+    TimelineQueryResult,
+    TimelineReason,
+    TimelineRuntimeEvent,
+    TimelineRuntimeSnapshot,
+    trusted_timeline_observation,
+)
 from jarvis.environment.trust_runtime import (
     ActionTrust,
     AmbiguityScore,
@@ -131,6 +147,20 @@ from jarvis.environment.worker_registry import (
 
 __all__ = [
 
+    "ChangeCause",
+    "EnvironmentTimelineRuntime",
+    "EnvironmentTimelineSession",
+    "StateTransition",
+    "StateTransitionKind",
+    "TimelineEventKind",
+    "TimelineOperationResult",
+    "TimelineQuery",
+    "TimelineQueryKind",
+    "TimelineQueryResult",
+    "TimelineReason",
+    "TimelineRuntimeEvent",
+    "TimelineRuntimeSnapshot",
+    "trusted_timeline_observation",
     "ActionTrust",
     "AmbiguityScore",
     "ConfidenceSignal",
