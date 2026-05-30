@@ -620,6 +620,39 @@ from jarvis.environment.ui_semantics import (
     UISemanticSession,
     UISemanticStatus,
 )
+from jarvis.environment.verification_runtime import (
+    ExpectedState,
+    ObservedState,
+    RecoveryNeededReason,
+    VerificationAuditRecord,
+    VerificationContract,
+    VerificationDecision,
+    VerificationDelta,
+    VerificationDeltaKind,
+    VerificationEventKind,
+    VerificationReason,
+    VerificationRuntime,
+    VerificationRuntimeEvent,
+    VerificationRuntimeSession,
+    VerificationRuntimeSnapshot,
+    VerificationStateKind,
+    VerificationTargetKind,
+    VerificationTrustScore,
+    expected_bool_state,
+    expected_hash_state,
+    observed_bool_state,
+    observed_hash_state,
+    state_hash,
+)
+from jarvis.environment.verification_runtime import (
+    StateHistoryComparator as VerificationStateComparator,
+)
+from jarvis.environment.verification_runtime import (
+    VerificationResult as ActionVerificationResult,
+)
+from jarvis.environment.verification_runtime import (
+    VerificationStatus as ActionVerificationStatus,
+)
 from jarvis.environment.visual_context_streaming import (
     EnvironmentSnapshotCache,
     FusedContextStream,
@@ -729,7 +762,31 @@ from jarvis.environment.workspace_graph import (
 )
 
 __all__ = [
-
+    "ExpectedState",
+    "ObservedState",
+    "RecoveryNeededReason",
+    "VerificationStateComparator",
+    "VerificationAuditRecord",
+    "VerificationContract",
+    "VerificationDecision",
+    "VerificationDelta",
+    "VerificationDeltaKind",
+    "VerificationEventKind",
+    "VerificationReason",
+    "ActionVerificationResult",
+    "VerificationRuntime",
+    "VerificationRuntimeEvent",
+    "VerificationRuntimeSession",
+    "VerificationRuntimeSnapshot",
+    "VerificationStateKind",
+    "ActionVerificationStatus",
+    "VerificationTargetKind",
+    "VerificationTrustScore",
+    "expected_bool_state",
+    "expected_hash_state",
+    "observed_bool_state",
+    "observed_hash_state",
+    "state_hash",
     "ClipboardAuditRecord",
     "ClipboardDecision",
     "ClipboardEventKind",
