@@ -695,6 +695,43 @@ from jarvis.environment.ui_semantics import (
     UISemanticSession,
     UISemanticStatus,
 )
+from jarvis.environment.undo_rollback import (
+    MutatingActionKind,
+    ReversibilityContract,
+    ReversibilityLevel,
+    UndoActionKind,
+    UndoApprovalKind,
+    UndoDeclarationResult,
+    UndoRollbackDecision,
+    UndoRollbackEventKind,
+    UndoRollbackReason,
+    UndoRollbackRuntime,
+    UndoRollbackRuntimeEvent,
+    UndoRollbackRuntimeSession,
+    UndoRollbackRuntimeSnapshot,
+    UndoRollbackStatus,
+    UndoStackEntry,
+    UndoStackSnapshot,
+    UndoVerificationRequirement,
+)
+from jarvis.environment.undo_rollback import (
+    RollbackAudit as EnvironmentRollbackAudit,
+)
+from jarvis.environment.undo_rollback import (
+    RollbackPlan as EnvironmentRollbackPlan,
+)
+from jarvis.environment.undo_rollback import (
+    RollbackPlanStep as EnvironmentRollbackPlanStep,
+)
+from jarvis.environment.undo_rollback import (
+    RollbackResult as EnvironmentRollbackResult,
+)
+from jarvis.environment.undo_rollback import (
+    UndoPolicy as EnvironmentUndoPolicy,
+)
+from jarvis.environment.undo_rollback import (
+    UndoStack as EnvironmentUndoStack,
+)
 from jarvis.environment.verification_runtime import (
     ExpectedState,
     ObservedState,
@@ -837,6 +874,29 @@ from jarvis.environment.workspace_graph import (
 )
 
 __all__ = [
+    "MutatingActionKind",
+    "ReversibilityContract",
+    "ReversibilityLevel",
+    "EnvironmentRollbackAudit",
+    "EnvironmentRollbackPlan",
+    "EnvironmentRollbackPlanStep",
+    "EnvironmentRollbackResult",
+    "UndoActionKind",
+    "UndoApprovalKind",
+    "UndoDeclarationResult",
+    "EnvironmentUndoPolicy",
+    "UndoRollbackDecision",
+    "UndoRollbackEventKind",
+    "UndoRollbackReason",
+    "UndoRollbackRuntime",
+    "UndoRollbackRuntimeEvent",
+    "UndoRollbackRuntimeSession",
+    "UndoRollbackRuntimeSnapshot",
+    "UndoRollbackStatus",
+    "EnvironmentUndoStack",
+    "UndoStackEntry",
+    "UndoStackSnapshot",
+    "UndoVerificationRequirement",
     "EnvironmentEscalationPolicy",
     "RecoveryAttemptKind",
     "EnvironmentRecoveryAuditRecord",
