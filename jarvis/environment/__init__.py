@@ -732,6 +732,18 @@ from jarvis.environment.undo_rollback import (
 from jarvis.environment.undo_rollback import (
     UndoStack as EnvironmentUndoStack,
 )
+from jarvis.environment.verification_recovery_smoke import (
+    VerificationRecoverySmokeCheckKind,
+    VerificationRecoverySmokeCheckResult,
+    VerificationRecoverySmokeEventKind,
+    VerificationRecoverySmokeGateRuntime,
+    VerificationRecoverySmokeReason,
+    VerificationRecoverySmokeReport,
+    VerificationRecoverySmokeRuntimeEvent,
+    VerificationRecoverySmokeSession,
+    VerificationRecoverySmokeSnapshot,
+    VerificationRecoverySmokeStatus,
+)
 from jarvis.environment.verification_runtime import (
     ExpectedState,
     ObservedState,
@@ -874,6 +886,17 @@ from jarvis.environment.workspace_graph import (
 )
 
 __all__ = [
+
+    "VerificationRecoverySmokeCheckKind",
+    "VerificationRecoverySmokeCheckResult",
+    "VerificationRecoverySmokeEventKind",
+    "VerificationRecoverySmokeGateRuntime",
+    "VerificationRecoverySmokeReason",
+    "VerificationRecoverySmokeReport",
+    "VerificationRecoverySmokeRuntimeEvent",
+    "VerificationRecoverySmokeSession",
+    "VerificationRecoverySmokeSnapshot",
+    "VerificationRecoverySmokeStatus",
     "MutatingActionKind",
     "ReversibilityContract",
     "ReversibilityLevel",
