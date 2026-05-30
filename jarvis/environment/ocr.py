@@ -164,10 +164,18 @@ class OCRTextRegion(OrchestrationModel):
     created_at: object = Field(default_factory=utc_now)
     metadata: dict[str, Any] = Field(default_factory=dict)
 
-    @field_validator("text_region_id", "text", "capture_id")
+    @field_validator("text_region_id", "capture_id")
     @classmethod
-    def _required_text(cls, value: str) -> str:
+    def _required_id_text(cls, value: str) -> str:
         return _clean_required(value)
+
+    @field_validator("text")
+    @classmethod
+    def _required_ocr_text_preserve_indentation(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("field cannot be empty.")
+
+        return value
 
     def to_environment_text_region(self) -> TextRegion:
         return TextRegion(

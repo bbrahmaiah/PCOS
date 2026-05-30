@@ -165,6 +165,18 @@ from jarvis.environment.ocr import (
     TextConfidenceScorer,
     TextConfidenceScorerConfig,
 )
+from jarvis.environment.perception_validation import (
+    CaptureCpuSample,
+    VisualPerceptionCheckKind,
+    VisualPerceptionCheckResult,
+    VisualPerceptionCheckStatus,
+    VisualPerceptionGateReason,
+    VisualPerceptionValidationEvent,
+    VisualPerceptionValidationEventKind,
+    VisualPerceptionValidationGate,
+    VisualPerceptionValidationReport,
+    VisualPerceptionValidationSnapshot,
+)
 from jarvis.environment.state_runtime import (
     AppResponsiveness,
     AppResponsivenessState,
@@ -295,6 +307,17 @@ from jarvis.environment.worker_registry import (
 )
 
 __all__ = [
+
+    "CaptureCpuSample",
+    "VisualPerceptionCheckKind",
+    "VisualPerceptionCheckResult",
+    "VisualPerceptionCheckStatus",
+    "VisualPerceptionGateReason",
+    "VisualPerceptionValidationEvent",
+    "VisualPerceptionValidationEventKind",
+    "VisualPerceptionValidationGate",
+    "VisualPerceptionValidationReport",
+    "VisualPerceptionValidationSnapshot",
     "AccessibilityBridge",
     "AccessibilityBridgeResult",
     "AppParserResult",
