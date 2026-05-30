@@ -463,6 +463,81 @@ from jarvis.environment.physical_input import (
     PreClickVerification,
     PreClickVerifier,
 )
+from jarvis.environment.recovery_runtime import (
+    EscalationPolicy as EnvironmentEscalationPolicy,
+)
+from jarvis.environment.recovery_runtime import (
+    RecoveryAttemptKind,
+)
+from jarvis.environment.recovery_runtime import (
+    RecoveryAuditRecord as EnvironmentRecoveryAuditRecord,
+)
+from jarvis.environment.recovery_runtime import (
+    RecoveryDecision as EnvironmentRecoveryDecision,
+)
+from jarvis.environment.recovery_runtime import (
+    RecoveryEventKind as EnvironmentRecoveryEventKind,
+)
+from jarvis.environment.recovery_runtime import (
+    RecoveryHistoryEntry as EnvironmentRecoveryHistoryEntry,
+)
+from jarvis.environment.recovery_runtime import (
+    RecoveryPlan as EnvironmentRecoveryPlan,
+)
+from jarvis.environment.recovery_runtime import (
+    RecoveryPlanStep as EnvironmentRecoveryPlanStep,
+)
+from jarvis.environment.recovery_runtime import (
+    RecoveryReason as EnvironmentRecoveryReason,
+)
+from jarvis.environment.recovery_runtime import (
+    RecoveryRequest as EnvironmentRecoveryRequest,
+)
+from jarvis.environment.recovery_runtime import (
+    RecoveryResult as EnvironmentRecoveryResult,
+)
+from jarvis.environment.recovery_runtime import (
+    RecoveryRiskLevel as EnvironmentRecoveryRiskLevel,
+)
+from jarvis.environment.recovery_runtime import (
+    RecoveryRuntime as EnvironmentRecoveryRuntime,
+)
+from jarvis.environment.recovery_runtime import (
+    RecoveryRuntimeEvent as EnvironmentRecoveryRuntimeEvent,
+)
+from jarvis.environment.recovery_runtime import (
+    RecoveryRuntimeSession as EnvironmentRecoveryRuntimeSession,
+)
+from jarvis.environment.recovery_runtime import (
+    RecoveryRuntimeSnapshot as EnvironmentRecoveryRuntimeSnapshot,
+)
+from jarvis.environment.recovery_runtime import (
+    RecoveryStatus as EnvironmentRecoveryStatus,
+)
+from jarvis.environment.recovery_runtime import (
+    RecoveryStrategy as EnvironmentRecoveryStrategy,
+)
+from jarvis.environment.recovery_runtime import (
+    RecoveryStrategySelector as EnvironmentRecoveryStrategySelector,
+)
+from jarvis.environment.recovery_runtime import (
+    RecoveryStrategyState as EnvironmentRecoveryStrategyState,
+)
+from jarvis.environment.recovery_runtime import (
+    RetryPolicy as EnvironmentRetryPolicy,
+)
+from jarvis.environment.recovery_runtime import (
+    RollbackTrigger as EnvironmentRollbackTrigger,
+)
+from jarvis.environment.recovery_runtime import (
+    RollbackTriggerKind as EnvironmentRollbackTriggerKind,
+)
+from jarvis.environment.recovery_runtime import (
+    StuckDetector as EnvironmentStuckDetector,
+)
+from jarvis.environment.recovery_runtime import (
+    StuckReport as EnvironmentStuckReport,
+)
 from jarvis.environment.state_runtime import (
     AppResponsiveness,
     AppResponsivenessState,
@@ -762,6 +837,31 @@ from jarvis.environment.workspace_graph import (
 )
 
 __all__ = [
+    "EnvironmentEscalationPolicy",
+    "RecoveryAttemptKind",
+    "EnvironmentRecoveryAuditRecord",
+    "EnvironmentRecoveryDecision",
+    "EnvironmentRecoveryEventKind",
+    "EnvironmentRecoveryHistoryEntry",
+    "EnvironmentRecoveryPlan",
+    "EnvironmentRecoveryPlanStep",
+    "EnvironmentRecoveryReason",
+    "EnvironmentRecoveryRequest",
+    "EnvironmentRecoveryResult",
+    "EnvironmentRecoveryRiskLevel",
+    "EnvironmentRecoveryRuntime",
+    "EnvironmentRecoveryRuntimeEvent",
+    "EnvironmentRecoveryRuntimeSession",
+    "EnvironmentRecoveryRuntimeSnapshot",
+    "EnvironmentRecoveryStatus",
+    "EnvironmentRecoveryStrategy",
+    "EnvironmentRecoveryStrategySelector",
+    "EnvironmentRecoveryStrategyState",
+    "EnvironmentRetryPolicy",
+    "EnvironmentRollbackTrigger",
+    "EnvironmentRollbackTriggerKind",
+    "EnvironmentStuckDetector",
+    "EnvironmentStuckReport",
     "ExpectedState",
     "ObservedState",
     "RecoveryNeededReason",
