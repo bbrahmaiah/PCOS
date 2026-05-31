@@ -590,6 +590,23 @@ from jarvis.environment.perception_validation import (
     VisualPerceptionValidationReport,
     VisualPerceptionValidationSnapshot,
 )
+from jarvis.environment.phase8_completion_gate import (
+    Phase8ChecklistResult,
+    Phase8CompletionCapability,
+    Phase8CompletionCapabilityResult,
+    Phase8CompletionChecklistItem,
+    Phase8CompletionDecision,
+    Phase8CompletionEventKind,
+    Phase8CompletionGateRuntime,
+    Phase8CompletionReason,
+    Phase8CompletionReport,
+    Phase8CompletionRuntimeEvent,
+    Phase8CompletionRuntimeSnapshot,
+    Phase8CompletionSession,
+    Phase8CompletionStatus,
+    Phase8GateKind,
+    Phase8GateResult,
+)
 from jarvis.environment.phase8_integration import (
     CognitionFusedContextBridge,
     EnvironmentAwarenessBridge,
@@ -1107,6 +1124,22 @@ from jarvis.environment.workspace_graph import (
 )
 
 __all__ = [
+
+    "Phase8ChecklistResult",
+    "Phase8CompletionCapability",
+    "Phase8CompletionCapabilityResult",
+    "Phase8CompletionChecklistItem",
+    "Phase8CompletionDecision",
+    "Phase8CompletionEventKind",
+    "Phase8CompletionGateRuntime",
+    "Phase8CompletionReason",
+    "Phase8CompletionReport",
+    "Phase8CompletionRuntimeEvent",
+    "Phase8CompletionRuntimeSnapshot",
+    "Phase8CompletionSession",
+    "Phase8CompletionStatus",
+    "Phase8GateKind",
+    "Phase8GateResult",
     "Phase8LatencyBudget",
     "Phase8LoadLatencyStabilityRuntime",
     "Phase8LoadSimulator",
