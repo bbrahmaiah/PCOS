@@ -888,6 +888,30 @@ from jarvis.environment.worker_registry import (
     EnvironmentWorkerRegistrySnapshot,
     default_environment_workers,
 )
+from jarvis.environment.workflow_cognition import (
+    IntentionModel as WorkflowIntentionModel,
+)
+from jarvis.environment.workflow_cognition import (
+    TaskContinuity,
+    WorkflowCognitionDecision,
+    WorkflowCognitionEventKind,
+    WorkflowCognitionReason,
+    WorkflowCognitionResult,
+    WorkflowCognitionRuntime,
+    WorkflowCognitionRuntimeEvent,
+    WorkflowCognitionRuntimeSnapshot,
+    WorkflowCognitionSession,
+    WorkflowCognitionStatus,
+    WorkflowConfidenceBand,
+    WorkflowContext,
+    WorkflowKind,
+    WorkflowPrediction,
+    WorkflowPredictor,
+    WorkflowResumePlan,
+    WorkflowResumePlanner,
+    WorkflowSignal,
+    WorkflowSignalKind,
+)
 from jarvis.environment.workspace_graph import (
     GraphDelta,
     GraphDeltaKind,
@@ -914,6 +938,26 @@ from jarvis.environment.workspace_graph import (
 )
 
 __all__ = [
+    "WorkflowIntentionModel",
+    "TaskContinuity",
+    "WorkflowCognitionDecision",
+    "WorkflowCognitionEventKind",
+    "WorkflowCognitionReason",
+    "WorkflowCognitionResult",
+    "WorkflowCognitionRuntime",
+    "WorkflowCognitionRuntimeEvent",
+    "WorkflowCognitionRuntimeSnapshot",
+    "WorkflowCognitionSession",
+    "WorkflowCognitionStatus",
+    "WorkflowConfidenceBand",
+    "WorkflowContext",
+    "WorkflowKind",
+    "WorkflowPrediction",
+    "WorkflowPredictor",
+    "WorkflowResumePlan",
+    "WorkflowResumePlanner",
+    "WorkflowSignal",
+    "WorkflowSignalKind",
     "CursorPosition",
     "EnvironmentMemoryAuditRecord",
     "EnvironmentMemoryDecision",
