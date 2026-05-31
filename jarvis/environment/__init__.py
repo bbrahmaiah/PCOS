@@ -226,6 +226,26 @@ from jarvis.environment.environment_fusion import (
     VisualContextInjection,
     VoiceInputFrame,
 )
+from jarvis.environment.environment_governance_audit import (
+    EnvironmentAttackVector,
+    EnvironmentGovernanceAuditor,
+    EnvironmentGovernancePolicy,
+    GovernanceAttackSample,
+    GovernanceAuditDecision,
+    GovernanceAuditEventKind,
+    GovernanceAuditReason,
+    GovernanceAuditReport,
+    GovernanceAuditRuntimeEvent,
+    GovernanceAuditRuntimeSnapshot,
+    GovernanceAuditSession,
+    GovernanceAuditStatus,
+    GovernanceControlKind,
+    GovernanceControlResult,
+    GovernanceRiskLevel,
+    GovernanceVectorAuditResult,
+    SafetyEnvironmentGovernanceAuditRuntime,
+    default_governance_attack_samples,
+)
 from jarvis.environment.environment_memory import (
     CursorPosition,
     EnvironmentMemoryAuditRecord,
@@ -1069,6 +1089,25 @@ from jarvis.environment.workspace_graph import (
 )
 
 __all__ = [
+
+    "EnvironmentAttackVector",
+    "EnvironmentGovernanceAuditor",
+    "EnvironmentGovernancePolicy",
+    "GovernanceAttackSample",
+    "GovernanceAuditDecision",
+    "GovernanceAuditEventKind",
+    "GovernanceAuditReason",
+    "GovernanceAuditReport",
+    "GovernanceAuditRuntimeEvent",
+    "GovernanceAuditRuntimeSnapshot",
+    "GovernanceAuditSession",
+    "GovernanceAuditStatus",
+    "GovernanceControlKind",
+    "GovernanceControlResult",
+    "GovernanceRiskLevel",
+    "GovernanceVectorAuditResult",
+    "SafetyEnvironmentGovernanceAuditRuntime",
+    "default_governance_attack_samples",
     "CognitionFusedContextBridge",
     "EnvironmentAwarenessBridge",
     "EnvironmentEventBusBridge",
