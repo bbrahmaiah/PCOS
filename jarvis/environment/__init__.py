@@ -615,6 +615,24 @@ from jarvis.environment.phase8_integration import (
     VoiceEnvironmentFusionBridge,
     WorkflowMemoryGatewayBridge,
 )
+from jarvis.environment.phase8_stability_validation import (
+    Phase8LatencyBudget,
+    Phase8LoadLatencyStabilityRuntime,
+    Phase8LoadSimulator,
+    Phase8MetricSample,
+    Phase8ScenarioResult,
+    Phase8StabilityDecision,
+    Phase8StabilityEventKind,
+    Phase8StabilityMetricKind,
+    Phase8StabilityReason,
+    Phase8StabilityReport,
+    Phase8StabilityRuntimeEvent,
+    Phase8StabilityRuntimeSnapshot,
+    Phase8StabilityScenario,
+    Phase8StabilitySession,
+    Phase8StabilityStatus,
+    Phase8StressProfile,
+)
 from jarvis.environment.physical_input import (
     HumanOverrideKind,
     HumanTimingPolicy,
@@ -1089,7 +1107,22 @@ from jarvis.environment.workspace_graph import (
 )
 
 __all__ = [
-
+    "Phase8LatencyBudget",
+    "Phase8LoadLatencyStabilityRuntime",
+    "Phase8LoadSimulator",
+    "Phase8MetricSample",
+    "Phase8ScenarioResult",
+    "Phase8StabilityDecision",
+    "Phase8StabilityEventKind",
+    "Phase8StabilityMetricKind",
+    "Phase8StabilityReason",
+    "Phase8StabilityReport",
+    "Phase8StabilityRuntimeEvent",
+    "Phase8StabilityRuntimeSnapshot",
+    "Phase8StabilityScenario",
+    "Phase8StabilitySession",
+    "Phase8StabilityStatus",
+    "Phase8StressProfile",
     "EnvironmentAttackVector",
     "EnvironmentGovernanceAuditor",
     "EnvironmentGovernancePolicy",
