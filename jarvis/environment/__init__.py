@@ -198,6 +198,34 @@ from jarvis.environment.environment_fusion import (
     VisualContextInjection,
     VoiceInputFrame,
 )
+from jarvis.environment.environment_memory import (
+    CursorPosition,
+    EnvironmentMemoryAuditRecord,
+    EnvironmentMemoryDecision,
+    EnvironmentMemoryEventKind,
+    EnvironmentMemoryReason,
+    EnvironmentMemoryResult,
+    EnvironmentMemoryRuntime,
+    EnvironmentMemoryRuntimeEvent,
+    EnvironmentMemoryRuntimeSnapshot,
+    EnvironmentMemoryScope,
+    EnvironmentMemorySession,
+    EnvironmentMemoryStatus,
+    WorkflowMemoryGateway,
+    WorkflowMemoryKind,
+    WorkflowMemoryRead,
+    WorkflowMemoryWrite,
+    WorkflowStage,
+)
+from jarvis.environment.environment_memory import (
+    ProjectMemory as EnvironmentProjectMemory,
+)
+from jarvis.environment.environment_memory import (
+    SessionContinuity as EnvironmentSessionContinuity,
+)
+from jarvis.environment.environment_memory import (
+    WorkspaceMemoryEntry as EnvironmentWorkspaceMemoryEntry,
+)
 from jarvis.environment.environment_simulation import (
     ActionOutcomePredictor,
     EnvironmentSimulationRequest,
@@ -886,7 +914,26 @@ from jarvis.environment.workspace_graph import (
 )
 
 __all__ = [
-
+    "CursorPosition",
+    "EnvironmentMemoryAuditRecord",
+    "EnvironmentMemoryDecision",
+    "EnvironmentMemoryEventKind",
+    "EnvironmentMemoryReason",
+    "EnvironmentMemoryResult",
+    "EnvironmentMemoryRuntime",
+    "EnvironmentMemoryRuntimeEvent",
+    "EnvironmentMemoryRuntimeSnapshot",
+    "EnvironmentMemoryScope",
+    "EnvironmentMemorySession",
+    "EnvironmentMemoryStatus",
+    "EnvironmentProjectMemory",
+    "EnvironmentSessionContinuity",
+    "EnvironmentWorkspaceMemoryEntry",
+    "WorkflowMemoryGateway",
+    "WorkflowMemoryKind",
+    "WorkflowMemoryRead",
+    "WorkflowMemoryWrite",
+    "WorkflowStage",
     "VerificationRecoverySmokeCheckKind",
     "VerificationRecoverySmokeCheckResult",
     "VerificationRecoverySmokeEventKind",
