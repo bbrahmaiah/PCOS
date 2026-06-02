@@ -33,6 +33,10 @@ from jarvis.system.contracts import (
     JarvisAskStatus,
     JarvisMemoryWriteDecision,
     JarvisMemoryWriteStatus,
+    JarvisPipelineEvent,
+    JarvisPipelineEventKind,
+    JarvisPipelineResult,
+    JarvisPipelineStatus,
     JarvisSubsystemHealth,
     JarvisSubsystemKind,
     JarvisSystemRequest,
@@ -352,6 +356,169 @@ class JarvisSystem:
             turn_id=turn_id,
             expects_follow_up=expects_follow_up,
         )
+
+    def process_user_utterance(
+        self,
+        *,
+        text: str,
+        session_id: str = "default",
+        signal: RealConversationInput | None = None,
+        max_memory_results: int = 5,
+        metadata: dict[str, object] | None = None,
+    ) -> JarvisPipelineResult:
+        pipeline_id = new_system_id("jarvis_pipeline")
+        events: list[JarvisPipelineEvent] = []
+
+        def record(
+            kind: JarvisPipelineEventKind,
+            message: str,
+            event_metadata: dict[str, object] | None = None,
+        ) -> None:
+            events.append(
+                JarvisPipelineEvent(
+                    kind=kind,
+                    message=message,
+                    created_at=utc_now(),
+                    metadata={
+                        "pipeline_id": pipeline_id,
+                        "session_id": session_id,
+                        **(event_metadata or {}),
+                    },
+                )
+            )
+
+        try:
+            clean_text = text.strip()
+            if not clean_text:
+                raise ValueError("text cannot be empty.")
+
+            record(
+                JarvisPipelineEventKind.USER_UTTERANCE_RECEIVED,
+                "user utterance received",
+                {"text_preview": clean_text[:120]},
+            )
+
+            conversation_output = None
+            if self._conversation_worker is not None:
+                conversation_signal = signal or _conversation_signal_from_text(
+                    clean_text
+                )
+                conversation_output = self.accept_conversation_input(
+                    conversation_signal
+                )
+                record(
+                    JarvisPipelineEventKind.CONVERSATION_ACCEPTED,
+                    "conversation runtime accepted user input",
+                    {
+                        "action_count": len(conversation_output.actions),
+                        "should_cancel": (
+                            conversation_output.should_cancel_active_work
+                        ),
+                        "should_keep_listening": (
+                            conversation_output.should_keep_listening
+                        ),
+                    },
+                )
+
+                if conversation_output.should_cancel_active_work:
+                    self._cognition_worker.request_cancel(
+                        reason="conversation interruption requested"
+                    )
+                    record(
+                        JarvisPipelineEventKind.INTERRUPTION_REQUESTED,
+                        "conversation requested active work cancellation",
+                        {},
+                    )
+                    record(
+                        JarvisPipelineEventKind.COGNITION_CANCEL_REQUESTED,
+                        "cognition cancellation requested",
+                        {},
+                    )
+
+                    return JarvisPipelineResult(
+                        pipeline_id=pipeline_id,
+                        session_id=session_id,
+                        status=JarvisPipelineStatus.CANCELLED,
+                        response=None,
+                        cancelled=True,
+                        should_keep_listening=True,
+                        events=tuple(events),
+                        reason="conversation requested cancellation",
+                        created_at=utc_now(),
+                    )
+
+            record(
+                JarvisPipelineEventKind.MEMORY_RETRIEVAL_STARTED,
+                "memory retrieval and cognition request starting",
+                {"max_memory_results": max_memory_results},
+            )
+            record(
+                JarvisPipelineEventKind.COGNITION_REQUEST_STARTED,
+                "cognition request starting",
+                {},
+            )
+
+            response = self.ask(
+                clean_text,
+                session_id=session_id,
+                max_memory_results=max_memory_results,
+                metadata={
+                    "pipeline_id": pipeline_id,
+                    **(metadata or {}),
+                },
+            )
+
+            record(
+                JarvisPipelineEventKind.RESPONSE_READY,
+                "cognition response ready",
+                {
+                    "response_status": response.status.value,
+                    "wrote_memory": response.wrote_memory,
+                },
+            )
+
+            if response.metadata.get("presence_updated") is True:
+                record(
+                    JarvisPipelineEventKind.PRESENCE_RESPONSE_PUBLISHED,
+                    "response published to presence runtime",
+                    {},
+                )
+
+            record(
+                JarvisPipelineEventKind.PIPELINE_COMPLETED,
+                "pipeline completed",
+                {"response_status": response.status.value},
+            )
+
+            return JarvisPipelineResult(
+                pipeline_id=pipeline_id,
+                session_id=session_id,
+                status=(
+                    JarvisPipelineStatus.COMPLETED
+                    if response.succeeded
+                    else JarvisPipelineStatus.FAILED
+                ),
+                response=response,
+                cancelled=False,
+                should_keep_listening=(
+                    conversation_output.should_keep_listening
+                    if conversation_output is not None
+                    else False
+                ),
+                events=tuple(events),
+                reason=response.reason,
+                created_at=utc_now(),
+            )
+
+        except Exception as exc:
+            record(
+                JarvisPipelineEventKind.PIPELINE_FAILED,
+                "pipeline failed",
+                {"error": f"{type(exc).__name__}: {exc}"},
+            )
+            self._failure_count += 1
+            self._last_error = f"{type(exc).__name__}: {exc}"
+            raise
 
     def snapshot(self) -> JarvisSystemSnapshot:
         memory_snapshot = self._memory_worker.snapshot()
@@ -757,6 +924,20 @@ def _no_memory_write(*, reason: str) -> JarvisMemoryWriteDecision:
         reason=reason,
         request=None,
         result=None,
+    )
+
+def _conversation_signal_from_text(text: str) -> RealConversationInput:
+    from jarvis.conversation.models import ConversationMode, TurnInputSource
+
+    return RealConversationInput(
+        transcript=text,
+        source=TurnInputSource.STT_PARTIAL,
+        is_speech_active=False,
+        silence_ms=900,
+        speech_ms=max(300, min(3000, len(text) * 35)),
+        vad_confidence=1.0,
+        transcript_stability=1.0,
+        conversation_mode=ConversationMode.QUESTION,
     )
 
 

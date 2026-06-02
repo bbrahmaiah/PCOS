@@ -52,6 +52,24 @@ class JarvisMemoryWriteStatus(StrEnum):
     BLOCKED = "blocked"
     FAILED = "failed"
 
+class JarvisPipelineStatus(StrEnum):
+    COMPLETED = "completed"
+    CANCELLED = "cancelled"
+    BLOCKED = "blocked"
+    FAILED = "failed"
+
+class JarvisPipelineEventKind(StrEnum):
+    USER_UTTERANCE_RECEIVED = "user_utterance_received"
+    CONVERSATION_ACCEPTED = "conversation_accepted"
+    INTERRUPTION_REQUESTED = "interruption_requested"
+    COGNITION_CANCEL_REQUESTED = "cognition_cancel_requested"
+    MEMORY_RETRIEVAL_STARTED = "memory_retrieval_started"
+    COGNITION_REQUEST_STARTED = "cognition_request_started"
+    RESPONSE_READY = "response_ready"
+    PRESENCE_RESPONSE_PUBLISHED = "presence_response_published"
+    PIPELINE_COMPLETED = "pipeline_completed"
+    PIPELINE_FAILED = "pipeline_failed"
+
 
 @dataclass(frozen=True, slots=True)
 class JarvisMemoryWriteDecision:
@@ -107,6 +125,30 @@ class JarvisSystemResponse:
     @property
     def succeeded(self) -> bool:
         return self.status == JarvisAskStatus.ANSWERED
+
+@dataclass(frozen=True, slots=True)
+class JarvisPipelineEvent:
+    kind: JarvisPipelineEventKind
+    message: str
+    created_at: datetime
+    metadata: dict[str, object]
+
+
+@dataclass(frozen=True, slots=True)
+class JarvisPipelineResult:
+    pipeline_id: str
+    session_id: str
+    status: JarvisPipelineStatus
+    response: JarvisSystemResponse | None
+    cancelled: bool
+    should_keep_listening: bool
+    events: tuple[JarvisPipelineEvent, ...]
+    reason: str
+    created_at: datetime
+
+    @property
+    def succeeded(self) -> bool:
+        return self.status == JarvisPipelineStatus.COMPLETED
 
 
 @dataclass(frozen=True, slots=True)

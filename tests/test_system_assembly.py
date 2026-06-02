@@ -62,6 +62,8 @@ from jarvis.system import (
     ConversationRuntimeWorker,
     JarvisAskStatus,
     JarvisMemoryWriteStatus,
+    JarvisPipelineEventKind,
+    JarvisPipelineStatus,
     JarvisSystem,
     JarvisSystemStatus,
     MemoryRuntimeWorker,
@@ -521,6 +523,11 @@ def test_enum_values_are_stable() -> None:
     )
     assert VoiceActivityState.SPEECH_STARTED.value == "speech_started"
     assert OrchestrationRuntimeWorker.__name__ == "OrchestrationRuntimeWorker"
+    assert JarvisPipelineStatus.COMPLETED.value == "completed"
+    assert (
+        JarvisPipelineEventKind.COGNITION_CANCEL_REQUESTED.value
+        == "cognition_cancel_requested"
+    )
 
 def _eventually(
     predicate: Callable[[], bool],
@@ -855,3 +862,110 @@ def test_jarvis_system_snapshot_includes_orchestration_health() -> None:
 
     assert len(orchestration_health) == 1
     assert orchestration_health[0].subsystem_snapshot is not None
+
+
+def test_step_44f_process_user_utterance_full_pipeline() -> None:
+    record = _memory_record(
+        text="Bala is building a living real-time cognition JARVIS OS."
+    )
+    gateway = FakeMemoryGateway(records=(record,))
+    adapter = FakeCognitionAdapter()
+    system = JarvisSystem(
+        memory_gateway=_memory_gateway(gateway),
+        cognition_worker=CognitionWorker(adapter=_cognition_adapter(adapter)),
+        conversation_runtime=RealConversationRuntime(),
+        presence_engine=_presence_engine(),
+        orchestration_runtime=FakeOrchestrationRuntime(),
+        kernel=RuntimeKernel(),
+    )
+
+    system.start()
+    result = system.process_user_utterance(
+        text="What am I building?",
+        session_id="session",
+    )
+    system.stop()
+
+    assert result.status == JarvisPipelineStatus.COMPLETED
+    assert result.response is not None
+    assert result.response.status == JarvisAskStatus.ANSWERED
+    assert "living real-time cognition JARVIS OS" in result.response.text
+    assert result.cancelled is False
+    assert len(gateway.queries) == 1
+    assert len(adapter.requests) == 1
+
+    event_kinds = {event.kind for event in result.events}
+
+    assert JarvisPipelineEventKind.USER_UTTERANCE_RECEIVED in event_kinds
+    assert JarvisPipelineEventKind.CONVERSATION_ACCEPTED in event_kinds
+    assert JarvisPipelineEventKind.MEMORY_RETRIEVAL_STARTED in event_kinds
+    assert JarvisPipelineEventKind.COGNITION_REQUEST_STARTED in event_kinds
+    assert JarvisPipelineEventKind.RESPONSE_READY in event_kinds
+    assert JarvisPipelineEventKind.PIPELINE_COMPLETED in event_kinds
+
+def test_step_44f_interruption_cancels_active_work() -> None:
+    adapter = FakeCognitionAdapter()
+    system = JarvisSystem(
+        memory_gateway=_memory_gateway(FakeMemoryGateway()),
+        cognition_worker=CognitionWorker(adapter=_cognition_adapter(adapter)),
+        conversation_runtime=RealConversationRuntime(),
+        presence_engine=_presence_engine(),
+        orchestration_runtime=FakeOrchestrationRuntime(),
+        kernel=RuntimeKernel(),
+    )
+
+    signal = RealConversationInput(
+        transcript="stop",
+        source=TurnInputSource.INTERRUPTION_WORKER,
+        is_speech_active=True,
+        is_assistant_speaking=True,
+        silence_ms=0,
+        speech_ms=250,
+        vad_confidence=0.99,
+        transcript_stability=1.0,
+        conversation_mode=ConversationMode.COMMAND,
+    )
+
+    system.start()
+    result = system.process_user_utterance(
+        text="stop",
+        session_id="session",
+        signal=signal,
+    )
+    system.stop()
+
+    assert result.status == JarvisPipelineStatus.CANCELLED
+    assert result.cancelled is True
+    assert result.response is None
+    assert len(adapter.requests) == 0
+
+    event_kinds = {event.kind for event in result.events}
+
+    assert JarvisPipelineEventKind.INTERRUPTION_REQUESTED in event_kinds
+    assert JarvisPipelineEventKind.COGNITION_CANCEL_REQUESTED in event_kinds
+
+
+def test_step_44f_pipeline_preserves_governed_memory_write() -> None:
+    gateway = FakeMemoryGateway()
+    system = JarvisSystem(
+        memory_gateway=_memory_gateway(gateway),
+        cognition_worker=CognitionWorker(
+            adapter=_cognition_adapter(FakeCognitionAdapter())
+        ),
+        conversation_runtime=RealConversationRuntime(),
+        presence_engine=_presence_engine(),
+        orchestration_runtime=FakeOrchestrationRuntime(),
+        kernel=RuntimeKernel(),
+    )
+
+    system.start()
+    result = system.process_user_utterance(
+        text="Remember that my favorite editor is VS Code.",
+        session_id="session",
+    )
+    system.stop()
+
+    assert result.status == JarvisPipelineStatus.COMPLETED
+    assert result.response is not None
+    assert result.response.wrote_memory is True
+    assert len(gateway.writes) == 1

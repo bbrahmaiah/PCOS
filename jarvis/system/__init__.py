@@ -5,6 +5,10 @@ from jarvis.system.contracts import (
     JarvisAskStatus,
     JarvisMemoryWriteDecision,
     JarvisMemoryWriteStatus,
+    JarvisPipelineEvent,
+    JarvisPipelineEventKind,
+    JarvisPipelineResult,
+    JarvisPipelineStatus,
     JarvisSubsystemHealth,
     JarvisSubsystemKind,
     JarvisSystemRequest,
@@ -21,6 +25,10 @@ from jarvis.system.worker_adapters import (
 )
 
 __all__ = [
+    "JarvisPipelineEvent",
+    "JarvisPipelineEventKind",
+    "JarvisPipelineResult",
+    "JarvisPipelineStatus",
     "OrchestrationRuntimeWorker",
     "PresenceRuntimeWorker",
     "JarvisMemoryWriteDecision",
