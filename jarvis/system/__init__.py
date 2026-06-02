@@ -1,6 +1,13 @@
 from __future__ import annotations
 
 from jarvis.system.assembly import JarvisSystem
+from jarvis.system.bootstrap import (
+    JarvisBootstrapConfig,
+    JarvisBootstrapResult,
+    JarvisBootstrapStatus,
+    JarvisSystemBootstrap,
+    JarvisSystemFactoryBundle,
+)
 from jarvis.system.contracts import (
     JarvisAskStatus,
     JarvisMemoryWriteDecision,
@@ -25,6 +32,11 @@ from jarvis.system.worker_adapters import (
 )
 
 __all__ = [
+    "JarvisBootstrapConfig",
+    "JarvisBootstrapResult",
+    "JarvisBootstrapStatus",
+    "JarvisSystemBootstrap",
+    "JarvisSystemFactoryBundle",
     "JarvisPipelineEvent",
     "JarvisPipelineEventKind",
     "JarvisPipelineResult",
