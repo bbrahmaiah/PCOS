@@ -45,6 +45,17 @@ from jarvis.system.contracts import (
     JarvisSystemSnapshot,
     JarvisSystemStatus,
 )
+from jarvis.system.failure_injection import (
+    FailureInjectionConfig,
+    FailureInjectionOutcome,
+    FailureInjectionReport,
+    FailureInjectionReview,
+    FailureInjectionScenario,
+    FailureInjectionScenarioKind,
+    FailureInjectionScenarioResult,
+    FailureInjectionStatus,
+    default_failure_scenarios,
+)
 from jarvis.system.live_wiring import (
     LiveDependencyProfile,
     LiveDependencyWiring,
@@ -69,6 +80,15 @@ from jarvis.system.worker_adapters import (
 )
 
 __all__ = [
+    "FailureInjectionConfig",
+    "FailureInjectionOutcome",
+    "FailureInjectionReport",
+    "FailureInjectionReview",
+    "FailureInjectionScenario",
+    "FailureInjectionScenarioKind",
+    "FailureInjectionScenarioResult",
+    "FailureInjectionStatus",
+    "default_failure_scenarios",
     "RuntimeReadinessCheck",
     "RuntimeReadinessCheckKind",
     "RuntimeReadinessConfig",
