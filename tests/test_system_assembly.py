@@ -43,6 +43,17 @@ from jarvis.memory.models import (
     MemorySource,
     MemoryWriteRequest,
 )
+from jarvis.presence import PresenceEngine, PresenceEngineAdapters
+from jarvis.presence.adapters import (
+    FakeAudioPlaybackAdapter,
+    FakeMicrophoneAdapter,
+    FakeSpeechToTextAdapter,
+    FakeTextToSpeechAdapter,
+    FakeVoiceActivityAdapter,
+    FakeWakeWordAdapter,
+    make_fake_audio_frame,
+)
+from jarvis.presence.models import VoiceActivityState
 from jarvis.runtime.events import EventBus
 from jarvis.runtime.kernel.runtime_kernel import RuntimeKernel
 from jarvis.runtime.shared.enums import WorkerStatus
@@ -54,6 +65,7 @@ from jarvis.system import (
     JarvisSystem,
     JarvisSystemStatus,
     MemoryRuntimeWorker,
+    PresenceRuntimeWorker,
 )
 
 
@@ -482,6 +494,7 @@ def test_enum_values_are_stable() -> None:
     assert RealConversationRuntimeAction.CANCEL_ACTIVE_WORK.value == (
         "cancel_active_work"
     )
+    assert VoiceActivityState.SPEECH_STARTED.value == "speech_started"
 
 def _eventually(
     predicate: Callable[[], bool],
@@ -497,6 +510,35 @@ def _eventually(
         time.sleep(interval_seconds)
 
     return False
+
+def _presence_engine() -> PresenceEngine:
+    frames = (
+        make_fake_audio_frame(frame_index=0),
+        make_fake_audio_frame(frame_index=1),
+        make_fake_audio_frame(frame_index=2),
+    )
+    adapters = PresenceEngineAdapters(
+        microphone=FakeMicrophoneAdapter(frames=frames),
+        wake_word=FakeWakeWordAdapter(detection_pattern=(True, False, False)),
+        vad=FakeVoiceActivityAdapter(
+            states=(
+                VoiceActivityState.SPEECH_STARTED,
+                VoiceActivityState.SPEECH_CONTINUING,
+                VoiceActivityState.SPEECH_ENDED,
+            ),
+        ),
+        stt=FakeSpeechToTextAdapter(
+            text="hello jarvis",
+            confidence=0.98,
+        ),
+        tts=FakeTextToSpeechAdapter(),
+        playback=FakeAudioPlaybackAdapter(),
+    )
+
+    return PresenceEngine(
+        name="test_presence_engine",
+        adapters=adapters,
+    )
 
 
 def _memory_record(*, text: str) -> MemoryRecord:
@@ -616,3 +658,96 @@ def test_jarvis_system_ask_updates_conversation_when_configured() -> None:
     ]
 
     assert len(conversation_health) == 1
+
+
+def test_presence_runtime_worker_is_base_worker_compatible() -> None:
+    event_bus = EventBus(name="test_event_bus")
+    worker = PresenceRuntimeWorker(
+        presence_engine=_presence_engine(),
+        event_bus=event_bus,
+        tick_interval_seconds=0.01,
+    )
+
+    worker.start()
+
+    try:
+        assert _eventually(lambda: worker.wait_until_ready())
+    finally:
+        worker.stop()
+
+    snapshot = worker.snapshot()
+
+    assert snapshot.name == "presence_runtime"
+    assert snapshot.status == WorkerStatus.STOPPED
+
+
+def test_jarvis_system_start_registers_presence_worker_when_configured() -> None:
+    system = JarvisSystem(
+        memory_gateway=_memory_gateway(FakeMemoryGateway()),
+        cognition_worker=CognitionWorker(
+            adapter=_cognition_adapter(FakeCognitionAdapter())
+        ),
+        conversation_runtime=RealConversationRuntime(),
+        presence_engine=_presence_engine(),
+        kernel=RuntimeKernel(),
+    )
+
+    system.start()
+    snapshot = system.snapshot()
+
+    assert system.status == JarvisSystemStatus.RUNNING
+    assert snapshot.presence_worker is not None
+    assert snapshot.presence_worker.running is True
+    assert len(snapshot.subsystem_health) == 4
+
+    system.stop()
+
+    stopped = system.snapshot()
+
+    assert stopped.presence_worker is not None
+    assert stopped.presence_worker.status == WorkerStatus.STOPPED
+
+
+def test_jarvis_system_ask_updates_presence_when_configured() -> None:
+    adapter = FakeCognitionAdapter()
+    system = JarvisSystem(
+        memory_gateway=_memory_gateway(FakeMemoryGateway()),
+        cognition_worker=CognitionWorker(adapter=_cognition_adapter(adapter)),
+        conversation_runtime=RealConversationRuntime(),
+        presence_engine=_presence_engine(),
+        kernel=RuntimeKernel(),
+    )
+
+    system.start()
+    response = system.ask("What is Python?")
+    snapshot = system.snapshot()
+    system.stop()
+
+    assert response.status == JarvisAskStatus.ANSWERED
+    assert response.metadata["conversation_updated"] is True
+    assert response.metadata["presence_updated"] is True
+
+    presence_health = [
+        health
+        for health in snapshot.subsystem_health
+        if health.kind.value == "presence"
+    ]
+
+    assert len(presence_health) == 1
+
+def test_jarvis_system_can_publish_presence_response_ready() -> None:
+    system = JarvisSystem(
+        memory_gateway=_memory_gateway(FakeMemoryGateway()),
+        cognition_worker=CognitionWorker(
+            adapter=_cognition_adapter(FakeCognitionAdapter())
+        ),
+        presence_engine=_presence_engine(),
+        kernel=RuntimeKernel(),
+    )
+
+    system.start()
+    system.publish_presence_response_ready(text="Ready.")
+    snapshot = system.snapshot()
+    system.stop()
+
+    assert snapshot.presence_worker is not None

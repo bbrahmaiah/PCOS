@@ -21,6 +21,7 @@ from jarvis.memory.gateway import (
     MemoryGatewayWriteResult,
 )
 from jarvis.memory.models import MemoryQuery, MemoryWriteRequest
+from jarvis.presence import PresenceEngine
 from jarvis.runtime.events import EventBus
 from jarvis.runtime.workers.worker import BaseWorker
 
@@ -235,3 +236,69 @@ class ConversationRuntimeWorker(BaseWorker):
 
     def conversation_snapshot(self) -> RealConversationRuntimeSnapshot:
         return self._conversation_runtime.snapshot()
+
+
+class PresenceRuntimeWorker(BaseWorker):
+    """
+    Runtime citizen wrapper for PresenceEngine.
+
+    Step 44D attaches the voice/presence organ to RuntimeKernel without
+    letting Presence call cognition, memory, tools, or orchestration directly.
+
+    Presence remains responsible for:
+    - microphone/wake/VAD/STT pipeline
+    - TTS/playback pipeline
+    - interruption detection
+    - presence state
+
+    EventBus full routing comes later in Step 44F.
+    """
+
+    def __init__(
+        self,
+        *,
+        presence_engine: PresenceEngine,
+        event_bus: EventBus,
+        name: str = "presence_runtime",
+        tick_interval_seconds: float = 0.05,
+    ) -> None:
+        super().__init__(
+            name=name,
+            event_bus=event_bus,
+            tick_interval_seconds=tick_interval_seconds,
+        )
+        self._presence_engine = presence_engine
+        self._ready = Event()
+
+    @property
+    def presence_engine(self) -> PresenceEngine:
+        return self._presence_engine
+
+    def on_start(self) -> None:
+        self._presence_engine.start()
+        self._ready.set()
+
+    def on_stop(self) -> None:
+        try:
+            self._presence_engine.stop()
+        finally:
+            self._ready.clear()
+
+    def run_once(self) -> None:
+        return None
+
+    def wait_until_ready(
+        self,
+        *,
+        timeout_seconds: float = 2.0,
+    ) -> bool:
+        return self._ready.wait(timeout=timeout_seconds)
+
+    def publish_response_ready(self, *, text: str) -> None:
+        if not self.wait_until_ready(timeout_seconds=2.0):
+            raise RuntimeError("presence runtime worker is not ready.")
+
+        self._presence_engine.publish_response_ready(text=text)
+
+    def presence_snapshot(self) -> object:
+        return self._presence_engine.snapshot()

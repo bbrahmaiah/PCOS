@@ -27,6 +27,7 @@ from jarvis.memory.models import (
     MemorySource,
     MemoryWriteRequest,
 )
+from jarvis.presence import PresenceEngine
 from jarvis.runtime.kernel.runtime_kernel import RuntimeKernel
 from jarvis.system.contracts import (
     JarvisAskStatus,
@@ -45,6 +46,7 @@ from jarvis.system.worker_adapters import (
     CognitionRuntimeWorker,
     ConversationRuntimeWorker,
     MemoryRuntimeWorker,
+    PresenceRuntimeWorker,
 )
 
 
@@ -70,6 +72,7 @@ class JarvisSystem:
         memory_gateway: MemoryGateway,
         cognition_worker: CognitionWorker,
         conversation_runtime: RealConversationRuntime | None = None,
+        presence_engine: PresenceEngine | None = None,
         kernel: RuntimeKernel | None = None,
         name: str = "jarvis_system",
     ) -> None:
@@ -94,6 +97,15 @@ class JarvisSystem:
                 event_bus=self._kernel.event_bus,
             )
             if conversation_runtime is not None
+            else None
+        )
+
+        self._presence_worker = (
+            PresenceRuntimeWorker(
+                presence_engine=presence_engine,
+                event_bus=self._kernel.event_bus,
+            )
+            if presence_engine is not None
             else None
         )
 
@@ -128,6 +140,10 @@ class JarvisSystem:
     @property
     def conversation_worker(self) -> ConversationRuntimeWorker | None:
         return self._conversation_worker
+
+    @property
+    def presence_worker(self) -> PresenceRuntimeWorker | None:
+        return self._presence_worker
 
     def start(self) -> None:
         if self._status == JarvisSystemStatus.RUNNING:
@@ -212,6 +228,12 @@ class JarvisSystem:
                         cognition_result.response.text,
                         expects_follow_up=False,
                     )
+                presence_updated = False
+                if self._presence_worker is not None:
+                    self.publish_presence_response_ready(
+                        text=cognition_result.response.text,
+                    )
+                    presence_updated = True
 
                 return JarvisSystemResponse(
                     request_id=request.request_id,
@@ -233,6 +255,7 @@ class JarvisSystem:
                         ),
                         "memory_write_status": memory_write.status.value,
                         "conversation_updated": conversation_output is not None,
+                        "presence_updated": presence_updated,
                     },
                 )
 
@@ -293,6 +316,12 @@ class JarvisSystem:
 
         return self._conversation_worker.accept_input(signal)
 
+    def publish_presence_response_ready(self, *, text: str) -> None:
+        if self._presence_worker is None:
+            raise RuntimeError("presence runtime worker is not configured.")
+
+        self._presence_worker.publish_response_ready(text=text)
+
     def add_conversation_response(
         self,
         text: str,
@@ -315,6 +344,12 @@ class JarvisSystem:
         conversation_snapshot = (
             self._conversation_worker.snapshot()
             if self._conversation_worker is not None
+            else None
+        )
+
+        presence_snapshot = (
+            self._presence_worker.snapshot()
+            if self._presence_worker is not None
             else None
         )
 
@@ -345,6 +380,15 @@ class JarvisSystem:
                 )
             )
 
+        if self._presence_worker is not None and presence_snapshot is not None:
+            subsystem_health.append(
+                JarvisSubsystemHealth(
+                    kind=JarvisSubsystemKind.PRESENCE,
+                    worker=presence_snapshot,
+                    subsystem_snapshot=self._presence_worker.presence_snapshot(),
+                )
+            )
+
         return JarvisSystemSnapshot(
             name=self._name,
             status=self._status,
@@ -353,6 +397,7 @@ class JarvisSystem:
             memory_worker=memory_snapshot,
             cognition_worker=cognition_snapshot,
             conversation_worker=conversation_snapshot,
+            presence_worker=presence_snapshot,
             subsystem_health=tuple(subsystem_health),
             kernel_snapshot=_safe_kernel_snapshot(self._kernel),
             ask_count=self._ask_count,
@@ -370,6 +415,9 @@ class JarvisSystem:
         if self._conversation_worker is not None:
             self._kernel.register_worker(self._conversation_worker)
 
+        if self._presence_worker is not None:
+            self._kernel.register_worker(self._presence_worker)
+
         self._registered = True
 
     def _wait_until_ready(self) -> None:
@@ -385,6 +433,14 @@ class JarvisSystem:
             raise RuntimeError(
                 "conversation runtime worker did not become ready."
             )
+
+        if (
+            self._presence_worker is not None
+            and not self._presence_worker.wait_until_ready(
+                timeout_seconds=2.0
+            )
+        ):
+            raise RuntimeError("presence runtime worker did not become ready.")
 
     def _retrieve_memory(
         self,

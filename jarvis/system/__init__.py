@@ -16,9 +16,11 @@ from jarvis.system.worker_adapters import (
     CognitionRuntimeWorker,
     ConversationRuntimeWorker,
     MemoryRuntimeWorker,
+    PresenceRuntimeWorker,
 )
 
 __all__ = [
+    "PresenceRuntimeWorker",
     "JarvisMemoryWriteDecision",
     "JarvisMemoryWriteStatus",
     "CognitionRuntimeWorker",

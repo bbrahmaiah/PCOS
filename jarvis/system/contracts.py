@@ -36,6 +36,7 @@ class JarvisSubsystemKind(StrEnum):
     MEMORY = "memory"
     COGNITION = "cognition"
     CONVERSATION = "conversation"
+    PRESENCE = "presence"
 
 
 class JarvisAskStatus(StrEnum):
@@ -123,6 +124,7 @@ class JarvisSystemSnapshot:
     memory_worker: WorkerSnapshot | None
     cognition_worker: WorkerSnapshot | None
     conversation_worker: WorkerSnapshot | None
+    presence_worker: WorkerSnapshot | None
     subsystem_health: tuple[JarvisSubsystemHealth, ...]
     kernel_snapshot: Any | None
     ask_count: int
