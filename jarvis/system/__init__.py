@@ -45,6 +45,17 @@ from jarvis.system.contracts import (
     JarvisSystemSnapshot,
     JarvisSystemStatus,
 )
+from jarvis.system.extended_operation import (
+    ExtendedOperationConfig,
+    ExtendedOperationEvent,
+    ExtendedOperationEventKind,
+    ExtendedOperationMetrics,
+    ExtendedOperationReport,
+    ExtendedOperationRunMode,
+    ExtendedOperationStatus,
+    ExtendedOperationValidator,
+    profile_config,
+)
 from jarvis.system.failure_injection import (
     FailureInjectionConfig,
     FailureInjectionOutcome,
@@ -80,6 +91,15 @@ from jarvis.system.worker_adapters import (
 )
 
 __all__ = [
+    "ExtendedOperationConfig",
+    "ExtendedOperationEvent",
+    "ExtendedOperationEventKind",
+    "ExtendedOperationMetrics",
+    "ExtendedOperationReport",
+    "ExtendedOperationRunMode",
+    "ExtendedOperationStatus",
+    "ExtendedOperationValidator",
+    "profile_config",
     "FailureInjectionConfig",
     "FailureInjectionOutcome",
     "FailureInjectionReport",
