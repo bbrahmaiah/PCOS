@@ -12,10 +12,21 @@ from jarvis.cognition.models import (
 )
 from jarvis.cognition.worker import CognitionWorker
 from jarvis.memory.gateway import MemoryGateway, MemoryGatewayRetrievalResult
-from jarvis.memory.models import MemoryQuery
+from jarvis.memory.models import (
+    MemoryImportance,
+    MemoryKind,
+    MemoryQuery,
+    MemoryRetention,
+    MemoryScope,
+    MemorySensitivity,
+    MemorySource,
+    MemoryWriteRequest,
+)
 from jarvis.runtime.kernel.runtime_kernel import RuntimeKernel
 from jarvis.system.contracts import (
     JarvisAskStatus,
+    JarvisMemoryWriteDecision,
+    JarvisMemoryWriteStatus,
     JarvisSubsystemHealth,
     JarvisSubsystemKind,
     JarvisSystemRequest,
@@ -170,6 +181,11 @@ class JarvisSystem:
             )
 
             if cognition_result.response is not None:
+                memory_write = self._maybe_write_memory_after_cognition(
+                    system_request=request,
+                    cognition_response_text=cognition_result.response.text,
+                )
+
                 return JarvisSystemResponse(
                     request_id=request.request_id,
                     session_id=request.session_id,
@@ -179,6 +195,8 @@ class JarvisSystem:
                     memory_result_count=context.item_count,
                     used_memory=True,
                     used_cognition=True,
+                    memory_write=memory_write,
+                    wrote_memory=memory_write.wrote_memory,
                     reason="cognition response produced",
                     created_at=utc_now(),
                     metadata={
@@ -186,6 +204,7 @@ class JarvisSystem:
                         "cognition_worker_request_id": (
                             cognition_result.request_id
                         ),
+                        "memory_write_status": memory_write.status.value,
                     },
                 )
 
@@ -201,6 +220,10 @@ class JarvisSystem:
                     memory_result_count=context.item_count,
                     used_memory=True,
                     used_cognition=True,
+                    memory_write=_no_memory_write(
+                        reason="cognition did not produce a successful response"
+                    ),
+                    wrote_memory=False,
                     reason=cognition_result.failure.message,
                     created_at=utc_now(),
                     metadata={
@@ -219,6 +242,10 @@ class JarvisSystem:
                 memory_result_count=context.item_count,
                 used_memory=True,
                 used_cognition=True,
+                memory_write=_no_memory_write(
+                    reason="cognition did not produce a successful response"
+                ),
+                wrote_memory=False,
                 reason=cognition_result.reason or "cognition request rejected",
                 created_at=utc_now(),
                 metadata={},
@@ -281,6 +308,51 @@ class JarvisSystem:
                 text=request.text,
                 max_results=request.max_memory_results,
             )
+        )
+
+
+    def _maybe_write_memory_after_cognition(
+        self,
+        *,
+        system_request: JarvisSystemRequest,
+        cognition_response_text: str,
+    ) -> JarvisMemoryWriteDecision:
+        write_request = _build_memory_write_request_if_explicit(
+            system_request=system_request,
+            cognition_response_text=cognition_response_text,
+        )
+
+        if write_request is None:
+            return _no_memory_write(
+                reason="no explicit user memory intent detected"
+            )
+
+        try:
+            result = self._memory_worker.remember(write_request)
+        except Exception as exc:
+            return JarvisMemoryWriteDecision(
+                status=JarvisMemoryWriteStatus.FAILED,
+                should_write=True,
+                reason=f"{type(exc).__name__}: {exc}",
+                request=write_request,
+                result=None,
+            )
+
+        if result.allowed and not result.blocked:
+            return JarvisMemoryWriteDecision(
+                status=JarvisMemoryWriteStatus.WRITTEN,
+                should_write=True,
+                reason=result.reason,
+                request=write_request,
+                result=result,
+            )
+
+        return JarvisMemoryWriteDecision(
+            status=JarvisMemoryWriteStatus.BLOCKED,
+            should_write=True,
+            reason=result.reason,
+            request=write_request,
+            result=result,
         )
 
 
@@ -414,6 +486,87 @@ def _memory_metadata(record: Any) -> dict[str, object]:
         metadata[field_name] = getattr(value, "value", value)
 
     return metadata
+
+def _build_memory_write_request_if_explicit(
+    *,
+    system_request: JarvisSystemRequest,
+    cognition_response_text: str,
+) -> MemoryWriteRequest | None:
+    memory_text = _extract_explicit_memory_text(system_request.text)
+
+    if memory_text is None:
+        return None
+
+    return MemoryWriteRequest(
+        kind=_classify_memory_kind(memory_text),
+        scope=MemoryScope.USER,
+        source=MemorySource.USER_EXPLICIT,
+        text=memory_text,
+        sensitivity=MemorySensitivity.PRIVATE,
+        importance=_classify_memory_importance(memory_text),
+        retention=MemoryRetention.PERSISTENT,
+        confidence=0.95,
+        tags=("jarvis-system", "explicit-user-memory"),
+        metadata={
+            "system_request_id": system_request.request_id,
+            "session_id": system_request.session_id,
+            "write_reason": "explicit user memory request",
+            "cognition_response_preview": cognition_response_text[:240],
+        },
+    )
+
+
+def _extract_explicit_memory_text(text: str) -> str | None:
+    cleaned = " ".join(text.strip().split())
+    lowered = cleaned.casefold()
+
+    prefixes = (
+        "remember that ",
+        "remember ",
+        "note that ",
+        "store that ",
+        "store this ",
+        "save that ",
+        "save this ",
+    )
+
+    for prefix in prefixes:
+        if lowered.startswith(prefix):
+            extracted = cleaned[len(prefix):].strip(" .")
+            return extracted or None
+
+    return None
+
+
+def _classify_memory_kind(text: str) -> MemoryKind:
+    lowered = text.casefold()
+
+    if any(marker in lowered for marker in ("favorite", "prefer", "preference")):
+        return MemoryKind.PREFERENCE
+
+    if any(marker in lowered for marker in ("project", "jarvis", "workspace")):
+        return MemoryKind.PROJECT
+
+    return MemoryKind.SEMANTIC
+
+
+def _classify_memory_importance(text: str) -> MemoryImportance:
+    lowered = text.casefold()
+
+    if any(marker in lowered for marker in ("always", "never", "important")):
+        return MemoryImportance.HIGH
+
+    return MemoryImportance.NORMAL
+
+
+def _no_memory_write(*, reason: str) -> JarvisMemoryWriteDecision:
+    return JarvisMemoryWriteDecision(
+        status=JarvisMemoryWriteStatus.NOT_REQUESTED,
+        should_write=False,
+        reason=reason,
+        request=None,
+        result=None,
+    )
 
 
 def _safe_kernel_snapshot(kernel: RuntimeKernel) -> object | None:

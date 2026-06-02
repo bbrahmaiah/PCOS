@@ -22,6 +22,7 @@ from jarvis.cognition.worker import CognitionWorker
 from jarvis.memory.gateway import (
     MemoryGateway,
     MemoryGatewayRetrievalResult,
+    MemoryGatewayWriteResult,
 )
 from jarvis.memory.models import (
     MemoryKind,
@@ -34,6 +35,7 @@ from jarvis.memory.models import (
     MemorySearchResult,
     MemorySensitivity,
     MemorySource,
+    MemoryWriteRequest,
 )
 from jarvis.runtime.events import EventBus
 from jarvis.runtime.kernel.runtime_kernel import RuntimeKernel
@@ -41,6 +43,7 @@ from jarvis.runtime.shared.enums import WorkerStatus
 from jarvis.system import (
     CognitionRuntimeWorker,
     JarvisAskStatus,
+    JarvisMemoryWriteStatus,
     JarvisSystem,
     JarvisSystemStatus,
     MemoryRuntimeWorker,
@@ -52,9 +55,16 @@ def _now() -> datetime:
 
 
 class FakeMemoryGateway:
-    def __init__(self, records: tuple[MemoryRecord, ...] = ()) -> None:
+    def __init__(
+        self,
+        records: tuple[MemoryRecord, ...] = (),
+        *,
+        block_writes: bool = False,
+    ) -> None:
         self.records = records
+        self.block_writes = block_writes
         self.queries: list[MemoryQuery] = []
+        self.writes: list[MemoryWriteRequest] = []
 
     @property
     def name(self) -> str:
@@ -90,9 +100,35 @@ class FakeMemoryGateway:
             policy_classification=MemoryPolicyClassification.ALLOWED,
         )
 
+    def remember(
+        self,
+        request: MemoryWriteRequest,
+    ) -> MemoryGatewayWriteResult:
+        self.writes.append(request)
+
+        if self.block_writes:
+            return MemoryGatewayWriteResult(
+                request=request,
+                record=None,
+                allowed=False,
+                blocked=True,
+                reason="test write blocked",
+                policy_classification=MemoryPolicyClassification.BLOCKED,
+            )
+
+        return MemoryGatewayWriteResult(
+            request=request,
+            record=request.to_record(),
+            allowed=True,
+            blocked=False,
+            reason="test write allowed",
+            policy_classification=MemoryPolicyClassification.ALLOWED,
+        )
+
     def snapshot(self) -> dict[str, object]:
         return {
             "query_count": len(self.queries),
+            "write_count": len(self.writes),
             "record_count": len(self.records),
         }
 
@@ -341,8 +377,7 @@ def test_jarvis_system_request_rejects_empty_text() -> None:
     with pytest.raises(ValueError):
         system.ask(" ")
 
-
-def test_step_44a_does_not_write_memory() -> None:
+def test_step_44b_writes_explicit_user_memory_after_cognition() -> None:
     gateway = FakeMemoryGateway()
     system = JarvisSystem(
         memory_gateway=_memory_gateway(gateway),
@@ -353,16 +388,69 @@ def test_step_44a_does_not_write_memory() -> None:
     )
 
     system.start()
-    system.ask("Remember this later maybe.")
+    response = system.ask("Remember that my favorite editor is VS Code.")
     system.stop()
 
+    assert response.status == JarvisAskStatus.ANSWERED
+    assert response.wrote_memory is True
+    assert response.memory_write.status == JarvisMemoryWriteStatus.WRITTEN
     assert len(gateway.queries) == 1
-    assert not hasattr(gateway, "writes")
+    assert len(gateway.writes) == 1
+
+    write = gateway.writes[0]
+
+    assert write.text == "my favorite editor is VS Code"
+    assert write.kind == MemoryKind.PREFERENCE
+    assert write.scope == MemoryScope.USER
+    assert write.source == MemorySource.USER_EXPLICIT
+    assert write.sensitivity == MemorySensitivity.PRIVATE
+
+def test_step_44b_surfaces_blocked_memory_write() -> None:
+    gateway = FakeMemoryGateway(block_writes=True)
+    system = JarvisSystem(
+        memory_gateway=_memory_gateway(gateway),
+        cognition_worker=CognitionWorker(
+            adapter=_cognition_adapter(FakeCognitionAdapter())
+        ),
+        kernel=RuntimeKernel(),
+    )
+
+    system.start()
+    response = system.ask("Remember that this is sensitive.")
+    system.stop()
+
+    assert response.status == JarvisAskStatus.ANSWERED
+    assert response.wrote_memory is False
+    assert response.memory_write.status == JarvisMemoryWriteStatus.BLOCKED
+    assert len(gateway.writes) == 1
+    assert response.memory_write.result is not None
+    assert response.memory_write.result.blocked is True
+
+def test_step_44b_does_not_write_without_explicit_memory_intent() -> None:
+    gateway = FakeMemoryGateway()
+    system = JarvisSystem(
+        memory_gateway=_memory_gateway(gateway),
+        cognition_worker=CognitionWorker(
+            adapter=_cognition_adapter(FakeCognitionAdapter())
+        ),
+        kernel=RuntimeKernel(),
+    )
+
+    system.start()
+    response = system.ask("What is Python?")
+    system.stop()
+
+    assert response.status == JarvisAskStatus.ANSWERED
+    assert response.wrote_memory is False
+    assert response.memory_write.status == JarvisMemoryWriteStatus.NOT_REQUESTED
+    assert len(gateway.queries) == 1
+    assert len(gateway.writes) == 0
 
 
 def test_enum_values_are_stable() -> None:
     assert JarvisSystemStatus.RUNNING.value == "running"
     assert JarvisAskStatus.ANSWERED.value == "answered"
+    assert JarvisMemoryWriteStatus.WRITTEN.value == "written"
 
 def _eventually(
     predicate: Callable[[], bool],

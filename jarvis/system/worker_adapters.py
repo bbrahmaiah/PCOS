@@ -9,8 +9,12 @@ from jarvis.cognition.worker import (
     CognitionWorkerResult,
     CognitionWorkerSnapshot,
 )
-from jarvis.memory.gateway import MemoryGateway, MemoryGatewayRetrievalResult
-from jarvis.memory.models import MemoryQuery
+from jarvis.memory.gateway import (
+    MemoryGateway,
+    MemoryGatewayRetrievalResult,
+    MemoryGatewayWriteResult,
+)
+from jarvis.memory.models import MemoryQuery, MemoryWriteRequest
 from jarvis.runtime.events import EventBus
 from jarvis.runtime.workers.worker import BaseWorker
 
@@ -38,6 +42,8 @@ class MemoryRuntimeWorker(BaseWorker):
         )
         self._memory_gateway = memory_gateway
         self._retrieve_count = 0
+        self._write_count = 0
+       
 
     @property
     def memory_gateway(self) -> MemoryGateway:
@@ -53,6 +59,13 @@ class MemoryRuntimeWorker(BaseWorker):
         self._retrieve_count += 1
         return self._memory_gateway.retrieve(query)
 
+    def remember(
+        self,
+        request: MemoryWriteRequest,
+    ) -> MemoryGatewayWriteResult:
+        self._write_count += 1
+        return self._memory_gateway.remember(request)
+
     def memory_snapshot(self) -> Any | None:
         snapshot = getattr(self._memory_gateway, "snapshot", None)
         if callable(snapshot):
@@ -60,6 +73,7 @@ class MemoryRuntimeWorker(BaseWorker):
 
         return {
             "retrieve_count": self._retrieve_count,
+            "write_count": self._write_count,
             "gateway": type(self._memory_gateway).__name__,
         }
 

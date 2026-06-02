@@ -3,6 +3,8 @@ from __future__ import annotations
 from jarvis.system.assembly import JarvisSystem
 from jarvis.system.contracts import (
     JarvisAskStatus,
+    JarvisMemoryWriteDecision,
+    JarvisMemoryWriteStatus,
     JarvisSubsystemHealth,
     JarvisSubsystemKind,
     JarvisSystemRequest,
@@ -16,6 +18,8 @@ from jarvis.system.worker_adapters import (
 )
 
 __all__ = [
+    "JarvisMemoryWriteDecision",
+    "JarvisMemoryWriteStatus",
     "CognitionRuntimeWorker",
     "JarvisAskStatus",
     "JarvisSubsystemHealth",

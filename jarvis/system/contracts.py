@@ -7,6 +7,8 @@ from typing import Any
 from uuid import uuid4
 
 from jarvis.cognition.models import CognitionResponse
+from jarvis.memory.gateway import MemoryGatewayWriteResult
+from jarvis.memory.models import MemoryWriteRequest
 from jarvis.runtime.workers.worker import WorkerSnapshot
 
 
@@ -40,6 +42,31 @@ class JarvisAskStatus(StrEnum):
     REJECTED = "rejected"
     FAILED = "failed"
 
+class JarvisMemoryWriteStatus(StrEnum):
+    NOT_REQUESTED = "not_requested"
+    SKIPPED = "skipped"
+    WRITTEN = "written"
+    BLOCKED = "blocked"
+    FAILED = "failed"
+
+
+@dataclass(frozen=True, slots=True)
+class JarvisMemoryWriteDecision:
+    status: JarvisMemoryWriteStatus
+    should_write: bool
+    reason: str
+    request: MemoryWriteRequest | None = None
+    result: MemoryGatewayWriteResult | None = None
+
+    @property
+    def wrote_memory(self) -> bool:
+        return (
+            self.status == JarvisMemoryWriteStatus.WRITTEN
+            and self.result is not None
+            and self.result.allowed
+            and not self.result.blocked
+        )
+
 
 @dataclass(frozen=True, slots=True)
 class JarvisSystemRequest:
@@ -65,6 +92,8 @@ class JarvisSystemResponse:
     status: JarvisAskStatus
     text: str
     cognition_response: CognitionResponse | None
+    memory_write: JarvisMemoryWriteDecision
+    wrote_memory: bool
     memory_result_count: int
     used_memory: bool
     used_cognition: bool
