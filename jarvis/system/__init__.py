@@ -45,6 +45,13 @@ from jarvis.system.contracts import (
     JarvisSystemSnapshot,
     JarvisSystemStatus,
 )
+from jarvis.system.live_wiring import (
+    LiveDependencyProfile,
+    LiveDependencyWiring,
+    LiveDependencyWiringConfig,
+    LiveDependencyWiringReport,
+    LiveDependencyWiringStatus,
+)
 from jarvis.system.worker_adapters import (
     CognitionRuntimeWorker,
     ConversationRuntimeWorker,
@@ -54,6 +61,11 @@ from jarvis.system.worker_adapters import (
 )
 
 __all__ = [
+    "LiveDependencyProfile",
+    "LiveDependencyWiring",
+    "LiveDependencyWiringConfig",
+    "LiveDependencyWiringReport",
+    "LiveDependencyWiringStatus",
     "JarvisComponentKind",
     "JarvisComponentMode",
     "JarvisComponentRequirement",
