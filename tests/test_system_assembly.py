@@ -19,6 +19,12 @@ from jarvis.cognition.models import (
     CognitionResponseKind,
 )
 from jarvis.cognition.worker import CognitionWorker
+from jarvis.conversation.models import ConversationMode, TurnInputSource
+from jarvis.conversation.runtime import (
+    RealConversationInput,
+    RealConversationRuntime,
+    RealConversationRuntimeAction,
+)
 from jarvis.memory.gateway import (
     MemoryGateway,
     MemoryGatewayRetrievalResult,
@@ -42,6 +48,7 @@ from jarvis.runtime.kernel.runtime_kernel import RuntimeKernel
 from jarvis.runtime.shared.enums import WorkerStatus
 from jarvis.system import (
     CognitionRuntimeWorker,
+    ConversationRuntimeWorker,
     JarvisAskStatus,
     JarvisMemoryWriteStatus,
     JarvisSystem,
@@ -191,6 +198,27 @@ def _cognition_adapter(
     adapter: FakeCognitionAdapter,
 ) -> CognitionAdapter:
     return cast(CognitionAdapter, adapter)
+
+def test_conversation_runtime_worker_is_base_worker_compatible() -> None:
+    conversation = RealConversationRuntime()
+    event_bus = EventBus(name="test_event_bus")
+    worker = ConversationRuntimeWorker(
+        conversation_runtime=conversation,
+        event_bus=event_bus,
+        tick_interval_seconds=0.01,
+    )
+
+    worker.start()
+
+    try:
+        assert _eventually(lambda: worker.wait_until_ready())
+    finally:
+        worker.stop()
+
+    snapshot = worker.snapshot()
+
+    assert snapshot.name == "conversation_runtime"
+    assert snapshot.status == WorkerStatus.STOPPED
 
 
 def test_memory_runtime_worker_is_base_worker_compatible() -> None:
@@ -451,6 +479,9 @@ def test_enum_values_are_stable() -> None:
     assert JarvisSystemStatus.RUNNING.value == "running"
     assert JarvisAskStatus.ANSWERED.value == "answered"
     assert JarvisMemoryWriteStatus.WRITTEN.value == "written"
+    assert RealConversationRuntimeAction.CANCEL_ACTIVE_WORK.value == (
+        "cancel_active_work"
+    )
 
 def _eventually(
     predicate: Callable[[], bool],
@@ -478,3 +509,110 @@ def _memory_record(*, text: str) -> MemoryRecord:
         confidence=0.9,
         metadata={},
     )
+
+def test_jarvis_system_start_registers_conversation_worker_when_configured() -> None:
+    system = JarvisSystem(
+        memory_gateway=_memory_gateway(FakeMemoryGateway()),
+        cognition_worker=CognitionWorker(
+            adapter=_cognition_adapter(FakeCognitionAdapter())
+        ),
+        conversation_runtime=RealConversationRuntime(),
+        kernel=RuntimeKernel(),
+    )
+
+    system.start()
+    snapshot = system.snapshot()
+
+    assert system.status == JarvisSystemStatus.RUNNING
+    assert snapshot.conversation_worker is not None
+    assert snapshot.conversation_worker.running is True
+    assert len(snapshot.subsystem_health) == 3
+
+    system.stop()
+
+    stopped = system.snapshot()
+
+    assert stopped.conversation_worker is not None
+    assert stopped.conversation_worker.status == WorkerStatus.STOPPED
+
+def test_jarvis_system_accepts_conversation_input() -> None:
+    system = JarvisSystem(
+        memory_gateway=_memory_gateway(FakeMemoryGateway()),
+        cognition_worker=CognitionWorker(
+            adapter=_cognition_adapter(FakeCognitionAdapter())
+        ),
+        conversation_runtime=RealConversationRuntime(),
+        kernel=RuntimeKernel(),
+    )
+
+    system.start()
+    output = system.accept_conversation_input(
+        RealConversationInput(
+            transcript="What is Python?",
+            source=TurnInputSource.STT_PARTIAL,
+            is_speech_active=False,
+            silence_ms=900,
+            speech_ms=1200,
+            vad_confidence=0.95,
+            transcript_stability=0.95,
+            conversation_mode=ConversationMode.QUESTION,
+        )
+    )
+    system.stop()
+
+    assert output.should_keep_listening is True
+    assert output.actions
+
+def test_jarvis_system_conversation_interruption_emits_cancel() -> None:
+    system = JarvisSystem(
+        memory_gateway=_memory_gateway(FakeMemoryGateway()),
+        cognition_worker=CognitionWorker(
+            adapter=_cognition_adapter(FakeCognitionAdapter())
+        ),
+        conversation_runtime=RealConversationRuntime(),
+        kernel=RuntimeKernel(),
+    )
+
+    system.start()
+    output = system.accept_conversation_input(
+        RealConversationInput(
+            transcript="stop",
+            source=TurnInputSource.INTERRUPTION_WORKER,
+            is_speech_active=True,
+            is_assistant_speaking=True,
+            silence_ms=0,
+            speech_ms=250,
+            vad_confidence=0.99,
+            transcript_stability=1.0,
+            conversation_mode=ConversationMode.COMMAND,
+        )
+    )
+    system.stop()
+
+    assert output.should_cancel_active_work is True
+    assert RealConversationRuntimeAction.CANCEL_ACTIVE_WORK in output.actions
+
+def test_jarvis_system_ask_updates_conversation_when_configured() -> None:
+    adapter = FakeCognitionAdapter()
+    system = JarvisSystem(
+        memory_gateway=_memory_gateway(FakeMemoryGateway()),
+        cognition_worker=CognitionWorker(adapter=_cognition_adapter(adapter)),
+        conversation_runtime=RealConversationRuntime(),
+        kernel=RuntimeKernel(),
+    )
+
+    system.start()
+    response = system.ask("What is Python?")
+    snapshot = system.snapshot()
+    system.stop()
+
+    assert response.status == JarvisAskStatus.ANSWERED
+    assert response.metadata["conversation_updated"] is True
+
+    conversation_health = [
+        health
+        for health in snapshot.subsystem_health
+        if health.kind.value == "conversation"
+    ]
+
+    assert len(conversation_health) == 1

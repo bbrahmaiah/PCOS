@@ -11,6 +11,11 @@ from jarvis.cognition.models import (
     SpokenResponseStyle,
 )
 from jarvis.cognition.worker import CognitionWorker
+from jarvis.conversation.runtime import (
+    RealConversationInput,
+    RealConversationRuntime,
+    RealConversationRuntimeOutput,
+)
 from jarvis.memory.gateway import MemoryGateway, MemoryGatewayRetrievalResult
 from jarvis.memory.models import (
     MemoryImportance,
@@ -38,6 +43,7 @@ from jarvis.system.contracts import (
 )
 from jarvis.system.worker_adapters import (
     CognitionRuntimeWorker,
+    ConversationRuntimeWorker,
     MemoryRuntimeWorker,
 )
 
@@ -63,6 +69,7 @@ class JarvisSystem:
         *,
         memory_gateway: MemoryGateway,
         cognition_worker: CognitionWorker,
+        conversation_runtime: RealConversationRuntime | None = None,
         kernel: RuntimeKernel | None = None,
         name: str = "jarvis_system",
     ) -> None:
@@ -79,6 +86,15 @@ class JarvisSystem:
         self._cognition_worker = CognitionRuntimeWorker(
             cognition_worker=cognition_worker,
             event_bus=self._kernel.event_bus,
+        )
+
+        self._conversation_worker = (
+            ConversationRuntimeWorker(
+                conversation_runtime=conversation_runtime,
+                event_bus=self._kernel.event_bus,
+            )
+            if conversation_runtime is not None
+            else None
         )
 
         self._status = JarvisSystemStatus.CREATED
@@ -108,6 +124,10 @@ class JarvisSystem:
     @property
     def cognition_worker(self) -> CognitionRuntimeWorker:
         return self._cognition_worker
+
+    @property
+    def conversation_worker(self) -> ConversationRuntimeWorker | None:
+        return self._conversation_worker
 
     def start(self) -> None:
         if self._status == JarvisSystemStatus.RUNNING:
@@ -185,6 +205,13 @@ class JarvisSystem:
                     system_request=request,
                     cognition_response_text=cognition_result.response.text,
                 )
+ 
+                conversation_output = None
+                if self._conversation_worker is not None:
+                    conversation_output = self.add_conversation_response(
+                        cognition_result.response.text,
+                        expects_follow_up=False,
+                    )
 
                 return JarvisSystemResponse(
                     request_id=request.request_id,
@@ -205,6 +232,7 @@ class JarvisSystem:
                             cognition_result.request_id
                         ),
                         "memory_write_status": memory_write.status.value,
+                        "conversation_updated": conversation_output is not None,
                     },
                 )
 
@@ -256,9 +284,66 @@ class JarvisSystem:
             self._last_error = f"{type(exc).__name__}: {exc}"
             raise
 
+    def accept_conversation_input(
+        self,
+        signal: RealConversationInput,
+    ) -> RealConversationRuntimeOutput:
+        if self._conversation_worker is None:
+            raise RuntimeError("conversation runtime worker is not configured.")
+
+        return self._conversation_worker.accept_input(signal)
+
+    def add_conversation_response(
+        self,
+        text: str,
+        *,
+        turn_id: str | None = None,
+        expects_follow_up: bool = False,
+    ) -> RealConversationRuntimeOutput:
+        if self._conversation_worker is None:
+            raise RuntimeError("conversation runtime worker is not configured.")
+
+        return self._conversation_worker.add_assistant_response(
+            text,
+            turn_id=turn_id,
+            expects_follow_up=expects_follow_up,
+        )
+
     def snapshot(self) -> JarvisSystemSnapshot:
         memory_snapshot = self._memory_worker.snapshot()
         cognition_snapshot = self._cognition_worker.snapshot()
+        conversation_snapshot = (
+            self._conversation_worker.snapshot()
+            if self._conversation_worker is not None
+            else None
+        )
+
+        subsystem_health: list[JarvisSubsystemHealth] = [
+            JarvisSubsystemHealth(
+                kind=JarvisSubsystemKind.MEMORY,
+                worker=memory_snapshot,
+                subsystem_snapshot=self._memory_worker.memory_snapshot(),
+            ),
+            JarvisSubsystemHealth(
+                kind=JarvisSubsystemKind.COGNITION,
+                worker=cognition_snapshot,
+                subsystem_snapshot=self._cognition_worker.cognition_snapshot(),
+            ),
+        ]
+
+        if (
+            self._conversation_worker is not None
+            and conversation_snapshot is not None
+        ):
+            subsystem_health.append(
+                JarvisSubsystemHealth(
+                    kind=JarvisSubsystemKind.CONVERSATION,
+                    worker=conversation_snapshot,
+                    subsystem_snapshot=(
+                        self._conversation_worker.conversation_snapshot()
+                    ),
+                )
+            )
 
         return JarvisSystemSnapshot(
             name=self._name,
@@ -267,20 +352,8 @@ class JarvisSystem:
             stopped_at=self._stopped_at,
             memory_worker=memory_snapshot,
             cognition_worker=cognition_snapshot,
-            subsystem_health=(
-                JarvisSubsystemHealth(
-                    kind=JarvisSubsystemKind.MEMORY,
-                    worker=memory_snapshot,
-                    subsystem_snapshot=self._memory_worker.memory_snapshot(),
-                ),
-                JarvisSubsystemHealth(
-                    kind=JarvisSubsystemKind.COGNITION,
-                    worker=cognition_snapshot,
-                    subsystem_snapshot=(
-                        self._cognition_worker.cognition_snapshot()
-                    ),
-                ),
-            ),
+            conversation_worker=conversation_snapshot,
+            subsystem_health=tuple(subsystem_health),
             kernel_snapshot=_safe_kernel_snapshot(self._kernel),
             ask_count=self._ask_count,
             failure_count=self._failure_count,
@@ -293,11 +366,25 @@ class JarvisSystem:
 
         self._kernel.register_worker(self._memory_worker)
         self._kernel.register_worker(self._cognition_worker)
+
+        if self._conversation_worker is not None:
+            self._kernel.register_worker(self._conversation_worker)
+
         self._registered = True
 
     def _wait_until_ready(self) -> None:
         if not self._cognition_worker.wait_until_ready(timeout_seconds=2.0):
             raise RuntimeError("cognition runtime worker did not become ready.")
+
+        if (
+            self._conversation_worker is not None
+            and not self._conversation_worker.wait_until_ready(
+                timeout_seconds=2.0
+            )
+        ):
+            raise RuntimeError(
+                "conversation runtime worker did not become ready."
+            )
 
     def _retrieve_memory(
         self,
@@ -309,7 +396,6 @@ class JarvisSystem:
                 max_results=request.max_memory_results,
             )
         )
-
 
     def _maybe_write_memory_after_cognition(
         self,

@@ -9,6 +9,12 @@ from jarvis.cognition.worker import (
     CognitionWorkerResult,
     CognitionWorkerSnapshot,
 )
+from jarvis.conversation.runtime import (
+    RealConversationInput,
+    RealConversationRuntime,
+    RealConversationRuntimeOutput,
+    RealConversationRuntimeSnapshot,
+)
 from jarvis.memory.gateway import (
     MemoryGateway,
     MemoryGatewayRetrievalResult,
@@ -148,3 +154,84 @@ class CognitionRuntimeWorker(BaseWorker):
 
     def cognition_snapshot(self) -> CognitionWorkerSnapshot:
         return self._cognition_worker.snapshot()
+
+class ConversationRuntimeWorker(BaseWorker):
+    """
+    Runtime citizen wrapper for RealConversationRuntime.
+
+    Step 44C attaches the conversation organ to RuntimeKernel without adding
+    voice, presence, orchestration, or bootstrap changes yet.
+
+    Conversation remains responsible for:
+    - turn state
+    - endpointing output
+    - interruption actions
+    - session continuity
+    - attention update signals
+
+    It does not directly call cognition, memory, tools, or TTS.
+    """
+
+    def __init__(
+        self,
+        *,
+        conversation_runtime: RealConversationRuntime,
+        event_bus: EventBus,
+        name: str = "conversation_runtime",
+        tick_interval_seconds: float = 0.05,
+    ) -> None:
+        super().__init__(
+            name=name,
+            event_bus=event_bus,
+            tick_interval_seconds=tick_interval_seconds,
+        )
+        self._conversation_runtime = conversation_runtime
+        self._ready = Event()
+
+    @property
+    def conversation_runtime(self) -> RealConversationRuntime:
+        return self._conversation_runtime
+
+    def on_start(self) -> None:
+        self._ready.set()
+
+    def on_stop(self) -> None:
+        self._ready.clear()
+
+    def run_once(self) -> None:
+        return None
+
+    def wait_until_ready(
+        self,
+        *,
+        timeout_seconds: float = 2.0,
+    ) -> bool:
+        return self._ready.wait(timeout=timeout_seconds)
+
+    def accept_input(
+        self,
+        signal: RealConversationInput,
+    ) -> RealConversationRuntimeOutput:
+        if not self.wait_until_ready(timeout_seconds=2.0):
+            raise RuntimeError("conversation runtime worker is not ready.")
+
+        return self._conversation_runtime.accept_input(signal)
+
+    def add_assistant_response(
+        self,
+        text: str,
+        *,
+        turn_id: str | None = None,
+        expects_follow_up: bool = False,
+    ) -> RealConversationRuntimeOutput:
+        if not self.wait_until_ready(timeout_seconds=2.0):
+            raise RuntimeError("conversation runtime worker is not ready.")
+
+        return self._conversation_runtime.add_assistant_response(
+            text,
+            turn_id=turn_id,
+            expects_follow_up=expects_follow_up,
+        )
+
+    def conversation_snapshot(self) -> RealConversationRuntimeSnapshot:
+        return self._conversation_runtime.snapshot()

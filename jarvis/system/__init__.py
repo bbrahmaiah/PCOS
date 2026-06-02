@@ -14,6 +14,7 @@ from jarvis.system.contracts import (
 )
 from jarvis.system.worker_adapters import (
     CognitionRuntimeWorker,
+    ConversationRuntimeWorker,
     MemoryRuntimeWorker,
 )
 
@@ -21,6 +22,7 @@ __all__ = [
     "JarvisMemoryWriteDecision",
     "JarvisMemoryWriteStatus",
     "CognitionRuntimeWorker",
+    "ConversationRuntimeWorker",
     "JarvisAskStatus",
     "JarvisSubsystemHealth",
     "JarvisSubsystemKind",
