@@ -9,6 +9,18 @@ from jarvis.developer.code_context import (
     CodeFileSignal,
     CodeLanguage,
 )
+from jarvis.developer.error_intelligence import (
+    ErrorCategory,
+    ErrorDiagnosis,
+    ErrorIntelligenceEngine,
+    ErrorIntelligenceReport,
+    ErrorIntelligenceRequest,
+    ErrorIntelligenceStatus,
+    ErrorLocation,
+    ErrorSeverity,
+    ErrorSignal,
+    ErrorSourceKind,
+)
 from jarvis.developer.test_runner import (
     SubprocessTestExecutionAdapter,
     TestCommandKind,
@@ -27,6 +39,16 @@ from jarvis.developer.test_runner import (
 )
 
 __all__ = [
+    "ErrorCategory",
+    "ErrorDiagnosis",
+    "ErrorIntelligenceEngine",
+    "ErrorIntelligenceReport",
+    "ErrorIntelligenceRequest",
+    "ErrorIntelligenceStatus",
+    "ErrorLocation",
+    "ErrorSeverity",
+    "ErrorSignal",
+    "ErrorSourceKind",
     "CodeContextEngine",
     "CodeContextRequest",
     "CodeContextRisk",
