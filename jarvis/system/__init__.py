@@ -16,6 +16,20 @@ from jarvis.system.bootstrap import (
     JarvisSystemBootstrap,
     JarvisSystemFactoryBundle,
 )
+from jarvis.system.composition import (
+    JarvisComponentKind,
+    JarvisComponentMode,
+    JarvisComponentRequirement,
+    JarvisComponentSpec,
+    JarvisComponentValidation,
+    JarvisComponentValidationStatus,
+    JarvisCompositionOverride,
+    JarvisCompositionRoot,
+    JarvisCompositionRootSnapshot,
+    JarvisDependencyGraphReport,
+    JarvisDependencyGraphStatus,
+    validate_dependency_graph,
+)
 from jarvis.system.contracts import (
     JarvisAskStatus,
     JarvisMemoryWriteDecision,
@@ -40,6 +54,18 @@ from jarvis.system.worker_adapters import (
 )
 
 __all__ = [
+    "JarvisComponentKind",
+    "JarvisComponentMode",
+    "JarvisComponentRequirement",
+    "JarvisComponentSpec",
+    "JarvisComponentValidation",
+    "JarvisComponentValidationStatus",
+    "JarvisCompositionOverride",
+    "JarvisCompositionRoot",
+    "JarvisCompositionRootSnapshot",
+    "JarvisDependencyGraphReport",
+    "JarvisDependencyGraphStatus",
+    "validate_dependency_graph",
     "JarvisAliveGate",
     "JarvisAliveGateCheck",
     "JarvisAliveGateCheckKind",
