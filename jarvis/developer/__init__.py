@@ -9,6 +9,22 @@ from jarvis.developer.code_context import (
     CodeFileSignal,
     CodeLanguage,
 )
+from jarvis.developer.test_runner import (
+    SubprocessTestExecutionAdapter,
+    TestCommandKind,
+    TestCommandPlan,
+    TestCommandSafety,
+    TestDiscoveryReport,
+    TestDiscoveryRequest,
+    TestDiscoveryStatus,
+    TestExecutionAdapter,
+    TestExecutionRequest,
+    TestExecutionResult,
+    TestRunnerEngine,
+    TestRunRequest,
+    TestRunResult,
+    TestRunStatus,
+)
 
 __all__ = [
     "CodeContextEngine",
@@ -20,4 +36,18 @@ __all__ = [
     "CodeContextSummary",
     "CodeFileSignal",
     "CodeLanguage",
+    "SubprocessTestExecutionAdapter",
+    "TestCommandKind",
+    "TestCommandPlan",
+    "TestCommandSafety",
+    "TestDiscoveryReport",
+    "TestDiscoveryRequest",
+    "TestDiscoveryStatus",
+    "TestExecutionAdapter",
+    "TestExecutionRequest",
+    "TestExecutionResult",
+    "TestRunRequest",
+    "TestRunResult",
+    "TestRunStatus",
+    "TestRunnerEngine",
 ]
