@@ -1,5 +1,13 @@
 from __future__ import annotations
 
+from jarvis.system.alive_gate import (
+    JarvisAliveGate,
+    JarvisAliveGateCheck,
+    JarvisAliveGateCheckKind,
+    JarvisAliveGateConfig,
+    JarvisAliveGateReport,
+    JarvisAliveGateStatus,
+)
 from jarvis.system.assembly import JarvisSystem
 from jarvis.system.bootstrap import (
     JarvisBootstrapConfig,
@@ -32,6 +40,12 @@ from jarvis.system.worker_adapters import (
 )
 
 __all__ = [
+    "JarvisAliveGate",
+    "JarvisAliveGateCheck",
+    "JarvisAliveGateCheckKind",
+    "JarvisAliveGateConfig",
+    "JarvisAliveGateReport",
+    "JarvisAliveGateStatus",
     "JarvisBootstrapConfig",
     "JarvisBootstrapResult",
     "JarvisBootstrapStatus",
