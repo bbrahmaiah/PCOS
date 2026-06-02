@@ -65,6 +65,7 @@ from jarvis.system import (
     JarvisSystem,
     JarvisSystemStatus,
     MemoryRuntimeWorker,
+    OrchestrationRuntimeWorker,
     PresenceRuntimeWorker,
 )
 
@@ -149,6 +150,30 @@ class FakeMemoryGateway:
             "query_count": len(self.queries),
             "write_count": len(self.writes),
             "record_count": len(self.records),
+        }
+
+class FakeOrchestrationRuntime:
+    def __init__(self) -> None:
+        self.started = False
+        self.stopped = False
+        self.heartbeat_count = 0
+
+    def start(self) -> None:
+        self.started = True
+        self.stopped = False
+
+    def stop(self) -> None:
+        self.stopped = True
+        self.started = False
+
+    def heartbeat(self) -> None:
+        self.heartbeat_count += 1
+
+    def snapshot(self) -> dict[str, object]:
+        return {
+            "started": self.started,
+            "stopped": self.stopped,
+            "heartbeat_count": self.heartbeat_count,
         }
 
 
@@ -495,6 +520,7 @@ def test_enum_values_are_stable() -> None:
         "cancel_active_work"
     )
     assert VoiceActivityState.SPEECH_STARTED.value == "speech_started"
+    assert OrchestrationRuntimeWorker.__name__ == "OrchestrationRuntimeWorker"
 
 def _eventually(
     predicate: Callable[[], bool],
@@ -751,3 +777,81 @@ def test_jarvis_system_can_publish_presence_response_ready() -> None:
     system.stop()
 
     assert snapshot.presence_worker is not None
+
+
+def test_orchestration_runtime_worker_is_base_worker_compatible() -> None:
+    runtime = FakeOrchestrationRuntime()
+    event_bus = EventBus(name="test_event_bus")
+    worker = OrchestrationRuntimeWorker(
+        orchestration_runtime=runtime,
+        event_bus=event_bus,
+        tick_interval_seconds=0.01,
+    )
+
+    worker.start()
+
+    try:
+        assert _eventually(lambda: worker.wait_until_ready())
+        assert runtime.started is True
+    finally:
+        worker.stop()
+
+    snapshot = worker.snapshot()
+
+    assert runtime.stopped is True
+    assert snapshot.name == "orchestration_runtime"
+    assert snapshot.status == WorkerStatus.STOPPED
+
+def test_jarvis_system_start_registers_orchestration_worker_when_configured() -> None:
+    runtime = FakeOrchestrationRuntime()
+    system = JarvisSystem(
+        memory_gateway=_memory_gateway(FakeMemoryGateway()),
+        cognition_worker=CognitionWorker(
+            adapter=_cognition_adapter(FakeCognitionAdapter())
+        ),
+        conversation_runtime=RealConversationRuntime(),
+        presence_engine=_presence_engine(),
+        orchestration_runtime=runtime,
+        kernel=RuntimeKernel(),
+    )
+
+    system.start()
+    snapshot = system.snapshot()
+
+    assert system.status == JarvisSystemStatus.RUNNING
+    assert snapshot.orchestration_worker is not None
+    assert snapshot.orchestration_worker.running is True
+    assert len(snapshot.subsystem_health) == 5
+    assert runtime.started is True
+
+    system.stop()
+
+    stopped = system.snapshot()
+
+    assert stopped.orchestration_worker is not None
+    assert stopped.orchestration_worker.status == WorkerStatus.STOPPED
+    assert runtime.stopped is True
+
+def test_jarvis_system_snapshot_includes_orchestration_health() -> None:
+    runtime = FakeOrchestrationRuntime()
+    system = JarvisSystem(
+        memory_gateway=_memory_gateway(FakeMemoryGateway()),
+        cognition_worker=CognitionWorker(
+            adapter=_cognition_adapter(FakeCognitionAdapter())
+        ),
+        orchestration_runtime=runtime,
+        kernel=RuntimeKernel(),
+    )
+
+    system.start()
+    snapshot = system.snapshot()
+    system.stop()
+
+    orchestration_health = [
+        health
+        for health in snapshot.subsystem_health
+        if health.kind.value == "orchestration"
+    ]
+
+    assert len(orchestration_health) == 1
+    assert orchestration_health[0].subsystem_snapshot is not None

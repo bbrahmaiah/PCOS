@@ -46,6 +46,7 @@ from jarvis.system.worker_adapters import (
     CognitionRuntimeWorker,
     ConversationRuntimeWorker,
     MemoryRuntimeWorker,
+    OrchestrationRuntimeWorker,
     PresenceRuntimeWorker,
 )
 
@@ -73,6 +74,7 @@ class JarvisSystem:
         cognition_worker: CognitionWorker,
         conversation_runtime: RealConversationRuntime | None = None,
         presence_engine: PresenceEngine | None = None,
+        orchestration_runtime: object | None = None,
         kernel: RuntimeKernel | None = None,
         name: str = "jarvis_system",
     ) -> None:
@@ -106,6 +108,15 @@ class JarvisSystem:
                 event_bus=self._kernel.event_bus,
             )
             if presence_engine is not None
+            else None
+        )
+
+        self._orchestration_worker = (
+            OrchestrationRuntimeWorker(
+                orchestration_runtime=orchestration_runtime,
+                event_bus=self._kernel.event_bus,
+            )
+            if orchestration_runtime is not None
             else None
         )
 
@@ -144,6 +155,10 @@ class JarvisSystem:
     @property
     def presence_worker(self) -> PresenceRuntimeWorker | None:
         return self._presence_worker
+
+    @property
+    def orchestration_worker(self) -> OrchestrationRuntimeWorker | None:
+        return self._orchestration_worker
 
     def start(self) -> None:
         if self._status == JarvisSystemStatus.RUNNING:
@@ -353,6 +368,12 @@ class JarvisSystem:
             else None
         )
 
+        orchestration_snapshot = (
+            self._orchestration_worker.snapshot()
+            if self._orchestration_worker is not None
+            else None
+        )
+
         subsystem_health: list[JarvisSubsystemHealth] = [
             JarvisSubsystemHealth(
                 kind=JarvisSubsystemKind.MEMORY,
@@ -389,6 +410,20 @@ class JarvisSystem:
                 )
             )
 
+        if (
+            self._orchestration_worker is not None
+            and orchestration_snapshot is not None
+        ):
+            subsystem_health.append(
+                JarvisSubsystemHealth(
+                    kind=JarvisSubsystemKind.ORCHESTRATION,
+                    worker=orchestration_snapshot,
+                    subsystem_snapshot=(
+                        self._orchestration_worker.orchestration_snapshot()
+                    ),
+                )
+            )
+
         return JarvisSystemSnapshot(
             name=self._name,
             status=self._status,
@@ -398,6 +433,7 @@ class JarvisSystem:
             cognition_worker=cognition_snapshot,
             conversation_worker=conversation_snapshot,
             presence_worker=presence_snapshot,
+            orchestration_worker=orchestration_snapshot,
             subsystem_health=tuple(subsystem_health),
             kernel_snapshot=_safe_kernel_snapshot(self._kernel),
             ask_count=self._ask_count,
@@ -417,6 +453,9 @@ class JarvisSystem:
 
         if self._presence_worker is not None:
             self._kernel.register_worker(self._presence_worker)
+
+        if self._orchestration_worker is not None:
+            self._kernel.register_worker(self._orchestration_worker)
 
         self._registered = True
 
@@ -441,6 +480,16 @@ class JarvisSystem:
             )
         ):
             raise RuntimeError("presence runtime worker did not become ready.")
+
+        if (
+            self._orchestration_worker is not None
+            and not self._orchestration_worker.wait_until_ready(
+                timeout_seconds=2.0
+            )
+        ):
+            raise RuntimeError(
+                "orchestration runtime worker did not become ready."
+            )
 
     def _retrieve_memory(
         self,

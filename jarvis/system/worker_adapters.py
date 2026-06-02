@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from threading import Event
-from typing import Any
+from typing import Any, cast
 
 from jarvis.cognition.models import CognitionRequest
 from jarvis.cognition.worker import (
@@ -302,3 +302,72 @@ class PresenceRuntimeWorker(BaseWorker):
 
     def presence_snapshot(self) -> object:
         return self._presence_engine.snapshot()
+
+class OrchestrationRuntimeWorker(BaseWorker):
+    """
+    Runtime citizen wrapper for the orchestration subsystem.
+
+    Step 44E attaches orchestration as the conductor organ without giving it
+    direct hidden control over cognition, memory, tools, presence, or desktop
+    actions.
+
+    Full event-driven coordination comes in Step 44F.
+    """
+
+    def __init__(
+        self,
+        *,
+        orchestration_runtime: object,
+        event_bus: EventBus,
+        name: str = "orchestration_runtime",
+        tick_interval_seconds: float = 0.05,
+    ) -> None:
+        super().__init__(
+            name=name,
+            event_bus=event_bus,
+            tick_interval_seconds=tick_interval_seconds,
+        )
+        self._orchestration_runtime = orchestration_runtime
+        self._ready = Event()
+
+    @property
+    def orchestration_runtime(self) -> object:
+        return self._orchestration_runtime
+
+    def on_start(self) -> None:
+        _call_optional_lifecycle(self._orchestration_runtime, "start")
+        self._ready.set()
+
+    def on_stop(self) -> None:
+        try:
+            _call_optional_lifecycle(self._orchestration_runtime, "stop")
+        finally:
+            self._ready.clear()
+
+    def run_once(self) -> None:
+        heartbeat = getattr(self._orchestration_runtime, "heartbeat", None)
+        if callable(heartbeat):
+            heartbeat()
+
+    def wait_until_ready(
+        self,
+        *,
+        timeout_seconds: float = 2.0,
+    ) -> bool:
+        return self._ready.wait(timeout=timeout_seconds)
+
+    def orchestration_snapshot(self) -> object | None:
+        snapshot = getattr(self._orchestration_runtime, "snapshot", None)
+        if callable(snapshot):
+            return cast(object, snapshot())
+
+        return {
+            "runtime": type(self._orchestration_runtime).__name__,
+            "ready": self._ready.is_set(),
+        }
+
+
+def _call_optional_lifecycle(subsystem: object, method_name: str) -> None:
+    method = getattr(subsystem, method_name, None)
+    if callable(method):
+        method()
