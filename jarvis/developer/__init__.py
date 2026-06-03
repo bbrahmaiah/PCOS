@@ -1,3 +1,12 @@
+from jarvis.developer.build_watch import (
+    BuildWatchDecision,
+    BuildWatchEngine,
+    BuildWatchEvent,
+    BuildWatchEventKind,
+    BuildWatchRequest,
+    BuildWatchSnapshot,
+    BuildWatchStatus,
+)
 from jarvis.developer.code_context import (
     CodeContextEngine,
     CodeContextRequest,
@@ -63,6 +72,13 @@ from jarvis.developer.test_runner import (
 )
 
 __all__ = [
+    "BuildWatchDecision",
+    "BuildWatchEngine",
+    "BuildWatchEvent",
+    "BuildWatchEventKind",
+    "BuildWatchRequest",
+    "BuildWatchSnapshot",
+    "BuildWatchStatus",
     "JsonProjectMemoryStore",
     "ProjectMemoryEngine",
     "ProjectMemoryImportance",
