@@ -21,6 +21,17 @@ from jarvis.developer.error_intelligence import (
     ErrorSignal,
     ErrorSourceKind,
 )
+from jarvis.developer.fix_suggestion import (
+    FixAction,
+    FixActionKind,
+    FixSuggestion,
+    FixSuggestionEngine,
+    FixSuggestionKind,
+    FixSuggestionReport,
+    FixSuggestionRequest,
+    FixSuggestionRisk,
+    FixSuggestionStatus,
+)
 from jarvis.developer.test_runner import (
     SubprocessTestExecutionAdapter,
     TestCommandKind,
@@ -39,6 +50,15 @@ from jarvis.developer.test_runner import (
 )
 
 __all__ = [
+    "FixAction",
+    "FixActionKind",
+    "FixSuggestion",
+    "FixSuggestionEngine",
+    "FixSuggestionKind",
+    "FixSuggestionReport",
+    "FixSuggestionRequest",
+    "FixSuggestionRisk",
+    "FixSuggestionStatus",
     "ErrorCategory",
     "ErrorDiagnosis",
     "ErrorIntelligenceEngine",
