@@ -32,6 +32,19 @@ from jarvis.developer.fix_suggestion import (
     FixSuggestionRisk,
     FixSuggestionStatus,
 )
+from jarvis.developer.project_memory import (
+    JsonProjectMemoryStore,
+    ProjectMemoryEngine,
+    ProjectMemoryImportance,
+    ProjectMemoryKind,
+    ProjectMemoryRecallRequest,
+    ProjectMemoryRecord,
+    ProjectMemoryResult,
+    ProjectMemorySnapshot,
+    ProjectMemoryStatus,
+    ProjectMemoryStore,
+    ProjectMemoryStoreRequest,
+)
 from jarvis.developer.test_runner import (
     SubprocessTestExecutionAdapter,
     TestCommandKind,
@@ -50,6 +63,17 @@ from jarvis.developer.test_runner import (
 )
 
 __all__ = [
+    "JsonProjectMemoryStore",
+    "ProjectMemoryEngine",
+    "ProjectMemoryImportance",
+    "ProjectMemoryKind",
+    "ProjectMemoryRecallRequest",
+    "ProjectMemoryRecord",
+    "ProjectMemoryResult",
+    "ProjectMemorySnapshot",
+    "ProjectMemoryStatus",
+    "ProjectMemoryStore",
+    "ProjectMemoryStoreRequest",
     "FixAction",
     "FixActionKind",
     "FixSuggestion",
