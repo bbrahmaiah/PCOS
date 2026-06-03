@@ -48,6 +48,19 @@ from jarvis.cognitive.goals import (
     GoalRuntimeStatus,
     GoalUpdateRequest,
 )
+from jarvis.cognitive.personality import (
+    BehaviorDirective,
+    BehaviorIntent,
+    BehaviorRequest,
+    BehaviorRisk,
+    BehaviorRuntimeResult,
+    BehaviorRuntimeSnapshot,
+    BehaviorRuntimeStatus,
+    BehaviorStance,
+    PersonalityRuntime,
+    default_behavior_policy,
+    default_jarvis_personality,
+)
 from jarvis.cognitive.planning import (
     PlanCreateRequest,
     PlanIntentKind,
@@ -73,6 +86,17 @@ from jarvis.cognitive.working_memory import (
 )
 
 __all__ = [
+    "BehaviorDirective",
+    "BehaviorIntent",
+    "BehaviorRequest",
+    "BehaviorRisk",
+    "BehaviorRuntimeResult",
+    "BehaviorRuntimeSnapshot",
+    "BehaviorRuntimeStatus",
+    "BehaviorStance",
+    "PersonalityRuntime",
+    "default_behavior_policy",
+    "default_jarvis_personality",
     "PlanCreateRequest",
     "PlanIntentKind",
     "PlanRecallRequest",
