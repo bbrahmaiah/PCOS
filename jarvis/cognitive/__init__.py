@@ -9,6 +9,14 @@ from jarvis.cognitive.attention import (
     AttentionSignalUrgency,
     make_attention_signal,
 )
+from jarvis.cognitive.completion_gate import (
+    Phase9CompletionCheck,
+    Phase9CompletionCheckKind,
+    Phase9CompletionGate,
+    Phase9CompletionGateConfig,
+    Phase9CompletionGateReport,
+    Phase9CompletionGateStatus,
+)
 from jarvis.cognitive.contracts import (
     AttentionDecision,
     AttentionItem,
@@ -108,6 +116,12 @@ from jarvis.cognitive.working_memory import (
 )
 
 __all__ = [
+    "Phase9CompletionCheck",
+    "Phase9CompletionCheckKind",
+    "Phase9CompletionGate",
+    "Phase9CompletionGateConfig",
+    "Phase9CompletionGateReport",
+    "Phase9CompletionGateStatus",
     "CognitiveIntegrationEvent",
     "CognitiveIntegrationEventKind",
     "CognitiveIntegrationRequest",
