@@ -1,3 +1,14 @@
+from jarvis.cognitive.attention import (
+    AttentionEvaluationRequest,
+    AttentionEvaluationResult,
+    AttentionRuntime,
+    AttentionRuntimeSnapshot,
+    AttentionRuntimeStatus,
+    AttentionSignal,
+    AttentionSignalSource,
+    AttentionSignalUrgency,
+    make_attention_signal,
+)
 from jarvis.cognitive.contracts import (
     AttentionDecision,
     AttentionItem,
@@ -29,6 +40,15 @@ from jarvis.cognitive.contracts import (
 )
 
 __all__ = [
+    "AttentionEvaluationRequest",
+    "AttentionEvaluationResult",
+    "AttentionRuntime",
+    "AttentionRuntimeSnapshot",
+    "AttentionRuntimeStatus",
+    "AttentionSignal",
+    "AttentionSignalSource",
+    "AttentionSignalUrgency",
+    "make_attention_signal",
     "AttentionDecision",
     "AttentionItem",
     "AttentionItemKind",
