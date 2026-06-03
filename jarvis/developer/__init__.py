@@ -18,6 +18,17 @@ from jarvis.developer.code_context import (
     CodeFileSignal,
     CodeLanguage,
 )
+from jarvis.developer.code_navigation import (
+    CodeNavigationEngine,
+    CodeNavigationIndex,
+    CodeNavigationMatch,
+    CodeNavigationQueryKind,
+    CodeNavigationReport,
+    CodeNavigationRequest,
+    CodeNavigationStatus,
+    CodeSymbol,
+    CodeSymbolKind,
+)
 from jarvis.developer.error_intelligence import (
     ErrorCategory,
     ErrorDiagnosis,
@@ -72,6 +83,15 @@ from jarvis.developer.test_runner import (
 )
 
 __all__ = [
+    "CodeNavigationEngine",
+    "CodeNavigationIndex",
+    "CodeNavigationMatch",
+    "CodeNavigationQueryKind",
+    "CodeNavigationReport",
+    "CodeNavigationRequest",
+    "CodeNavigationStatus",
+    "CodeSymbol",
+    "CodeSymbolKind",
     "BuildWatchDecision",
     "BuildWatchEngine",
     "BuildWatchEvent",
