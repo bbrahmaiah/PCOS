@@ -38,8 +38,30 @@ from jarvis.cognitive.contracts import (
     WorkingMemoryState,
     default_cognitive_session,
 )
+from jarvis.cognitive.working_memory import (
+    WorkingMemoryEntry,
+    WorkingMemoryOperation,
+    WorkingMemoryRecallRequest,
+    WorkingMemoryRetention,
+    WorkingMemoryRuntime,
+    WorkingMemoryRuntimeResult,
+    WorkingMemoryRuntimeSnapshot,
+    WorkingMemoryRuntimeStatus,
+    WorkingMemoryUpdateRequest,
+    make_working_memory_entry,
+)
 
 __all__ = [
+    "WorkingMemoryEntry",
+    "WorkingMemoryOperation",
+    "WorkingMemoryRecallRequest",
+    "WorkingMemoryRetention",
+    "WorkingMemoryRuntime",
+    "WorkingMemoryRuntimeResult",
+    "WorkingMemoryRuntimeSnapshot",
+    "WorkingMemoryRuntimeStatus",
+    "WorkingMemoryUpdateRequest",
+    "make_working_memory_entry",
     "AttentionEvaluationRequest",
     "AttentionEvaluationResult",
     "AttentionRuntime",
