@@ -29,6 +29,14 @@ from jarvis.developer.code_navigation import (
     CodeSymbol,
     CodeSymbolKind,
 )
+from jarvis.developer.completion_gate import (
+    DeveloperFeaturePackCheck,
+    DeveloperFeaturePackCheckKind,
+    DeveloperFeaturePackCompletionGate,
+    DeveloperFeaturePackGateConfig,
+    DeveloperFeaturePackGateReport,
+    DeveloperFeaturePackGateStatus,
+)
 from jarvis.developer.error_intelligence import (
     ErrorCategory,
     ErrorDiagnosis,
@@ -83,6 +91,12 @@ from jarvis.developer.test_runner import (
 )
 
 __all__ = [
+    "DeveloperFeaturePackCheck",
+    "DeveloperFeaturePackCheckKind",
+    "DeveloperFeaturePackCompletionGate",
+    "DeveloperFeaturePackGateConfig",
+    "DeveloperFeaturePackGateReport",
+    "DeveloperFeaturePackGateStatus",
     "CodeNavigationEngine",
     "CodeNavigationIndex",
     "CodeNavigationMatch",
