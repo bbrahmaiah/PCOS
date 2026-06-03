@@ -38,6 +38,16 @@ from jarvis.cognitive.contracts import (
     WorkingMemoryState,
     default_cognitive_session,
 )
+from jarvis.cognitive.goals import (
+    GoalCreateRequest,
+    GoalOperation,
+    GoalRecallRequest,
+    GoalRuntime,
+    GoalRuntimeResult,
+    GoalRuntimeSnapshot,
+    GoalRuntimeStatus,
+    GoalUpdateRequest,
+)
 from jarvis.cognitive.working_memory import (
     WorkingMemoryEntry,
     WorkingMemoryOperation,
@@ -52,6 +62,14 @@ from jarvis.cognitive.working_memory import (
 )
 
 __all__ = [
+    "GoalCreateRequest",
+    "GoalOperation",
+    "GoalRecallRequest",
+    "GoalRuntime",
+    "GoalRuntimeResult",
+    "GoalRuntimeSnapshot",
+    "GoalRuntimeStatus",
+    "GoalUpdateRequest",
     "WorkingMemoryEntry",
     "WorkingMemoryOperation",
     "WorkingMemoryRecallRequest",
