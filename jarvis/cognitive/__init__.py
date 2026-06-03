@@ -48,6 +48,17 @@ from jarvis.cognitive.goals import (
     GoalRuntimeStatus,
     GoalUpdateRequest,
 )
+from jarvis.cognitive.planning import (
+    PlanCreateRequest,
+    PlanIntentKind,
+    PlanningOperation,
+    PlanningRuntime,
+    PlanningRuntimeResult,
+    PlanningRuntimeSnapshot,
+    PlanningRuntimeStatus,
+    PlanRecallRequest,
+    PlanStepUpdateRequest,
+)
 from jarvis.cognitive.working_memory import (
     WorkingMemoryEntry,
     WorkingMemoryOperation,
@@ -62,6 +73,15 @@ from jarvis.cognitive.working_memory import (
 )
 
 __all__ = [
+    "PlanCreateRequest",
+    "PlanIntentKind",
+    "PlanRecallRequest",
+    "PlanningOperation",
+    "PlanningRuntime",
+    "PlanningRuntimeResult",
+    "PlanningRuntimeSnapshot",
+    "PlanningRuntimeStatus",
+    "PlanStepUpdateRequest",
     "GoalCreateRequest",
     "GoalOperation",
     "GoalRecallRequest",
