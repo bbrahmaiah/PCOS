@@ -403,6 +403,12 @@ def _text_for_request(
     if not directive.should_speak:
         return ""
 
+    if request.intent == BehaviorIntent.INTERRUPTION:
+        return _bounded_text(
+            "Stopping. Listening now.",
+            max_sentences=policy.max_reply_sentences,
+        )
+
     if directive.should_warn:
         return _bounded_text(
             f"{profile.warning_phrase} {request.message}".strip(),
@@ -427,11 +433,6 @@ def _text_for_request(
             max_sentences=policy.max_reply_sentences,
         )
 
-    if request.intent == BehaviorIntent.INTERRUPTION:
-        return _bounded_text(
-            "Stopping. Listening now.",
-            max_sentences=policy.max_reply_sentences,
-        )
 
     if request.intent == BehaviorIntent.HUMOR and directive.allow_humor:
         return _bounded_text(

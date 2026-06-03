@@ -48,6 +48,17 @@ from jarvis.cognitive.goals import (
     GoalRuntimeStatus,
     GoalUpdateRequest,
 )
+from jarvis.cognitive.integration import (
+    CognitiveIntegrationEvent,
+    CognitiveIntegrationEventKind,
+    CognitiveIntegrationRequest,
+    CognitiveIntegrationResult,
+    CognitiveIntegrationRuntime,
+    CognitiveIntegrationRuntimeSnapshot,
+    CognitiveIntegrationSource,
+    CognitiveIntegrationStatus,
+    make_cognitive_integration_event,
+)
 from jarvis.cognitive.personality import (
     BehaviorDirective,
     BehaviorIntent,
@@ -97,6 +108,15 @@ from jarvis.cognitive.working_memory import (
 )
 
 __all__ = [
+    "CognitiveIntegrationEvent",
+    "CognitiveIntegrationEventKind",
+    "CognitiveIntegrationRequest",
+    "CognitiveIntegrationResult",
+    "CognitiveIntegrationRuntime",
+    "CognitiveIntegrationRuntimeSnapshot",
+    "CognitiveIntegrationSource",
+    "CognitiveIntegrationStatus",
+    "make_cognitive_integration_event",
     "CognitiveSessionGoalRequest",
     "CognitiveSessionOperation",
     "CognitiveSessionResponseRequest",
