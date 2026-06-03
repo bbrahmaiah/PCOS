@@ -72,6 +72,17 @@ from jarvis.cognitive.planning import (
     PlanRecallRequest,
     PlanStepUpdateRequest,
 )
+from jarvis.cognitive.session import (
+    CognitiveSessionGoalRequest,
+    CognitiveSessionOperation,
+    CognitiveSessionResponseRequest,
+    CognitiveSessionRuntime,
+    CognitiveSessionRuntimeResult,
+    CognitiveSessionRuntimeSnapshot,
+    CognitiveSessionRuntimeStatus,
+    CognitiveSessionStartRequest,
+    CognitiveSessionUpdateRequest,
+)
 from jarvis.cognitive.working_memory import (
     WorkingMemoryEntry,
     WorkingMemoryOperation,
@@ -86,6 +97,15 @@ from jarvis.cognitive.working_memory import (
 )
 
 __all__ = [
+    "CognitiveSessionGoalRequest",
+    "CognitiveSessionOperation",
+    "CognitiveSessionResponseRequest",
+    "CognitiveSessionRuntime",
+    "CognitiveSessionRuntimeResult",
+    "CognitiveSessionRuntimeSnapshot",
+    "CognitiveSessionRuntimeStatus",
+    "CognitiveSessionStartRequest",
+    "CognitiveSessionUpdateRequest",
     "BehaviorDirective",
     "BehaviorIntent",
     "BehaviorRequest",
