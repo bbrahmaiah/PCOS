@@ -106,6 +106,16 @@ from jarvis.live.interruption_runtime import (
     LiveInterruptionRuntimeStatus,
     LiveInterruptionSnapshot,
 )
+from jarvis.live.recovery_runtime import (
+    LiveRecoveryAction,
+    LiveRecoveryOperation,
+    LiveRecoveryPlan,
+    LiveRecoveryPolicy,
+    LiveRecoveryResult,
+    LiveRecoveryRuntime,
+    LiveRecoveryRuntimeStatus,
+    LiveRecoverySnapshot,
+)
 from jarvis.live.response_boundary import (
     LiveDeterministicSystemMessage,
     LiveResponseBoundaryPolicy,
@@ -141,6 +151,14 @@ from jarvis.live.wake_engagement import (
 )
 
 __all__ = [
+    "LiveRecoveryAction",
+    "LiveRecoveryOperation",
+    "LiveRecoveryPlan",
+    "LiveRecoveryPolicy",
+    "LiveRecoveryResult",
+    "LiveRecoveryRuntime",
+    "LiveRecoveryRuntimeStatus",
+    "LiveRecoverySnapshot",
     "LiveHealthMonitorOperation",
     "LiveHealthMonitorPolicy",
     "LiveHealthMonitorResult",
