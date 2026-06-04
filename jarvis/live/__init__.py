@@ -84,6 +84,16 @@ from jarvis.live.event_bridge import (
     LiveResponseBridgeRequest,
     LiveTranscriptBridgeRequest,
 )
+from jarvis.live.health_monitor import (
+    LiveHealthMonitorOperation,
+    LiveHealthMonitorPolicy,
+    LiveHealthMonitorResult,
+    LiveHealthMonitorRuntime,
+    LiveHealthMonitorSnapshot,
+    LiveHealthMonitorStatus,
+    LiveHealthSignal,
+    LiveHealthSignalKind,
+)
 from jarvis.live.interruption_runtime import (
     LiveInterruptedContext,
     LiveInterruptionDisposition,
@@ -131,6 +141,14 @@ from jarvis.live.wake_engagement import (
 )
 
 __all__ = [
+    "LiveHealthMonitorOperation",
+    "LiveHealthMonitorPolicy",
+    "LiveHealthMonitorResult",
+    "LiveHealthMonitorRuntime",
+    "LiveHealthMonitorSnapshot",
+    "LiveHealthMonitorStatus",
+    "LiveHealthSignal",
+    "LiveHealthSignalKind",
     "LiveInterruptedContext",
     "LiveInterruptionDisposition",
     "LiveInterruptionKind",
