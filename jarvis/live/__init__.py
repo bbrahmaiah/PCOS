@@ -42,6 +42,17 @@ from jarvis.live.contracts import (
     make_live_turn_id,
     utc_now,
 )
+from jarvis.live.event_bridge import (
+    LiveEventBridgeOperation,
+    LiveEventBridgeRequest,
+    LiveEventBridgeResult,
+    LiveEventBridgeRoute,
+    LiveEventBridgeRuntime,
+    LiveEventBridgeSnapshot,
+    LiveEventBridgeStatus,
+    LiveResponseBridgeRequest,
+    LiveTranscriptBridgeRequest,
+)
 from jarvis.live.response_boundary import (
     LiveDeterministicSystemMessage,
     LiveResponseBoundaryPolicy,
@@ -66,6 +77,15 @@ from jarvis.live.session_state import (
 )
 
 __all__ = [
+    "LiveEventBridgeOperation",
+    "LiveEventBridgeRequest",
+    "LiveEventBridgeResult",
+    "LiveEventBridgeRoute",
+    "LiveEventBridgeRuntime",
+    "LiveEventBridgeSnapshot",
+    "LiveEventBridgeStatus",
+    "LiveResponseBridgeRequest",
+    "LiveTranscriptBridgeRequest",
     "LiveSessionStateOperation",
     "LiveSessionStateRuntime",
     "LiveSessionStateRuntimeResult",
