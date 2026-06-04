@@ -131,6 +131,14 @@ from jarvis.live.response_boundary import (
     LiveResponseIntent,
     LiveResponseSurface,
 )
+from jarvis.live.session_runner import (
+    LiveSessionRunner,
+    LiveSessionRunnerConfig,
+    LiveSessionRunnerOperation,
+    LiveSessionRunnerResult,
+    LiveSessionRunnerSnapshot,
+    LiveSessionRunnerStatus,
+)
 from jarvis.live.session_state import (
     LiveSessionStateOperation,
     LiveSessionStateRuntime,
@@ -151,6 +159,12 @@ from jarvis.live.wake_engagement import (
 )
 
 __all__ = [
+    "LiveSessionRunner",
+    "LiveSessionRunnerConfig",
+    "LiveSessionRunnerOperation",
+    "LiveSessionRunnerResult",
+    "LiveSessionRunnerSnapshot",
+    "LiveSessionRunnerStatus",
     "LiveRecoveryAction",
     "LiveRecoveryOperation",
     "LiveRecoveryPlan",

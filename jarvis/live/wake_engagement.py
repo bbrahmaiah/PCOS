@@ -489,9 +489,19 @@ class LiveWakeEngagementRuntime:
         )
 
     def _is_active_session(self) -> bool:
+        state = self._state.state
+
+        has_real_dialogue_context = (
+            state.current_turn_id is not None
+            or state.last_transcript is not None
+            or state.last_response is not None
+            or state.assistant_speaking
+        )
+
         return (
-            self._state.state.conversation_active
-            and self._state.state.interaction_state
+            state.conversation_active
+            and has_real_dialogue_context
+            and state.interaction_state
             in {
                 LiveInteractionState.LISTENING,
                 LiveInteractionState.WAITING_FOR_USER,
