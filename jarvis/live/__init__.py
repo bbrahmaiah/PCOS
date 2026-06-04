@@ -61,6 +61,16 @@ from jarvis.live.contracts import (
     make_live_turn_id,
     utc_now,
 )
+from jarvis.live.daily_driver_gate import (
+    LiveDailyDriverCheck,
+    LiveDailyDriverCheckKind,
+    LiveDailyDriverGateConfig,
+    LiveDailyDriverGateGenerator,
+    LiveDailyDriverGateReport,
+    LiveDailyDriverGateStatus,
+    LiveDailyDriverProfile,
+    LiveDailyDriverRuntimeGate,
+)
 from jarvis.live.dialogue_runtime import (
     LiveDialogueOperation,
     LiveDialoguePolicy,
@@ -159,6 +169,14 @@ from jarvis.live.wake_engagement import (
 )
 
 __all__ = [
+    "LiveDailyDriverCheck",
+    "LiveDailyDriverCheckKind",
+    "LiveDailyDriverGateConfig",
+    "LiveDailyDriverGateGenerator",
+    "LiveDailyDriverGateReport",
+    "LiveDailyDriverGateStatus",
+    "LiveDailyDriverProfile",
+    "LiveDailyDriverRuntimeGate",
     "LiveSessionRunner",
     "LiveSessionRunnerConfig",
     "LiveSessionRunnerOperation",
