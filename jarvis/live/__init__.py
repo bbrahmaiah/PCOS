@@ -116,6 +116,11 @@ from jarvis.live.interruption_runtime import (
     LiveInterruptionRuntimeStatus,
     LiveInterruptionSnapshot,
 )
+from jarvis.live.ollama_generator import (
+    OllamaGeneratorConfig,
+    OllamaGeneratorStatus,
+    OllamaLiveResponseGenerator,
+)
 from jarvis.live.recovery_runtime import (
     LiveRecoveryAction,
     LiveRecoveryOperation,
@@ -169,6 +174,9 @@ from jarvis.live.wake_engagement import (
 )
 
 __all__ = [
+    "OllamaGeneratorConfig",
+    "OllamaGeneratorStatus",
+    "OllamaLiveResponseGenerator",
     "LiveDailyDriverCheck",
     "LiveDailyDriverCheckKind",
     "LiveDailyDriverGateConfig",
