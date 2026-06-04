@@ -84,6 +84,18 @@ from jarvis.live.event_bridge import (
     LiveResponseBridgeRequest,
     LiveTranscriptBridgeRequest,
 )
+from jarvis.live.interruption_runtime import (
+    LiveInterruptedContext,
+    LiveInterruptionDisposition,
+    LiveInterruptionKind,
+    LiveInterruptionOperation,
+    LiveInterruptionPolicy,
+    LiveInterruptionRequest,
+    LiveInterruptionResult,
+    LiveInterruptionRuntime,
+    LiveInterruptionRuntimeStatus,
+    LiveInterruptionSnapshot,
+)
 from jarvis.live.response_boundary import (
     LiveDeterministicSystemMessage,
     LiveResponseBoundaryPolicy,
@@ -119,6 +131,16 @@ from jarvis.live.wake_engagement import (
 )
 
 __all__ = [
+    "LiveInterruptedContext",
+    "LiveInterruptionDisposition",
+    "LiveInterruptionKind",
+    "LiveInterruptionOperation",
+    "LiveInterruptionPolicy",
+    "LiveInterruptionRequest",
+    "LiveInterruptionResult",
+    "LiveInterruptionRuntime",
+    "LiveInterruptionRuntimeStatus",
+    "LiveInterruptionSnapshot",
     "LiveDialogueOperation",
     "LiveDialoguePolicy",
     "LiveDialogueRequest",
