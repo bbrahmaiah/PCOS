@@ -57,8 +57,20 @@ from jarvis.live.response_boundary import (
     LiveResponseIntent,
     LiveResponseSurface,
 )
+from jarvis.live.session_state import (
+    LiveSessionStateOperation,
+    LiveSessionStateRuntime,
+    LiveSessionStateRuntimeResult,
+    LiveSessionStateRuntimeSnapshot,
+    LiveSessionStateRuntimeStatus,
+)
 
 __all__ = [
+    "LiveSessionStateOperation",
+    "LiveSessionStateRuntime",
+    "LiveSessionStateRuntimeResult",
+    "LiveSessionStateRuntimeSnapshot",
+    "LiveSessionStateRuntimeStatus",
     "LiveDeterministicSystemMessage",
     "LiveResponseBoundaryPolicy",
     "LiveResponseBoundaryResult",
