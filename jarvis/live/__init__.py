@@ -61,6 +61,18 @@ from jarvis.live.contracts import (
     make_live_turn_id,
     utc_now,
 )
+from jarvis.live.dialogue_runtime import (
+    LiveDialogueOperation,
+    LiveDialoguePolicy,
+    LiveDialogueRequest,
+    LiveDialogueResult,
+    LiveDialogueRuntime,
+    LiveDialogueRuntimeStatus,
+    LiveDialogueSnapshot,
+    LiveDialogueTurn,
+    LiveDialogueTurnStatus,
+    make_dialogue_turn_id,
+)
 from jarvis.live.event_bridge import (
     LiveEventBridgeOperation,
     LiveEventBridgeRequest,
@@ -107,6 +119,16 @@ from jarvis.live.wake_engagement import (
 )
 
 __all__ = [
+    "LiveDialogueOperation",
+    "LiveDialoguePolicy",
+    "LiveDialogueRequest",
+    "LiveDialogueResult",
+    "LiveDialogueRuntime",
+    "LiveDialogueRuntimeStatus",
+    "LiveDialogueSnapshot",
+    "LiveDialogueTurn",
+    "LiveDialogueTurnStatus",
+    "make_dialogue_turn_id",
     "LiveEngagementDecision",
     "LiveEngagementReason",
     "LiveWakeEngagementOperation",
