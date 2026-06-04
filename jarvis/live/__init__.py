@@ -94,8 +94,28 @@ from jarvis.live.session_state import (
     LiveSessionStateRuntimeSnapshot,
     LiveSessionStateRuntimeStatus,
 )
+from jarvis.live.wake_engagement import (
+    LiveEngagementDecision,
+    LiveEngagementReason,
+    LiveWakeEngagementOperation,
+    LiveWakeEngagementPolicy,
+    LiveWakeEngagementRequest,
+    LiveWakeEngagementResult,
+    LiveWakeEngagementRuntime,
+    LiveWakeEngagementSnapshot,
+    LiveWakeEngagementStatus,
+)
 
 __all__ = [
+    "LiveEngagementDecision",
+    "LiveEngagementReason",
+    "LiveWakeEngagementOperation",
+    "LiveWakeEngagementPolicy",
+    "LiveWakeEngagementRequest",
+    "LiveWakeEngagementResult",
+    "LiveWakeEngagementRuntime",
+    "LiveWakeEngagementSnapshot",
+    "LiveWakeEngagementStatus",
     "LiveAudioAdapterReport",
     "LiveAudioBuffer",
     "LiveAudioDeviceKind",
