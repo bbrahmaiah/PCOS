@@ -37,8 +37,28 @@ from jarvis.voice.contracts import (
     make_voice_tts_chunk_id,
     utc_now,
 )
+from jarvis.voice.microphone_capture import (
+    PyAudioMicrophoneAdapter,
+    VoiceMicrophoneAdapter,
+    VoiceMicrophoneCaptureOperation,
+    VoiceMicrophoneCapturePolicy,
+    VoiceMicrophoneCaptureResult,
+    VoiceMicrophoneCaptureRuntime,
+    VoiceMicrophoneCaptureSnapshot,
+    VoiceMicrophoneCaptureStatus,
+    VoiceMicrophoneDeviceInfo,
+)
 
 __all__ = [
+    "PyAudioMicrophoneAdapter",
+    "VoiceMicrophoneAdapter",
+    "VoiceMicrophoneCaptureOperation",
+    "VoiceMicrophoneCapturePolicy",
+    "VoiceMicrophoneCaptureResult",
+    "VoiceMicrophoneCaptureRuntime",
+    "VoiceMicrophoneCaptureSnapshot",
+    "VoiceMicrophoneCaptureStatus",
+    "VoiceMicrophoneDeviceInfo",
     "VoiceDeviceHealth",
     "VoiceFrameId",
     "VoiceInputFrame",
