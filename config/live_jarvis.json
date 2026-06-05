@@ -1,9 +1,0 @@
-{
-  "ollama_base_url": "http://localhost:11434",
-  "ollama_model": "llama3.2:3b",
-  "assistant_name": "JARVIS",
-  "user_label": "Balu",
-  "wake_word": "jarvis",
-  "max_sentences": 3,
-  "timeout_seconds": 60
-}
