@@ -48,6 +48,21 @@ from jarvis.voice.microphone_capture import (
     VoiceMicrophoneCaptureStatus,
     VoiceMicrophoneDeviceInfo,
 )
+from jarvis.voice.stt_runtime import (
+    FasterWhisperSTTAdapter,
+    VoiceSTTAdapter,
+    VoiceSTTMode,
+    VoiceSTTModelInfo,
+    VoiceSTTOperation,
+    VoiceSTTPolicy,
+    VoiceSTTRequest,
+    VoiceSTTResult,
+    VoiceSTTRuntime,
+    VoiceSTTRuntimeStatus,
+    VoiceSTTSnapshot,
+    VoiceSTTTranscriptCandidate,
+    VoiceSTTTranscriptSafety,
+)
 from jarvis.voice.voice_activity import (
     VoiceActivityDecision,
     VoiceActivityOperation,
@@ -59,6 +74,19 @@ from jarvis.voice.voice_activity import (
 )
 
 __all__ = [
+    "FasterWhisperSTTAdapter",
+    "VoiceSTTAdapter",
+    "VoiceSTTMode",
+    "VoiceSTTModelInfo",
+    "VoiceSTTOperation",
+    "VoiceSTTPolicy",
+    "VoiceSTTRequest",
+    "VoiceSTTResult",
+    "VoiceSTTRuntime",
+    "VoiceSTTRuntimeStatus",
+    "VoiceSTTSnapshot",
+    "VoiceSTTTranscriptCandidate",
+    "VoiceSTTTranscriptSafety",
     "VoiceActivityDecision",
     "VoiceActivityOperation",
     "VoiceActivityPolicy",
