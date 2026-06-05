@@ -48,8 +48,24 @@ from jarvis.voice.microphone_capture import (
     VoiceMicrophoneCaptureStatus,
     VoiceMicrophoneDeviceInfo,
 )
+from jarvis.voice.voice_activity import (
+    VoiceActivityDecision,
+    VoiceActivityOperation,
+    VoiceActivityPolicy,
+    VoiceActivityResult,
+    VoiceActivityRuntime,
+    VoiceActivityRuntimeStatus,
+    VoiceActivitySnapshot,
+)
 
 __all__ = [
+    "VoiceActivityDecision",
+    "VoiceActivityOperation",
+    "VoiceActivityPolicy",
+    "VoiceActivityResult",
+    "VoiceActivityRuntime",
+    "VoiceActivityRuntimeStatus",
+    "VoiceActivitySnapshot",
     "PyAudioMicrophoneAdapter",
     "VoiceMicrophoneAdapter",
     "VoiceMicrophoneCaptureOperation",
