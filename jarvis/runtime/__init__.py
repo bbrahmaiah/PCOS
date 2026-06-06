@@ -1,3 +1,13 @@
+from jarvis.runtime.binding_verification import (
+    JarvisRuntimeBindingCheck,
+    JarvisRuntimeBindingCheckKind,
+    JarvisRuntimeBindingVerificationMode,
+    JarvisRuntimeBindingVerificationReport,
+    JarvisRuntimeBindingVerificationStatus,
+    JarvisRuntimeBindingVerifier,
+    JarvisRuntimeBindingVerifierConfig,
+    summarize_binding_report,
+)
 from jarvis.runtime.phase_adapters import (
     JarvisConnectedRuntimePlan,
     JarvisPhaseAdapterSnapshot,
@@ -13,6 +23,22 @@ from jarvis.runtime.phase_adapters import (
     build_plan_from_import_bindings,
     default_phase_runtime_specs,
     read_runtime_binding_imports,
+)
+from jarvis.runtime.phase_factories import (
+    ModuleBackedPhaseRuntime,
+    PhaseRuntimeHealth,
+    create_phase1_events_runtime,
+    create_phase1_kernel_runtime,
+    create_phase1_observability_runtime,
+    create_phase2_presence_runtime,
+    create_phase2_voice_runtime,
+    create_phase3_cognition_runtime,
+    create_phase4_memory_runtime,
+    create_phase5_tools_runtime,
+    create_phase6_orchestration_runtime,
+    create_phase7_streaming_latency_runtime,
+    create_phase8_environment_runtime,
+    create_phase9_cognitive_session_runtime,
 )
 from jarvis.runtime.start_control import (
     JarvisOrganController,
@@ -33,6 +59,28 @@ from jarvis.runtime.start_control import (
 )
 
 __all__ = [
+    "ModuleBackedPhaseRuntime",
+    "PhaseRuntimeHealth",
+    "create_phase1_events_runtime",
+    "create_phase1_kernel_runtime",
+    "create_phase1_observability_runtime",
+    "create_phase2_presence_runtime",
+    "create_phase2_voice_runtime",
+    "create_phase3_cognition_runtime",
+    "create_phase4_memory_runtime",
+    "create_phase5_tools_runtime",
+    "create_phase6_orchestration_runtime",
+    "create_phase7_streaming_latency_runtime",
+    "create_phase8_environment_runtime",
+    "create_phase9_cognitive_session_runtime",
+    "JarvisRuntimeBindingCheck",
+    "JarvisRuntimeBindingCheckKind",
+    "JarvisRuntimeBindingVerificationMode",
+    "JarvisRuntimeBindingVerificationReport",
+    "JarvisRuntimeBindingVerificationStatus",
+    "JarvisRuntimeBindingVerifier",
+    "JarvisRuntimeBindingVerifierConfig",
+    "summarize_binding_report",
     "JarvisConnectedRuntimePlan",
     "JarvisPhaseAdapterSnapshot",
     "JarvisPhaseAdapterStatus",
