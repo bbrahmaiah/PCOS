@@ -82,7 +82,7 @@ class StreamingTokenPipelineConfig:
     sentence_flush_chars: int = 220
     emit_partial_chunks: bool = False
     partial_flush_chars: int = 120
-    fallback_empty_response_text: str = "I understand, sir."
+    fallback_empty_response_text: str = "empty_streaming_response"
 
     def validate(self) -> None:
         if not self.name.strip():
@@ -663,7 +663,12 @@ class StreamingTokenPipeline:
         raw_text = "".join(token.text for token in tokens).strip()
         normalized_text = self._normalize_streamed_text(raw_text)
 
-        return normalized_text or self._config.fallback_empty_response_text
+        if normalized_text:
+            return normalized_text
+
+        raise RuntimeError(
+            "empty generated response is not allowed as fixed conversational speech"
+        )
 
     @staticmethod
     def _normalize_streamed_text(text: str) -> str:

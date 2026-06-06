@@ -160,7 +160,7 @@ def test_cognition_worker_processes_successful_request() -> None:
 
     assert result.succeeded is True
     assert result.response is not None
-    assert result.response.text == "Yes sir. I can hear you clearly."
+    assert result.response.text == "derived_fake_test_response::can you hear me"
     assert snapshot.processed_count == 1
     assert snapshot.success_count == 1
     assert snapshot.failure_count == 0

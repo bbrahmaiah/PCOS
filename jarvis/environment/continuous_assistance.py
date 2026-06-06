@@ -464,15 +464,15 @@ class ContinuousSuggestionBuilder:
         preparation: AssistancePreparation | None,
     ) -> AssistanceSuggestion:
         kind = AssistanceSuggestionKind.ASK_IF_HELP_NEEDED
-        message = "I noticed something. Would you like help?"
+        message = "proactive_observation_available"
 
         if observation.kind == AssistanceObservationKind.BUILD_ERROR:
             kind = AssistanceSuggestionKind.DEBUG_ERROR
-            message = "I found a build error. Want me to help inspect it?"
+            message = "build_error_assistance_available"
 
         elif observation.kind == AssistanceObservationKind.LONG_RUNNING_TASK:
             kind = AssistanceSuggestionKind.CHECK_LONG_TASK
-            message = "This task is taking a while. Want me to check its status?"
+            message = "long_running_task_status_available"
 
         elif observation.kind == AssistanceObservationKind.REPEATED_ACTION:
             kind = AssistanceSuggestionKind.AUTOMATE_REPEATED_ACTION
@@ -483,11 +483,11 @@ class ContinuousSuggestionBuilder:
 
         elif observation.kind == AssistanceObservationKind.APP_CRASH:
             kind = AssistanceSuggestionKind.RESTORE_CRASHED_APP
-            message = "The app may have crashed. Want me to prepare recovery info?"
+            message = "app_crash_recovery_available"
 
         elif observation.kind == AssistanceObservationKind.USER_RETURN:
             kind = AssistanceSuggestionKind.RESUME_WORKFLOW
-            message = "Welcome back. Want me to summarize where you left off?"
+            message = "resume_summary_available"
 
         return AssistanceSuggestion(
             kind=kind,

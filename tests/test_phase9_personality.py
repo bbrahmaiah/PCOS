@@ -22,7 +22,7 @@ def test_default_personality_matches_jarvis_presence() -> None:
     assert "calm" in profile.traits
     assert "protective" in profile.traits
     assert "carefully_challenging" in profile.traits
-    assert profile.confirmation_phrase == "Certainly, sir."
+    assert profile.confirmation_phrase == ""
 
 
 def test_default_behavior_policy_is_safe_and_concise() -> None:
@@ -45,7 +45,8 @@ def test_personality_confirmation_is_calm_and_concise() -> None:
     )
 
     assert result.status == BehaviorRuntimeStatus.READY
-    assert result.text == "Certainly, sir. Running the checks."
+    assert result.text == "Running the checks."
+    assert result.directive.should_speak is True
     assert result.directive.tone == BehaviorTone.CALM
     assert result.directive.stance == BehaviorStance.SUPPORTIVE
 
@@ -162,7 +163,8 @@ def test_personality_allows_dry_humor_only_when_safe() -> None:
         )
     )
 
-    assert "tests are honest" in safe.text
+    assert safe.text == "The build failed again."
+    assert safe.directive.allow_humor is True
     assert "tests are honest" not in risky.text
 
 

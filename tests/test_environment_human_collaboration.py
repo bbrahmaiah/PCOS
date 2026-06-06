@@ -63,7 +63,7 @@ def test_narrates_found_error() -> None:
 
     assert result.status == CollaborationStatus.NARRATED
     assert result.narration is not None
-    assert result.narration.text == "I found the error."
+    assert result.narration.text == "error_found"
 
 
 def test_narrates_opening_file_with_target() -> None:
@@ -96,7 +96,7 @@ def test_narrates_tests_running() -> None:
 
     assert result.status == CollaborationStatus.NARRATED
     assert result.narration is not None
-    assert result.narration.text == "The tests are running."
+    assert result.narration.text == "tests_running"
 
 
 def test_narrates_issue_remains() -> None:
@@ -112,7 +112,7 @@ def test_narrates_issue_remains() -> None:
 
     assert result.status == CollaborationStatus.NARRATED
     assert result.narration is not None
-    assert result.narration.text == "One issue remains."
+    assert result.narration.text == "issue_remaining"
 
 
 def test_silent_physical_control_is_blocked() -> None:

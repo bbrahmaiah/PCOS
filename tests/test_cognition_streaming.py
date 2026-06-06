@@ -189,7 +189,7 @@ def test_streaming_token_pipeline_completes_request() -> None:
 
     assert result.completed is True
     assert result.response is not None
-    assert result.response.text == "Yes sir. I am listening."
+    assert result.response.text == "derived_fake_test_response::hello jarvis"
     assert result.response.token_count == len(result.tokens)
     assert len(result.tokens) > 0
     assert len(result.speech_chunks) > 0

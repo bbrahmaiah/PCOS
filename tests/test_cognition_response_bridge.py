@@ -267,14 +267,14 @@ def test_cognition_dialogue_bridge_publishes_failure_fallback() -> None:
     snapshot = worker.snapshot()
 
     assert result.accepted is True
-    assert result.response_text == "I had trouble thinking that through, sir."
+    assert result.response_text == "cognition_response_bridge_failure"
     assert len(bus.published) == 1
 
     published = bus.published[0]
 
     assert published.event_type == EventType.DIALOGUE_RESPONSE_READY
     assert published.payload["fallback"] is True
-    assert published.payload["text"] == "I had trouble thinking that through, sir."
+    assert published.payload["text"] == "cognition_response_bridge_failure"
     assert published.payload["cognition_request_id"] == "cognition-request-1"
     assert published.payload["cognition_response_id"] == "failure-1"
     assert published.payload["response_id"] == "dialogue-fallback-failure-1"

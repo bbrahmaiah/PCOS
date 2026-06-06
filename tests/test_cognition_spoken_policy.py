@@ -113,7 +113,7 @@ def test_spoken_dialogue_policy_uses_fallback_for_empty_direct_reply() -> None:
     policy = SpokenDialoguePolicy()
     decision = policy.prepare(" ")
 
-    assert decision.spoken_text == "I understand, sir."
+    assert decision.spoken_text == "emptyspokenpolicyoutput."
     assert decision.act == SpokenDialogueAct.DIRECT_REPLY
 
 
@@ -144,7 +144,7 @@ def test_spoken_dialogue_policy_uses_failure_fallback() -> None:
         act=SpokenDialogueAct.FAILURE_FALLBACK,
     )
 
-    assert decision.spoken_text == "I had trouble thinking that through, sir."
+    assert decision.spoken_text == "spokenpolicygenerationfailed."
 
 
 def test_spoken_dialogue_policy_removes_basic_markdown() -> None:

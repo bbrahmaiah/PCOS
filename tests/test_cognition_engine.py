@@ -165,7 +165,7 @@ def test_cognition_engine_runs_successfully() -> None:
     assert result.succeeded is True
     assert result.response is not None
     assert result.failure is None
-    assert result.response.text == "Yes sir. I can hear you clearly."
+    assert result.response.text == "derived_fake_test_response::can you hear me"
     assert result.response.plan == result.plan
     assert result.response.metadata["engine"] == "cognition_engine"
     assert snapshot.request_count == 1
@@ -277,7 +277,7 @@ def test_cognition_engine_builds_fallback_response() -> None:
     snapshot = engine.snapshot()
 
     assert fallback.kind == CognitionResponseKind.ERROR_FALLBACK
-    assert fallback.text == "I had trouble thinking that through, sir."
+    assert fallback.text == "cognition_backend_unavailable"
     assert fallback.confidence == 0.0
     assert snapshot.fallback_count == 1
 

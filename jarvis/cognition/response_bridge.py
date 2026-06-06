@@ -71,7 +71,7 @@ class CognitionDialogueBridgeConfig:
     name: str = "cognition_dialogue_bridge_worker"
     source: str = "cognition_dialogue_bridge_worker"
     publish_failure_fallback: bool = True
-    failure_fallback_text: str = "I had trouble thinking that through, sir."
+    failure_fallback_text: str = "cognition_response_bridge_failure"
     max_response_chars: int = 4_000
 
     def validate(self) -> None:

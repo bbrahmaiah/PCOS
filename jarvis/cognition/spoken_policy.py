@@ -80,10 +80,10 @@ class SpokenDialoguePolicyConfig:
     detailed_max_chars: int = 1_600
     concise_max_sentences: int = 2
     normal_max_sentences: int = 5
-    fallback_text: str = "I understand, sir."
+    fallback_text: str = "empty_spoken_policy_output"
     clarification_text: str = "What should I focus on, sir?"
     refusal_text: str = "I cannot help with that, sir."
-    failure_fallback_text: str = "I had trouble thinking that through, sir."
+    failure_fallback_text: str = "spoken_policy_generation_failed"
     acknowledgement_text: str = "Yes sir."
     remove_markdown: bool = True
     ensure_terminal_punctuation: bool = True

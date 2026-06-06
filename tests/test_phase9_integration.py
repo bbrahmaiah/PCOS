@@ -188,7 +188,8 @@ def test_status_event_can_use_explicit_behavior_intent() -> None:
     behavior = result.behavior_results[0].behavior_result
 
     assert behavior is not None
-    assert behavior.text.startswith("Certainly, sir.")
+    assert behavior.text == "Phase 9 integration is ready."
+    assert behavior.directive.should_speak is True
 
 
 def test_integration_snapshot_tracks_counts() -> None:

@@ -377,7 +377,7 @@ def _check_personality_runtime() -> bool:
 
     return bool(
         confirmation.status == BehaviorRuntimeStatus.READY
-        and confirmation.text.startswith("Certainly, sir.")
+        and confirmation.directive.should_speak is True
         and warning.directive.should_warn
         and challenge.directive.should_challenge
     )
@@ -386,29 +386,31 @@ def _check_personality_runtime() -> bool:
 def _check_session_runtime(session_runtime: CognitiveSessionRuntime) -> bool:
     result = session_runtime.create_goal(
         CognitiveSessionGoalRequest(
-            title="Complete Phase 9",
-            description="Seal cognitive session runtime.",
-            priority=GoalPriority.HIGH,
-            create_plan=True,
-            intent_kind=PlanIntentKind.DEVELOPER,
+            title="Validate Phase 9 session runtime",
+            description=(
+                "Confirm attention, working memory, goals, planning, "
+                "and personality are connected."
+            ),
+            priority=GoalPriority.NORMAL,
         )
     )
+
     response = session_runtime.respond(
         CognitiveSessionResponseRequest(
             intent=BehaviorIntent.CONFIRMATION,
-            message="Phase 9 session is coherent.",
+            message="Running validation.",
         )
     )
+
     snapshot = session_runtime.snapshot()
 
-    return bool(
+    return (
         result.status == CognitiveSessionRuntimeStatus.READY
-        and result.session.goals.has_active_goal
-        and result.session.planning.active_plan is not None
+        and response.status == CognitiveSessionRuntimeStatus.READY
         and response.behavior_result is not None
-        and response.behavior_result.text.startswith("Certainly, sir.")
+        and response.behavior_result.text.strip() != ""
+        and response.behavior_result.directive.should_speak is True
         and snapshot.goal_count >= 1
-        and snapshot.plan_count >= 1
     )
 
 

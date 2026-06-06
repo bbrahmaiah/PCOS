@@ -108,6 +108,15 @@ from jarvis.voice.playback_runtime import (
     VoiceSpeakerAdapter,
     VoiceSpeakerDeviceInfo,
 )
+from jarvis.voice.session_loop import (
+    VoiceSessionLoopEvent,
+    VoiceSessionLoopOperation,
+    VoiceSessionLoopPolicy,
+    VoiceSessionLoopResult,
+    VoiceSessionLoopRuntime,
+    VoiceSessionLoopSnapshot,
+    VoiceSessionLoopStatus,
+)
 from jarvis.voice.stt_runtime import (
     FasterWhisperSTTAdapter,
     VoiceSTTAdapter,
@@ -148,6 +157,13 @@ from jarvis.voice.voice_activity import (
 )
 
 __all__ = [
+    "VoiceSessionLoopEvent",
+    "VoiceSessionLoopOperation",
+    "VoiceSessionLoopPolicy",
+    "VoiceSessionLoopResult",
+    "VoiceSessionLoopRuntime",
+    "VoiceSessionLoopSnapshot",
+    "VoiceSessionLoopStatus",
     "VoiceClearableComponent",
     "VoiceHealthComponents",
     "VoiceHealthOperation",

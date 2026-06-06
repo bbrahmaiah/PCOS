@@ -125,7 +125,8 @@ def test_cognitive_session_response_uses_personality_runtime() -> None:
 
     assert result.status == CognitiveSessionRuntimeStatus.READY
     assert result.behavior_result is not None
-    assert result.behavior_result.text == "Certainly, sir. Running validation."
+    assert result.behavior_result.text == "Running validation."
+    assert result.behavior_result.directive.should_speak is True
 
 
 def test_cognitive_session_warning_response_is_protective() -> None:

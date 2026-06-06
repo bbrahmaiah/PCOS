@@ -85,7 +85,7 @@ def test_fake_cognition_adapter_generates_jarvis_response() -> None:
 
     assert result.succeeded is True
     assert result.response is not None
-    assert result.response.text == "Yes sir. I am listening."
+    assert result.response.text == "derived_fake_test_response::hello jarvis"
     assert result.response.metadata["adapter"] == "fake_cognition_adapter"
     assert result.response.metadata["mode"] == "jarvis"
 
@@ -98,7 +98,9 @@ def test_fake_cognition_adapter_generates_hearing_response() -> None:
 
     assert result.succeeded is True
     assert result.response is not None
-    assert result.response.text == "Yes sir. I can hear you clearly."
+    assert result.response.text == (
+        "derived_fake_test_response::jarvis can you hear me?"
+    )
 
 
 def test_fake_cognition_adapter_generates_phase3_response() -> None:

@@ -28,7 +28,7 @@ class CognitionEngineConfig:
     """
 
     name: str = "cognition_engine"
-    fallback_response_text: str = "I had trouble thinking that through, sir."
+    fallback_response_text: str = "cognition_backend_unavailable"
     max_input_chars: int = 12_000
     enforce_spoken_limit: bool = True
 

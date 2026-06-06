@@ -939,28 +939,28 @@ class HumanCollaborationRuntime:
 
 def _default_message_for(request: CollaborationRequest) -> str:
     if request.phase == CollaborationPhase.FOUND_ERROR:
-        return "I found the error."
+        return "error_found"
 
     if request.phase == CollaborationPhase.OPENING_FILE:
         target = f" {request.target}" if request.target else ""
         return f"I'm opening the file now{target}."
 
     if request.phase == CollaborationPhase.RUNNING_TESTS:
-        return "The tests are running."
+        return "tests_running"
 
     if request.phase == CollaborationPhase.ISSUE_REMAINS:
-        return "One issue remains."
+        return "issue_remaining"
 
     if request.phase == CollaborationPhase.WAITING_FOR_APPROVAL:
-        return "I need your approval before continuing."
+        return "approval_required"
 
     if request.phase == CollaborationPhase.COMPLETED:
-        return "Done. The action is complete."
+        return "action_completed"
 
     if request.phase == CollaborationPhase.VERIFYING:
-        return "I'm verifying the result now."
+        return "verificatio_in_progress"
 
-    return "I'm working on it."
+    return "work_in_progress"
 
 
 def _approval_prompt(

@@ -260,7 +260,7 @@ def default_jarvis_personality() -> PersonalityProfile:
             "carefully_challenging",
         ),
         default_tone=BehaviorTone.CALM,
-        confirmation_phrase="Certainly, sir.",
+        confirmation_phrase="",
         warning_phrase="I would advise caution.",
         clarification_phrase="I need one detail before proceeding.",
         created_at=utc_now(),
@@ -477,9 +477,11 @@ def _reason_for_request(
 
 def _humorous_text(message: str) -> str:
     if message.strip():
-        return f"{message.strip()} Small mercy: at least the tests are honest."
+        return message.strip()
 
-    return "Certainly, sir. The code remains dramatic, but manageable."
+    raise RuntimeError(
+        "fixed conversational responses are banned in production personality runtime"
+    )
 
 
 def _bounded_text(

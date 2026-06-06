@@ -58,7 +58,7 @@ class FakeCognitionConfig:
 
     adapter_name: str = "fake_cognition_adapter"
     mode: FakeCognitionMode = FakeCognitionMode.JARVIS
-    default_response: str = "Yes sir. I am listening."
+    default_response: str = "derived_fake_test_response"
     echo_prefix: str = "I heard you say: "
     scripted_responses: dict[str, str] = field(default_factory=dict)
     fail_phrases: tuple[str, ...] = ("simulate cognition failure",)
@@ -424,10 +424,10 @@ class FakeCognitionAdapter:
 
     def _jarvis_response_for(self, normalized_text: str) -> str:
         if any(greeting in normalized_text for greeting in ("hello", "hi")):
-            return "Yes sir. I am listening."
+            return f"derived_fake_test_response::{normalized_text}"
 
         if "can you hear me" in normalized_text:
-            return "Yes sir. I can hear you clearly."
+            return f"derived_fake_test_response::{normalized_text}"
 
         if "what did we build" in normalized_text:
             return (
