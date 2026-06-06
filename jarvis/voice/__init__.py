@@ -83,6 +83,20 @@ from jarvis.voice.stt_runtime import (
     VoiceSTTTranscriptCandidate,
     VoiceSTTTranscriptSafety,
 )
+from jarvis.voice.tts_runtime import (
+    PiperCliTTSAdapter,
+    VoiceTTSAdapter,
+    VoiceTTSAudioData,
+    VoiceTTSAudioFormat,
+    VoiceTTSChunkPlan,
+    VoiceTTSOperation,
+    VoiceTTSPolicy,
+    VoiceTTSResult,
+    VoiceTTSRuntime,
+    VoiceTTSRuntimeStatus,
+    VoiceTTSSnapshot,
+    VoiceTTSVoiceInfo,
+)
 from jarvis.voice.voice_activity import (
     VoiceActivityDecision,
     VoiceActivityOperation,
@@ -94,6 +108,18 @@ from jarvis.voice.voice_activity import (
 )
 
 __all__ = [
+    "PiperCliTTSAdapter",
+    "VoiceTTSAudioData",
+    "VoiceTTSAudioFormat",
+    "VoiceTTSAdapter",
+    "VoiceTTSChunkPlan",
+    "VoiceTTSOperation",
+    "VoiceTTSPolicy",
+    "VoiceTTSResult",
+    "VoiceTTSRuntime",
+    "VoiceTTSRuntimeStatus",
+    "VoiceTTSSnapshot", 
+    "VoiceTTSVoiceInfo",
     "EmptyVoiceCognitionContextProvider",
     "StaticVoiceCognitionContextProvider",
     "VoiceCognitionContextItem",
