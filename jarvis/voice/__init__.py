@@ -68,6 +68,18 @@ from jarvis.voice.microphone_capture import (
     VoiceMicrophoneCaptureStatus,
     VoiceMicrophoneDeviceInfo,
 )
+from jarvis.voice.playback_runtime import (
+    SoundDeviceSpeakerAdapter,
+    VoicePlaybackAdapterReport,
+    VoicePlaybackOperation,
+    VoicePlaybackPolicy,
+    VoicePlaybackResult,
+    VoicePlaybackRuntime,
+    VoicePlaybackRuntimeStatus,
+    VoicePlaybackSnapshot,
+    VoiceSpeakerAdapter,
+    VoiceSpeakerDeviceInfo,
+)
 from jarvis.voice.stt_runtime import (
     FasterWhisperSTTAdapter,
     VoiceSTTAdapter,
@@ -108,6 +120,16 @@ from jarvis.voice.voice_activity import (
 )
 
 __all__ = [
+    "SoundDeviceSpeakerAdapter",
+    "VoicePlaybackAdapterReport",
+    "VoicePlaybackOperation",
+    "VoicePlaybackPolicy",
+    "VoicePlaybackResult",
+    "VoicePlaybackRuntime",
+    "VoicePlaybackRuntimeStatus",
+    "VoicePlaybackSnapshot",
+    "VoiceSpeakerAdapter",
+    "VoiceSpeakerDeviceInfo",
     "PiperCliTTSAdapter",
     "VoiceTTSAudioData",
     "VoiceTTSAudioFormat",
