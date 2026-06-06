@@ -69,6 +69,19 @@ from jarvis.voice.contracts import (
     make_voice_tts_chunk_id,
     utc_now,
 )
+from jarvis.voice.daily_driver_gate import (
+    VoiceDailyDriverCheck,
+    VoiceDailyDriverCheckKind,
+    VoiceDailyDriverCheckSeverity,
+    VoiceDailyDriverContextProbe,
+    VoiceDailyDriverContextProbeResult,
+    VoiceDailyDriverContextSource,
+    VoiceDailyDriverGate,
+    VoiceDailyDriverGateConfig,
+    VoiceDailyDriverGateReport,
+    VoiceDailyDriverGateStatus,
+    VoiceDailyDriverProfile,
+)
 from jarvis.voice.health_recovery import (
     VoiceClearableComponent,
     VoiceHealthComponents,
@@ -157,6 +170,17 @@ from jarvis.voice.voice_activity import (
 )
 
 __all__ = [
+    "VoiceDailyDriverCheck",
+    "VoiceDailyDriverCheckKind",
+    "VoiceDailyDriverCheckSeverity",
+    "VoiceDailyDriverContextProbe",
+    "VoiceDailyDriverContextProbeResult",
+    "VoiceDailyDriverContextSource",
+    "VoiceDailyDriverGate",
+    "VoiceDailyDriverGateConfig",
+    "VoiceDailyDriverGateReport",
+    "VoiceDailyDriverGateStatus",
+    "VoiceDailyDriverProfile",
     "VoiceSessionLoopEvent",
     "VoiceSessionLoopOperation",
     "VoiceSessionLoopPolicy",
