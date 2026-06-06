@@ -6,6 +6,9 @@ from datetime import datetime
 from enum import StrEnum
 from typing import Protocol, cast
 
+from jarvis.voice.awareness_cognition_bridge import (
+    VoiceAwarenessCognitionBridge,
+)
 from jarvis.voice.barge_in_runtime import (
     VoiceBargeInPlaybackController,
     VoiceBargeInRequest,
@@ -14,7 +17,6 @@ from jarvis.voice.barge_in_runtime import (
 )
 from jarvis.voice.cognition_response import (
     VoiceCognitionRequest,
-    VoiceCognitionResponseRuntime,
     VoiceCognitionResult,
 )
 from jarvis.voice.contracts import (
@@ -342,7 +344,7 @@ class VoiceSessionLoopRuntime:
         )
         self._vad = vad or VoiceActivityRuntime()
         self._stt = stt or VoiceSTTRuntime(config=self._config)
-        self._cognition = cognition or VoiceCognitionResponseRuntime()
+        self._cognition = cognition or VoiceAwarenessCognitionBridge()
         self._tts = tts or VoiceTTSRuntime(config=self._config)
         self._playback = playback or VoicePlaybackRuntime(config=self._config)
         self._barge_in = barge_in or VoiceBargeInRuntime()

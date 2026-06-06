@@ -1,3 +1,11 @@
+from jarvis.voice.awareness_cognition_bridge import (
+    VoiceAwarenessCognitionBridge,
+    VoiceAwarenessCognitionBridgeOperation,
+    VoiceAwarenessCognitionBridgePolicy,
+    VoiceAwarenessCognitionBridgeResult,
+    VoiceAwarenessCognitionBridgeSnapshot,
+    VoiceAwarenessCognitionBridgeStatus,
+)
 from jarvis.voice.awareness_runtime import (
     StaticVoiceAwarenessProvider,
     VoiceAwarenessFact,
@@ -189,6 +197,12 @@ from jarvis.voice.voice_activity import (
 )
 
 __all__ = [
+    "VoiceAwarenessCognitionBridge",
+    "VoiceAwarenessCognitionBridgeOperation",
+    "VoiceAwarenessCognitionBridgePolicy",
+    "VoiceAwarenessCognitionBridgeResult",
+    "VoiceAwarenessCognitionBridgeSnapshot",
+    "VoiceAwarenessCognitionBridgeStatus",
     "StaticVoiceAwarenessProvider",
     "VoiceAwarenessFact",
     "VoiceAwarenessPacket",
