@@ -168,6 +168,15 @@ from jarvis.voice.real_awareness_integration import (
     make_real_awareness_provider,
     make_real_awareness_runtime,
 )
+from jarvis.voice.runtime_launcher import (
+    VoiceRuntimeLauncher,
+    VoiceRuntimeLauncherConfig,
+    VoiceRuntimeLauncherEvent,
+    VoiceRuntimeLauncherOperation,
+    VoiceRuntimeLauncherResult,
+    VoiceRuntimeLauncherSnapshot,
+    VoiceRuntimeLauncherStatus,
+)
 from jarvis.voice.session_loop import (
     VoiceSessionLoopEvent,
     VoiceSessionLoopOperation,
@@ -217,6 +226,13 @@ from jarvis.voice.voice_activity import (
 )
 
 __all__ = [
+    "VoiceRuntimeLauncher",
+    "VoiceRuntimeLauncherConfig",
+    "VoiceRuntimeLauncherEvent",
+    "VoiceRuntimeLauncherOperation",
+    "VoiceRuntimeLauncherResult",
+    "VoiceRuntimeLauncherSnapshot",
+    "VoiceRuntimeLauncherStatus",
     "StaticAwarenessSourceClient",
     "VoiceAwarenessRecord",
     "VoiceRealAwarenessBoundaryConfig",
