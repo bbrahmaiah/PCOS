@@ -8,6 +8,15 @@ from jarvis.runtime.binding_verification import (
     JarvisRuntimeBindingVerifierConfig,
     summarize_binding_report,
 )
+from jarvis.runtime.final_daily_driver_gate import (
+    JarvisFinalDailyDriverCheck,
+    JarvisFinalDailyDriverCheckKind,
+    JarvisFinalDailyDriverGate,
+    JarvisFinalDailyDriverGateConfig,
+    JarvisFinalDailyDriverGateReport,
+    JarvisFinalDailyDriverGateStatus,
+    summarize_final_daily_driver_report,
+)
 from jarvis.runtime.phase_adapters import (
     JarvisConnectedRuntimePlan,
     JarvisPhaseAdapterSnapshot,
@@ -59,6 +68,13 @@ from jarvis.runtime.start_control import (
 )
 
 __all__ = [
+    "JarvisFinalDailyDriverCheck",
+    "JarvisFinalDailyDriverCheckKind",
+    "JarvisFinalDailyDriverGate",
+    "JarvisFinalDailyDriverGateConfig",
+    "JarvisFinalDailyDriverGateReport",
+    "JarvisFinalDailyDriverGateStatus",
+    "summarize_final_daily_driver_report",
     "ModuleBackedPhaseRuntime",
     "PhaseRuntimeHealth",
     "create_phase1_events_runtime",
