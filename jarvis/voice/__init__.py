@@ -1,3 +1,15 @@
+from jarvis.voice.barge_in_runtime import (
+    VoiceBargeInDisposition,
+    VoiceBargeInOperation,
+    VoiceBargeInPlaybackController,
+    VoiceBargeInPolicy,
+    VoiceBargeInRequest,
+    VoiceBargeInResult,
+    VoiceBargeInRuntime,
+    VoiceBargeInRuntimeStatus,
+    VoiceBargeInSnapshot,
+    VoiceInterruptedSpeechContext,
+)
 from jarvis.voice.cognition_response import (
     EmptyVoiceCognitionContextProvider,
     StaticVoiceCognitionContextProvider,
@@ -120,6 +132,16 @@ from jarvis.voice.voice_activity import (
 )
 
 __all__ = [
+    "VoiceBargeInDisposition",
+    "VoiceBargeInOperation",
+    "VoiceBargeInPlaybackController",
+    "VoiceBargeInPolicy",
+    "VoiceBargeInRequest",
+    "VoiceBargeInResult",
+    "VoiceBargeInRuntime",
+    "VoiceBargeInRuntimeStatus",
+    "VoiceBargeInSnapshot",
+    "VoiceInterruptedSpeechContext",
     "SoundDeviceSpeakerAdapter",
     "VoicePlaybackAdapterReport",
     "VoicePlaybackOperation",
