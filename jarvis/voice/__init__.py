@@ -69,6 +69,22 @@ from jarvis.voice.contracts import (
     make_voice_tts_chunk_id,
     utc_now,
 )
+from jarvis.voice.health_recovery import (
+    VoiceClearableComponent,
+    VoiceHealthComponents,
+    VoiceHealthOperation,
+    VoiceHealthPolicy,
+    VoiceHealthRecoveryRuntime,
+    VoiceHealthResult,
+    VoiceHealthSnapshot,
+    VoiceHealthStatus,
+    VoiceHealthSubsystem,
+    VoiceRecoverableComponent,
+    VoiceRecoveryAction,
+    VoiceRecoveryAttempt,
+    VoiceStoppableComponent,
+    VoiceSubsystemHealth,
+)
 from jarvis.voice.microphone_capture import (
     PyAudioMicrophoneAdapter,
     VoiceMicrophoneAdapter,
@@ -132,6 +148,20 @@ from jarvis.voice.voice_activity import (
 )
 
 __all__ = [
+    "VoiceClearableComponent",
+    "VoiceHealthComponents",
+    "VoiceHealthOperation",
+    "VoiceHealthPolicy",
+    "VoiceHealthRecoveryRuntime",
+    "VoiceHealthResult",
+    "VoiceHealthSnapshot",
+    "VoiceHealthStatus",
+    "VoiceHealthSubsystem",
+    "VoiceRecoveryAction",
+    "VoiceRecoveryAttempt",
+    "VoiceRecoverableComponent",
+    "VoiceStoppableComponent",
+    "VoiceSubsystemHealth",
     "VoiceBargeInDisposition",
     "VoiceBargeInOperation",
     "VoiceBargeInPlaybackController",
