@@ -1,24 +1,42 @@
-# JARVIS_OS
+# \# PCOS — Personal Cognitive Operating System
 
-Realtime AI Cognitive Operating System
+# 
 
-## Architecture
+# A real-time personal cognitive OS built on consumer hardware.
 
-- Event-driven
-- Parallel runtime
-- Typed contracts
-- Observable systems
-- Secure execution
-- Real-time cognition
+# No GPU required. Not a voice assistant. A cognitive operating system.
 
-## Runtime Phases
+# 
 
-1. Kernel + Events + Security
-2. Presence
-3. Awareness
-4. Memory
-5. Fast Router
-6. Cognition
-7. Actions
-8. Dialogue
-9. Operations
+# \*\*Live voice confirmed\*\* · \*\*3,953 tests passing\*\* · \*\*9 sealed phases\*\*
+
+# 
+
+# \## Architecture
+
+# 9 sealed phases: Runtime · Presence · Cognition · Memory · 
+
+# Tools · Orchestration · Latency · Vision · Personality
+
+# 
+
+# \## Stack
+
+# Python · ZeroMQ · Pydantic v2 · faster-whisper · 
+
+# Piper TTS · Ollama · SQLite · ChromaDB · sounddevice
+
+# 
+
+# \## Research Question
+
+# Can machines understand humans well enough to become trustworthy 
+
+# collaborators while preserving human agency, judgment, and control?
+
+# 
+
+# \*\*Author:\*\* Bala Brahmaiah Thumbeti  
+
+# \*\*Institution:\*\* Mohan Babu University, B.Tech CSE
+
