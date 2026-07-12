@@ -1,15 +1,14 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import time
 from dataclasses import dataclass, field, replace
 from datetime import datetime
 from enum import StrEnum
-from typing import Any, Protocol, cast
+from typing import TYPE_CHECKING, Any, Protocol, cast
 
 from jarvis.voice.awareness_runtime import (
     VoiceAwarenessPacket,
     VoiceAwarenessRequest,
-    VoiceAwarenessRuntime,
     VoiceAwarenessStatus,
 )
 from jarvis.voice.cognition_response import (
@@ -18,6 +17,9 @@ from jarvis.voice.cognition_response import (
     VoiceCognitionResult,
 )
 from jarvis.voice.contracts import utc_now
+
+if TYPE_CHECKING:
+    from jarvis.voice.awareness_runtime import VoiceAwarenessRuntime
 
 
 class VoiceAwarenessCognitionBridgeStatus(StrEnum):
@@ -119,7 +121,7 @@ class VoiceAwarenessCognitionBridge:
         cognition: VoiceCognitionEngine | None = None,
         policy: VoiceAwarenessCognitionBridgePolicy | None = None,
     ) -> None:
-        self._awareness = awareness or VoiceAwarenessRuntime()
+        self._awareness = awareness or _build_default_live_awareness_runtime()
         self._cognition = cognition or VoiceCognitionResponseRuntime()
         self._policy = policy or VoiceAwarenessCognitionBridgePolicy()
         self._status = VoiceAwarenessCognitionBridgeStatus.READY
@@ -210,6 +212,16 @@ class VoiceAwarenessCognitionBridge:
                     awareness_packet=packet,
                     reason="awareness failed; cognition blocked",
                     started=started,
+                    metadata={
+                        "awareness_status": packet.status.value,
+                        "awareness_signature": packet.signature,
+                        "missing_sources": tuple(
+                            source.value for source in packet.missing_sources
+                        ),
+                        "provider_errors": packet.provider_errors,
+                        "fact_count": len(packet.facts),
+                        "cognition_context": packet.cognition_context,
+                    },
                 )
 
         if packet.status == VoiceAwarenessStatus.DEGRADED:
@@ -382,3 +394,9 @@ def _replace_request_metadata(
                 "VoiceCognitionRequest does not support awareness metadata. "
                 "Add metadata: dict[str, object] to the request contract."
             ) from exc
+
+
+def _build_default_live_awareness_runtime() -> VoiceAwarenessRuntime:
+    from jarvis.voice.live_awareness_factory import build_live_voice_awareness_runtime
+
+    return build_live_voice_awareness_runtime()

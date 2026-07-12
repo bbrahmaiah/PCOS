@@ -144,11 +144,14 @@ class FasterWhisperSpeechToTextBackend:
 
         for segment in segments:
             segment_count += 1
+            no_speech_prob = float(getattr(segment, "no_speech_prob", 0.0))
+            if no_speech_prob > 0.6:
+                continue
             text = str(getattr(segment, "text", "")).strip()
-
+            if len(text.split()) < 2:
+                continue
             if text:
                 texts.append(text)
-
             avg_logprob = float(getattr(segment, "avg_logprob", 0.0))
             probabilities.append(log_probability_to_confidence(avg_logprob))
 

@@ -51,7 +51,39 @@ def main() -> int:
     results: list[CheckResult] = []
 
     results.append(run_command("Ruff", [sys.executable, "-m", "ruff", "check", "."]))
-    results.append(run_command("Mypy", [sys.executable, "-m", "mypy", "."]))
+    results.append(
+        run_command(
+            "Mypy",
+            [sys.executable, "-m", "mypy", "jarvis", "scripts", "tests"],
+        )
+    )
+
+    results.append(
+        run_command(
+            "Runtime binding factory dry run",
+            [sys.executable, "scripts/verify_runtime_bindings.py", "--dry-run"],
+        )
+    )
+
+    results.append(
+        run_python_check(
+            "Pure connected JARVIS preflight",
+            """
+from scripts.run_connected_jarvis import (
+    PureConnectedJarvisLauncher,
+    PureConnectedJarvisLauncherConfig,
+)
+
+launcher = PureConnectedJarvisLauncher(
+    config=PureConnectedJarvisLauncherConfig()
+)
+report = launcher._run_preflight()
+launcher._print_preflight_report(report)
+
+assert report.status.value == 'passed'
+""",
+        )
+    )
 
     results.append(
         run_command(
@@ -206,7 +238,10 @@ assert session.personality.name == 'JARVIS'
 
     print("\nWhole built system check PASSED.")
     print("Built system validated up to Phase 9.")
-    print("Note: real always-on microphone/STT/TTS requires a Live Session Runner.")
+    print(
+        "Production voice entrypoint: "
+        "python scripts/run_connected_jarvis.py"
+    )
     return 0
 
 

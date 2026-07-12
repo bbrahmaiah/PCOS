@@ -13,7 +13,13 @@ from jarvis.voice.daily_driver_gate import (
     VoiceDailyDriverGateReport,
     VoiceDailyDriverGateStatus,
 )
+from jarvis.voice.live_spine_monitor import (
+    VoiceLiveSpineMonitor,
+    VoiceLiveSpineReport,
+    VoiceLiveSpineStatus,
+)
 from jarvis.voice.session_loop import (
+    VoiceSessionLoopEvent,
     VoiceSessionLoopResult,
     VoiceSessionLoopRuntime,
     VoiceSessionLoopSnapshot,
@@ -60,6 +66,9 @@ class VoiceRuntimeLauncherConfig:
     allow_degraded_gate: bool = False
     idle_sleep_seconds: float = 0.02
     stop_on_session_failure: bool = True
+    run_live_spine_monitor: bool = True
+    live_spine_monitor_every_cycles: int = 20
+    stop_on_spine_failure: bool = True
     metadata: dict[str, object] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
@@ -69,6 +78,8 @@ class VoiceRuntimeLauncherConfig:
             raise ValueError("bounded_seconds must be positive when provided.")
         if self.idle_sleep_seconds < 0:
             raise ValueError("idle_sleep_seconds cannot be negative.")
+        if self.live_spine_monitor_every_cycles < 1:
+            raise ValueError("live_spine_monitor_every_cycles must be positive.")
 
 
 @dataclass(frozen=True, slots=True)
@@ -134,6 +145,11 @@ class VoiceLauncherDailyDriverGate(Protocol):
         raise NotImplementedError
 
 
+class VoiceLauncherSpineMonitor(Protocol):
+    def inspect(self, snapshot: VoiceSessionLoopSnapshot) -> VoiceLiveSpineReport:
+        raise NotImplementedError
+
+
 class VoiceRuntimeLauncher:
     """
     Step 51L real voice launcher.
@@ -148,6 +164,7 @@ class VoiceRuntimeLauncher:
         *,
         session_loop: VoiceLauncherSessionLoop | None = None,
         daily_driver_gate: VoiceLauncherDailyDriverGate | None = None,
+        spine_monitor: VoiceLauncherSpineMonitor | None = None,
         config: VoiceRuntimeLauncherConfig | None = None,
     ) -> None:
         self._config = config or VoiceRuntimeLauncherConfig()
@@ -155,6 +172,7 @@ class VoiceRuntimeLauncher:
         self._daily_driver_gate = daily_driver_gate or VoiceDailyDriverGate(
             session_loop=self._session_loop
         )
+        self._spine_monitor = spine_monitor or VoiceLiveSpineMonitor()
         self._status = VoiceRuntimeLauncherStatus.CREATED
         self._booted = False
         self._running = False
@@ -165,6 +183,8 @@ class VoiceRuntimeLauncher:
         self._last_event: VoiceRuntimeLauncherEvent | None = None
         self._last_error: str | None = None
         self._last_latency_ms: float | None = None
+        self._last_spine_report: VoiceLiveSpineReport | None = None
+        self._last_spine_inspection_cycle = -1
 
     def boot(self) -> VoiceRuntimeLauncherResult:
         started = time.perf_counter()
@@ -273,16 +293,31 @@ class VoiceRuntimeLauncher:
         self._status = VoiceRuntimeLauncherStatus.RUNNING
         self._last_event = VoiceRuntimeLauncherEvent.SESSION_STARTED
 
+        spine_report = self._inspect_live_spine(force=True)
+        if self._spine_report_is_fatal(spine_report):
+            self._running = False
+            self._status = VoiceRuntimeLauncherStatus.FAILED
+            return self._result(
+                operation=VoiceRuntimeLauncherOperation.RUN,
+                event=VoiceRuntimeLauncherEvent.ERROR,
+                session_result=start_result,
+                gate_report=None,
+                reason="voice spine monitor failed after session start",
+                started=started,
+            )
+
         final_session_result = start_result
 
         try:
             if self._config.run_forever:
                 final_session_result = self._run_forever()
+                spine_report = self._last_spine_report
             else:
                 final_session_result = self._session_loop.run(
                     max_cycles=self._config.bounded_cycles,
                     max_seconds=self._config.bounded_seconds,
                 )
+                spine_report = self._inspect_live_spine(force=True)
         except KeyboardInterrupt:
             self.request_stop()
             final_session_result = self._session_loop.stop()
@@ -311,6 +346,18 @@ class VoiceRuntimeLauncher:
                 session_result=final_session_result,
                 gate_report=None,
                 reason="voice session failed during run",
+                started=started,
+            )
+
+        if self._spine_report_is_fatal(spine_report):
+            self._running = False
+            self._status = VoiceRuntimeLauncherStatus.FAILED
+            return self._result(
+                operation=VoiceRuntimeLauncherOperation.RUN,
+                event=VoiceRuntimeLauncherEvent.ERROR,
+                session_result=final_session_result,
+                gate_report=None,
+                reason="voice spine monitor failed during run",
                 started=started,
             )
 
@@ -393,15 +440,61 @@ class VoiceRuntimeLauncher:
             last_latency_ms=self._last_latency_ms,
             session_snapshot=session_snapshot,
             created_at=utc_now(),
-            metadata=self._config.metadata,
+            metadata=self._launcher_metadata(),
+        )
+
+    def live_snapshot(self) -> VoiceRuntimeLauncherSnapshot:
+        session_snapshot: VoiceSessionLoopSnapshot | None
+        try:
+            session_snapshot = self._session_live_snapshot()
+        except Exception:
+            session_snapshot = None
+
+        return VoiceRuntimeLauncherSnapshot(
+            status=self._status,
+            booted=self._booted,
+            running=self._running,
+            stop_requested=self._stop_requested,
+            boot_count=self._boot_count,
+            run_cycles=self._run_cycles,
+            stop_count=self._stop_count,
+            last_event=self._last_event,
+            last_error=self._last_error,
+            last_latency_ms=self._last_latency_ms,
+            session_snapshot=session_snapshot,
+            created_at=utc_now(),
+            metadata=self._launcher_metadata(),
         )
 
     def _run_forever(self) -> VoiceSessionLoopResult:
         result = self._session_loop.run(max_cycles=1)
+        self._run_cycles += 1
+        spine_report = self._inspect_live_spine(
+            session_result=result,
+        )
+        if self._spine_report_is_fatal(spine_report):
+            self._running = False
+            self._status = VoiceRuntimeLauncherStatus.FAILED
+            return result
 
         while not self._stop_requested:
+            if result.status == VoiceSessionLoopStatus.STOPPED:
+                break
+            if (
+                result.status == VoiceSessionLoopStatus.FAILED
+                and self._config.stop_on_session_failure
+            ):
+                break
+
             result = self._session_loop.run(max_cycles=1)
             self._run_cycles += 1
+            spine_report = self._inspect_live_spine(session_result=result)
+            if self._spine_report_is_fatal(spine_report):
+                self._status = VoiceRuntimeLauncherStatus.FAILED
+                break
+
+            if result.status == VoiceSessionLoopStatus.STOPPED:
+                break
 
             if (
                 result.status == VoiceSessionLoopStatus.FAILED
@@ -413,7 +506,98 @@ class VoiceRuntimeLauncher:
                 time.sleep(self._config.idle_sleep_seconds)
 
         self._running = False
+        if (
+            result.status == VoiceSessionLoopStatus.FAILED
+            and self._config.stop_on_session_failure
+        ):
+            try:
+                self._session_loop.stop()
+            except Exception:
+                pass
+            return result
         return self._session_loop.stop()
+
+    def _inspect_live_spine(
+        self,
+        *,
+        force: bool = False,
+        session_result: VoiceSessionLoopResult | None = None,
+    ) -> VoiceLiveSpineReport | None:
+        if not self._config.run_live_spine_monitor:
+            return None
+        if not force and not self._spine_inspection_due(session_result):
+            return self._last_spine_report
+
+        try:
+            snapshot = self._session_live_snapshot()
+            report = self._spine_monitor.inspect(snapshot)
+        except Exception as exc:
+            self._last_error = str(exc)
+            return None
+
+        self._last_spine_report = report
+        self._last_spine_inspection_cycle = self._run_cycles
+        return report
+
+    def _spine_inspection_due(
+        self,
+        session_result: VoiceSessionLoopResult | None,
+    ) -> bool:
+        if self._run_cycles - self._last_spine_inspection_cycle >= (
+            self._config.live_spine_monitor_every_cycles
+        ):
+            return True
+        if session_result is None:
+            return False
+        if session_result.status in {
+            VoiceSessionLoopStatus.DEGRADED,
+            VoiceSessionLoopStatus.FAILED,
+            VoiceSessionLoopStatus.INTERRUPTED,
+            VoiceSessionLoopStatus.STOPPED,
+        }:
+            return True
+        return session_result.event in {
+            VoiceSessionLoopEvent.BARGE_IN_INTERRUPTED,
+            VoiceSessionLoopEvent.ERROR,
+            VoiceSessionLoopEvent.PLAYBACK_FINISHED,
+            VoiceSessionLoopEvent.RESPONSE_READY,
+            VoiceSessionLoopEvent.STOPPED,
+        }
+
+    def _session_live_snapshot(self) -> VoiceSessionLoopSnapshot:
+        live_snapshot = getattr(self._session_loop, "live_snapshot", None)
+        if callable(live_snapshot):
+            result = live_snapshot()
+            if isinstance(result, VoiceSessionLoopSnapshot):
+                return result
+        return self._session_loop.snapshot()
+
+    def _spine_report_is_fatal(
+        self,
+        report: VoiceLiveSpineReport | None,
+    ) -> bool:
+        if report is None:
+            return False
+        return (
+            self._config.stop_on_spine_failure
+            and report.status
+            in {
+                VoiceLiveSpineStatus.DEGRADED,
+                VoiceLiveSpineStatus.FAILED,
+            }
+        )
+
+    def _launcher_metadata(self) -> dict[str, object]:
+        metadata: dict[str, object] = {
+            **self._config.metadata,
+            "live_spine_monitor_enabled": self._config.run_live_spine_monitor,
+            "live_spine_monitor_every_cycles": (
+                self._config.live_spine_monitor_every_cycles
+            ),
+        }
+        if self._last_spine_report is not None:
+            metadata["live_spine"] = self._last_spine_report.to_metadata()
+        return metadata
 
     def _result(
         self,
@@ -432,6 +616,13 @@ class VoiceRuntimeLauncher:
         if event is not None:
             self._last_event = event
 
+        result_metadata = metadata or {}
+        if self._last_spine_report is not None:
+            result_metadata = {
+                **result_metadata,
+                "live_spine": self._last_spine_report.to_metadata(),
+            }
+
         return VoiceRuntimeLauncherResult(
             status=self._status,
             operation=operation,
@@ -441,5 +632,5 @@ class VoiceRuntimeLauncher:
             reason=reason,
             latency_ms=latency_ms,
             created_at=utc_now(),
-            metadata=metadata or {},
+            metadata=result_metadata,
         )

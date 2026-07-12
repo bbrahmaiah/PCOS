@@ -77,6 +77,7 @@ def _transcript(
     *,
     confidence: float = 0.95,
     kind: VoiceTranscriptKind = VoiceTranscriptKind.PARTIAL,
+    metadata: dict[str, object] | None = None,
 ) -> VoiceTranscript:
     return VoiceTranscript(
         transcript_id=make_voice_transcript_id(),
@@ -86,6 +87,7 @@ def _transcript(
         text=text,
         confidence=confidence,
         created_at=utc_now(),
+        metadata=metadata or {},
     )
 
 
@@ -162,6 +164,75 @@ def test_barge_in_stops_playback_on_wait() -> None:
     )
 
 
+def test_barge_in_ignores_assistant_echoed_wait() -> None:
+    playback = _playback()
+    runtime = VoiceBargeInRuntime(playback=playback)
+
+    result = runtime.evaluate_transcript(
+        VoiceBargeInRequest(
+            transcript=_transcript("wait"),
+            assistant_speaking=True,
+            active_response_text="Please wait while I check the runtime.",
+        )
+    )
+
+    assert result.status == VoiceBargeInRuntimeStatus.IGNORED
+    assert result.playback_result is None
+    assert result.metadata["echo_guard"] is True
+
+
+def test_barge_in_ignores_assistant_echoed_question() -> None:
+    playback = _playback()
+    runtime = VoiceBargeInRuntime(playback=playback)
+
+    result = runtime.evaluate_transcript(
+        VoiceBargeInRequest(
+            transcript=_transcript(
+                "what i can do is explain artificial intelligence"
+            ),
+            assistant_speaking=True,
+            active_response_text=(
+                "What I can do is explain artificial intelligence briefly."
+            ),
+        )
+    )
+
+    assert result.status == VoiceBargeInRuntimeStatus.IGNORED
+    assert result.disposition == VoiceBargeInDisposition.IGNORE
+    assert result.playback_result is None
+    assert result.metadata["candidate_disposition"] == "new_question"
+
+
+def test_barge_in_wake_word_overrides_echo_guard() -> None:
+    runtime = VoiceBargeInRuntime(playback=_playback())
+
+    result = runtime.evaluate_transcript(
+        VoiceBargeInRequest(
+            transcript=_transcript("jarvis wait"),
+            assistant_speaking=True,
+            active_response_text="Jarvis can wait for the next instruction.",
+        )
+    )
+
+    assert result.status == VoiceBargeInRuntimeStatus.INTERRUPTED
+    assert result.disposition == VoiceBargeInDisposition.STOP_PLAYBACK
+
+
+def test_barge_in_ignores_wait_thank_you_hallucination() -> None:
+    runtime = VoiceBargeInRuntime(playback=_playback())
+
+    result = runtime.evaluate_transcript(
+        VoiceBargeInRequest(
+            transcript=_transcript("wait thank you"),
+            assistant_speaking=True,
+            active_response_text="I am checking the runtime now.",
+        )
+    )
+
+    assert result.status == VoiceBargeInRuntimeStatus.IGNORED
+    assert result.playback_result is None
+
+
 def test_barge_in_cancel_response() -> None:
     runtime = VoiceBargeInRuntime(playback=_playback())
 
@@ -216,6 +287,51 @@ def test_barge_in_ignores_low_confidence_noise() -> None:
     result = runtime.evaluate_transcript(
         VoiceBargeInRequest(
             transcript=_transcript("maybe something", confidence=0.2),
+            assistant_speaking=True,
+        )
+    )
+
+    assert result.status == VoiceBargeInRuntimeStatus.IGNORED
+    assert result.disposition == VoiceBargeInDisposition.IGNORE
+
+
+def test_barge_in_ignores_unstable_semantic_question() -> None:
+    runtime = VoiceBargeInRuntime(playback=_playback())
+
+    result = runtime.evaluate_transcript(
+        VoiceBargeInRequest(
+            transcript=_transcript(
+                "what does integral mean",
+                metadata={
+                    "perception": {
+                        "intent_state": "stabilizing",
+                        "stability": 0.40,
+                    }
+                },
+            ),
+            assistant_speaking=True,
+        )
+    )
+
+    assert result.status == VoiceBargeInRuntimeStatus.IGNORED
+    assert result.disposition == VoiceBargeInDisposition.IGNORE
+    assert result.metadata["candidate_disposition"] == "new_question"
+
+
+def test_barge_in_ignores_known_noise_perception() -> None:
+    runtime = VoiceBargeInRuntime(playback=_playback())
+
+    result = runtime.evaluate_transcript(
+        VoiceBargeInRequest(
+            transcript=_transcript(
+                "happy holidays",
+                metadata={
+                    "perception": {
+                        "intent_state": "noise",
+                        "stability": 0.10,
+                    }
+                },
+            ),
             assistant_speaking=True,
         )
     )

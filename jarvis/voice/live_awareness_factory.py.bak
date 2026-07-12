@@ -1,0 +1,172 @@
+from __future__ import annotations
+
+import ctypes
+from dataclasses import dataclass
+
+from jarvis.cognition.memory import InMemoryShortTermMemoryStore, ShortTermMemoryQuery
+from jarvis.cognitive.goals import GoalRuntime
+from jarvis.cognitive.personality import default_jarvis_personality
+from jarvis.voice.awareness_runtime import (
+    VoiceAwarenessFact,
+    VoiceAwarenessPriority,
+    VoiceAwarenessProvider,
+    VoiceAwarenessRequest,
+    VoiceAwarenessRuntime,
+    VoiceAwarenessSource,
+    VoiceResponseBoundaryAwarenessProvider,
+)
+
+_MEMORY = InMemoryShortTermMemoryStore()
+_GOALS = GoalRuntime()
+
+
+@dataclass(slots=True)
+class LiveMemoryAwarenessProvider(VoiceAwarenessProvider):
+    memory: object = _MEMORY
+    source: VoiceAwarenessSource = VoiceAwarenessSource.MEMORY
+
+    def collect(self, request: VoiceAwarenessRequest) -> tuple[VoiceAwarenessFact, ...]:
+        result = self.memory.retrieve(
+            ShortTermMemoryQuery(
+                query_text=request.transcript.text,
+                max_items=5,
+            )
+        )
+
+        items = tuple(getattr(result, "items", ()) or ())
+
+        facts: list[VoiceAwarenessFact] = [
+            VoiceAwarenessFact(
+                source=self.source,
+                key="memory_runtime_state",
+                value=f"short-term memory active; retrieved_items={len(items)}",
+                confidence=1.0,
+                priority=VoiceAwarenessPriority.NORMAL,
+                metadata={
+                    "provider": type(self).__name__,
+                    "retrieval_performed": True,
+                    "retrieved_items": len(items),
+                },
+            )
+        ]
+
+        for index, item in enumerate(items[:5], start=1):
+            facts.append(
+                VoiceAwarenessFact(
+                    source=self.source,
+                    key=f"retrieved_memory_{index}",
+                    value=str(getattr(item, "text", item)),
+                    confidence=float(getattr(item, "confidence", 0.85) or 0.85),
+                    priority=VoiceAwarenessPriority.NORMAL,
+                    metadata={
+                        "provider": type(self).__name__,
+                        "memory_id": str(getattr(item, "memory_id", "")),
+                    },
+                )
+            )
+
+        return tuple(facts)
+
+
+@dataclass(slots=True)
+class LiveGoalAwarenessProvider(VoiceAwarenessProvider):
+    goals: object = _GOALS
+    source: VoiceAwarenessSource = VoiceAwarenessSource.GOALS
+
+    def collect(self, request: VoiceAwarenessRequest) -> tuple[VoiceAwarenessFact, ...]:
+        snapshot = self.goals.snapshot()
+
+        return (
+            VoiceAwarenessFact(
+                source=self.source,
+                key="goal_runtime_state",
+                value=str(snapshot),
+                confidence=1.0,
+                priority=VoiceAwarenessPriority.NORMAL,
+                metadata={
+                    "provider": type(self).__name__,
+                    "snapshot_type": type(snapshot).__name__,
+                },
+            ),
+        )
+
+
+@dataclass(slots=True)
+class LiveEnvironmentAwarenessProvider(VoiceAwarenessProvider):
+    source: VoiceAwarenessSource = VoiceAwarenessSource.ENVIRONMENT
+
+    def collect(self, request: VoiceAwarenessRequest) -> tuple[VoiceAwarenessFact, ...]:
+        user32 = ctypes.windll.user32
+        hwnd = user32.GetForegroundWindow()
+
+        length = user32.GetWindowTextLengthW(hwnd)
+        buffer = ctypes.create_unicode_buffer(length + 1)
+        user32.GetWindowTextW(hwnd, buffer, length + 1)
+
+        pid = ctypes.c_ulong()
+        user32.GetWindowThreadProcessId(hwnd, ctypes.byref(pid))
+
+        title = buffer.value.strip() or "unknown"
+
+        return (
+            VoiceAwarenessFact(
+                source=self.source,
+                key="active_windows_foreground_window",
+                value=f"title={title}; pid={pid.value}; hwnd={hwnd}",
+                confidence=1.0,
+                priority=VoiceAwarenessPriority.NORMAL,
+                metadata={
+                    "provider": type(self).__name__,
+                    "title": title,
+                    "pid": int(pid.value),
+                    "hwnd": int(hwnd),
+                    "fake_capture": False,
+                },
+            ),
+        )
+
+
+@dataclass(slots=True)
+class LivePersonalityAwarenessProvider(VoiceAwarenessProvider):
+    source: VoiceAwarenessSource = VoiceAwarenessSource.PERSONALITY
+
+    def collect(self, request: VoiceAwarenessRequest) -> tuple[VoiceAwarenessFact, ...]:
+        profile = default_jarvis_personality()
+
+        return (
+            VoiceAwarenessFact(
+                source=self.source,
+                key="personality_profile",
+                value=(
+                    f"profile={profile}; "
+                    "spoken_style=concise; "
+                    "fixed_conversational_responses_allowed=false"
+                ),
+                confidence=1.0,
+                priority=VoiceAwarenessPriority.HIGH,
+                metadata={
+                    "provider": type(self).__name__,
+                    "profile_type": type(profile).__name__,
+                },
+            ),
+        )
+
+
+def build_live_voice_awareness_runtime() -> VoiceAwarenessRuntime:
+    """
+    Pure JARVIS awareness assembly.
+
+    This keeps awareness strict.
+    It wires real available subsystems:
+    memory, goals, Windows foreground environment, personality config,
+    and response-boundary provider.
+    """
+    return VoiceAwarenessRuntime(
+        providers=(
+            LiveMemoryAwarenessProvider(),
+            LiveEnvironmentAwarenessProvider(),
+            LiveGoalAwarenessProvider(),
+            LivePersonalityAwarenessProvider(),
+            VoiceResponseBoundaryAwarenessProvider(),
+        )
+    )

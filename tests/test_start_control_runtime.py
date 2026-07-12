@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import time
 from dataclasses import dataclass
+from threading import Event
+from types import SimpleNamespace
 
 from jarvis.runtime import (
     JarvisOrganCriticality,
@@ -114,6 +117,45 @@ class FakeVoiceLauncher:
 
     def stop(self) -> None:
         self.stop_called = True
+
+
+@dataclass
+class FakeFailingVoiceLauncher:
+    run_called: bool = False
+
+    def run(self) -> object:
+        self.run_called = True
+        return SimpleNamespace(
+            status="failed",
+            reason="voice session failed during run",
+        )
+
+    def request_stop(self) -> None:
+        return None
+
+    def stop(self) -> None:
+        return None
+
+
+@dataclass
+class FakeLongRunningVoiceLauncher:
+    run_called: bool = False
+    stop_called: bool = False
+
+    def __post_init__(self) -> None:
+        self._stop = Event()
+
+    def run(self) -> None:
+        self.run_called = True
+        self._stop.wait(timeout=2.0)
+
+    def request_stop(self) -> None:
+        self.stop_called = True
+        self._stop.set()
+
+    def stop(self) -> None:
+        self.stop_called = True
+        self._stop.set()
 
 
 def _connected_organs() -> tuple[FakeOrgan, ...]:
@@ -265,7 +307,7 @@ def test_start_control_rejects_duplicate_organs() -> None:
 
 
 def test_voice_launcher_organ_starts_launcher() -> None:
-    launcher = FakeVoiceLauncher()
+    launcher = FakeLongRunningVoiceLauncher()
     organ = VoiceLauncherOrganController(launcher=launcher)
 
     report = organ.start()
@@ -274,6 +316,59 @@ def test_voice_launcher_organ_starts_launcher() -> None:
     assert report.status == JarvisOrganStatus.RUNNING
     assert launcher.run_called is True
     assert launcher.stop_called is True
+
+
+def test_voice_launcher_organ_fails_when_launcher_exits_unexpectedly() -> None:
+    launcher = FakeVoiceLauncher()
+    organ = VoiceLauncherOrganController(launcher=launcher)
+
+    start = organ.start()
+    deadline = time.perf_counter() + 1.0
+    health = organ.health()
+    while health.status == JarvisOrganStatus.RUNNING and time.perf_counter() < deadline:
+        time.sleep(0.01)
+        health = organ.health()
+
+    assert start.status in {
+        JarvisOrganStatus.RUNNING,
+        JarvisOrganStatus.FAILED,
+    }
+    assert launcher.run_called is True
+    assert health.status == JarvisOrganStatus.FAILED
+    assert str(health.metadata["last_error"]).startswith(
+        "voice launcher exited unexpectedly"
+    )
+
+
+def test_voice_launcher_organ_preserves_launcher_failure_reason() -> None:
+    launcher = FakeFailingVoiceLauncher()
+    organ = VoiceLauncherOrganController(launcher=launcher)
+
+    organ.start()
+    deadline = time.perf_counter() + 1.0
+    health = organ.health()
+    while health.status == JarvisOrganStatus.RUNNING and time.perf_counter() < deadline:
+        time.sleep(0.01)
+        health = organ.health()
+
+    assert launcher.run_called is True
+    assert health.status == JarvisOrganStatus.FAILED
+    assert health.metadata["launcher_status"] == "failed"
+    assert health.metadata["launcher_reason"] == "voice session failed during run"
+    assert health.metadata["last_error"] == "voice session failed during run"
+
+
+def test_start_control_fails_when_required_organ_stops_unexpectedly() -> None:
+    organs = _connected_organs()
+    runtime = JarvisStartControlRuntime(organs=organs)
+
+    runtime.start_all()
+    organs[0].started = False
+    organs[0].stopped = True
+    result = runtime.health()
+
+    assert result.status == JarvisStartControlStatus.FAILED
+    assert result.reason == "connected JARVIS health failed"
 
 
 def test_start_control_enum_values_are_stable() -> None:

@@ -82,7 +82,7 @@ class VoiceRuntimeProfile:
 VOICE_RUNTIME_PROFILES: dict[VoiceRuntimePreset, VoiceRuntimeProfile] = {
     VoiceRuntimePreset.FAST: VoiceRuntimeProfile(
         preset=VoiceRuntimePreset.FAST,
-        stt_model="tiny",
+        stt_model="small",
         vad_threshold=120.0,
         vad_silence_threshold=60.0,
         speech_start_frames=2,

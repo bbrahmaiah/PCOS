@@ -316,7 +316,7 @@ class BuildWatchEngine:
 
         error_report = self._error_engine.analyze(
             ErrorIntelligenceRequest(
-                stdout=test_result.stdout,
+                stdout=_analysis_stdout_for_test_result(test_result),
                 stderr=test_result.stderr,
                 source=_source_for_test_result(test_result),
                 exit_code=test_result.exit_code,
@@ -463,6 +463,16 @@ def _source_for_test_result(test_result: TestRunResult) -> ErrorSourceKind:
         return ErrorSourceKind.PYTEST
 
     return ErrorSourceKind.TERMINAL
+
+
+def _analysis_stdout_for_test_result(test_result: TestRunResult) -> str:
+    if test_result.stdout.strip() or test_result.stderr.strip():
+        return test_result.stdout
+
+    return (
+        f"Test command ended with status={test_result.status.value}. "
+        f"{test_result.summary}"
+    )
 
 
 def _failure_summary(

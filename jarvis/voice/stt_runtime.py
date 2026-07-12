@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import importlib
+import re
 import tempfile
+import threading
 import time
 import wave
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import datetime
 from enum import StrEnum
 from pathlib import Path
@@ -78,8 +80,8 @@ class VoiceSTTModelInfo:
 
 @dataclass(frozen=True, slots=True)
 class VoiceSTTPolicy:
-    partial_model_name: str = "tiny.en"
-    final_model_name: str = "base.en"
+    partial_model_name: str = "small"
+    final_model_name: str = "small"
     device: str = "cpu"
     compute_type: str = "int8"
     partial_beam_size: int = 1
@@ -90,6 +92,36 @@ class VoiceSTTPolicy:
     allow_partial_for_actions: bool = False
     prewarm_on_prepare: bool = True
     max_empty_results_before_degraded: int = 3
+    min_transcript_chars: int = 3
+    max_no_speech_prob: float = 0.60
+    max_compression_ratio: float = 2.40
+    min_avg_logprob: float = -1.20
+    known_silence_hallucinations: frozenset[str] = frozenset(
+        {
+            "thank you",
+            "thanks",
+            "thanks for watching",
+            "that was good",
+            "on this case",
+            "alexa",
+            "caleb",
+            "bless you",
+            "good day",
+            "goodbye",
+            "god",
+            "bye",
+            "bye bye",
+            "buh bye",
+            "service",
+            "see you",
+            "see you next time",
+            "we ll see you in the next video",
+            "we ll see you next time",
+            "i ll be right back",
+            "ill be right back",
+            "happy holidays",
+        }
+    )
     metadata: dict[str, object] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
@@ -115,6 +147,12 @@ class VoiceSTTPolicy:
             raise ValueError(
                 "max_empty_results_before_degraded must be positive."
             )
+        if self.min_transcript_chars < 1:
+            raise ValueError("min_transcript_chars must be positive.")
+        if not 0.0 <= self.max_no_speech_prob <= 1.0:
+            raise ValueError("max_no_speech_prob must be 0..1.")
+        if self.max_compression_ratio <= 0:
+            raise ValueError("max_compression_ratio must be positive.")
 
 
 @dataclass(frozen=True, slots=True)
@@ -210,7 +248,7 @@ class VoiceSTTAdapter(Protocol):
         request: VoiceSTTRequest,
         config: VoiceRuntimeConfig,
         policy: VoiceSTTPolicy,
-    ) -> tuple[str, float, str]:
+    ) -> tuple[str, float, str] | tuple[str, float, str, dict[str, object]]:
         raise NotImplementedError
 
     def close(self) -> None:
@@ -244,11 +282,14 @@ class FasterWhisperSTTAdapter:
                 device=policy.device,
                 compute_type=policy.compute_type,
             )
-            self._final_model = model_cls(
-                policy.final_model_name,
-                device=policy.device,
-                compute_type=policy.compute_type,
-            )
+            if policy.final_model_name == policy.partial_model_name:
+                self._final_model = self._partial_model
+            else:
+                self._final_model = model_cls(
+                    policy.final_model_name,
+                    device=policy.device,
+                    compute_type=policy.compute_type,
+                )
 
         partial = VoiceSTTModelInfo(
             provider="faster_whisper",
@@ -275,7 +316,7 @@ class FasterWhisperSTTAdapter:
         request: VoiceSTTRequest,
         config: VoiceRuntimeConfig,
         policy: VoiceSTTPolicy,
-    ) -> tuple[str, float, str]:
+    ) -> tuple[str, float, str, dict[str, object]]:
         module = importlib.import_module("faster_whisper")
         model_cls = module.WhisperModel
 
@@ -283,21 +324,33 @@ class FasterWhisperSTTAdapter:
             model_name = policy.partial_model_name
             beam_size = policy.partial_beam_size
             if self._partial_model is None:
-                self._partial_model = model_cls(
-                    model_name,
-                    device=policy.device,
-                    compute_type=policy.compute_type,
-                )
+                if (
+                    policy.partial_model_name == policy.final_model_name
+                    and self._final_model is not None
+                ):
+                    self._partial_model = self._final_model
+                else:
+                    self._partial_model = model_cls(
+                        model_name,
+                        device=policy.device,
+                        compute_type=policy.compute_type,
+                    )
             model = self._partial_model
         else:
             model_name = policy.final_model_name
             beam_size = policy.final_beam_size
             if self._final_model is None:
-                self._final_model = model_cls(
-                    model_name,
-                    device=policy.device,
-                    compute_type=policy.compute_type,
-                )
+                if (
+                    policy.partial_model_name == policy.final_model_name
+                    and self._partial_model is not None
+                ):
+                    self._final_model = self._partial_model
+                else:
+                    self._final_model = model_cls(
+                        model_name,
+                        device=policy.device,
+                        compute_type=policy.compute_type,
+                    )
             model = self._final_model
 
         wav_path = _frames_to_temp_wav(request.frames, config)
@@ -310,14 +363,37 @@ class FasterWhisperSTTAdapter:
                 condition_on_previous_text=False,
             )
             text_parts: list[str] = []
+            no_speech_probs: list[float] = []
+            avg_logprobs: list[float] = []
+            compression_ratios: list[float] = []
             for segment in segments:
+                no_speech_prob = getattr(segment, "no_speech_prob", None)
+                if isinstance(no_speech_prob, int | float):
+                    no_speech_value = float(no_speech_prob)
+                    no_speech_probs.append(no_speech_value)
+                    if no_speech_value > 0.6:
+                        continue
                 text = str(getattr(segment, "text", "")).strip()
+                if len(text.split()) < 2:
+                    continue
                 if text:
                     text_parts.append(text)
+                avg_logprob = getattr(segment, "avg_logprob", None)
+                if isinstance(avg_logprob, int | float):
+                    avg_logprobs.append(float(avg_logprob))
+                compression_ratio = getattr(segment, "compression_ratio", None)
+                if isinstance(compression_ratio, int | float):
+                    compression_ratios.append(float(compression_ratio))
 
             text = " ".join(text_parts).strip()
             confidence = float(getattr(info, "language_probability", 0.5))
-            return text, max(0.0, min(1.0, confidence)), model_name
+            metadata: dict[str, object] = {
+                "segment_count": len(text_parts),
+                "max_no_speech_prob": max(no_speech_probs, default=0.0),
+                "min_avg_logprob": min(avg_logprobs, default=0.0),
+                "max_compression_ratio": max(compression_ratios, default=0.0),
+            }
+            return text, max(0.0, min(1.0, confidence)), model_name, metadata
         finally:
             wav_path.unlink(missing_ok=True)
 
@@ -362,12 +438,33 @@ class VoiceSTTRuntime:
         self._last_latency_ms: float | None = None
         self._last_safety: VoiceSTTTranscriptSafety | None = None
         self._last_error: str | None = None
+        self._lock = threading.RLock()
 
     def prepare(self) -> VoiceSTTResult:
+        with self._lock:
+            return self._prepare_with_policy(
+                self._policy,
+                message="dual-lane STT runtime prepared",
+            )
+
+    def warm_models(self) -> VoiceSTTResult:
+        with self._lock:
+            warm_policy = replace(self._policy, prewarm_on_prepare=True)
+            return self._prepare_with_policy(
+                warm_policy,
+                message="dual-lane STT models warmed",
+            )
+
+    def _prepare_with_policy(
+        self,
+        policy: VoiceSTTPolicy,
+        *,
+        message: str,
+    ) -> VoiceSTTResult:
         try:
             partial, final = self._adapter.prepare(
                 self._config,
-                self._policy,
+                policy,
             )
             self._partial_model = partial
             self._final_model = final
@@ -378,7 +475,12 @@ class VoiceSTTRuntime:
                 status=self._status,
                 transcript=None,
                 candidate=None,
-                message="dual-lane STT runtime prepared",
+                message=message,
+                metadata={
+                    "partial_model": partial.model_name,
+                    "final_model": final.model_name,
+                    "prewarmed": policy.prewarm_on_prepare,
+                },
             )
         except Exception as exc:
             self._status = VoiceSTTRuntimeStatus.FAILED
@@ -430,11 +532,16 @@ class VoiceSTTRuntime:
 
         try:
             self._status = VoiceSTTRuntimeStatus.TRANSCRIBING
-            text, confidence, model_name = self._adapter.transcribe(
-                request,
-                self._config,
-                self._policy,
-            )
+            with self._lock:
+                text, confidence, model_name, stt_metadata = (
+                    _coerce_transcription_result(
+                        self._adapter.transcribe(
+                            request,
+                            self._config,
+                            self._policy,
+                        )
+                    )
+                )
         except Exception as exc:
             self._status = VoiceSTTRuntimeStatus.FAILED
             self._failed_results += 1
@@ -453,6 +560,25 @@ class VoiceSTTRuntime:
 
         if not text.strip():
             return self._empty_result(operation=operation)
+
+        hallucination_reason = _stt_hallucination_reason(
+            text=text,
+            metadata=stt_metadata,
+            policy=self._policy,
+        )
+        if hallucination_reason is not None:
+            return self._rejected_result(
+                operation=operation,
+                message="STT transcript rejected by hallucination policy",
+                metadata={
+                    "mode": request.mode.value,
+                    "text": text,
+                    "confidence": confidence,
+                    "latency_ms": latency_ms,
+                    "rejection_reason": hallucination_reason,
+                    **stt_metadata,
+                },
+            )
 
         min_confidence = _min_confidence_for_mode(
             mode=request.mode,
@@ -506,6 +632,7 @@ class VoiceSTTRuntime:
                 "mode": request.mode.value,
                 "model_name": model_name,
                 "latency_ms": latency_ms,
+                **stt_metadata,
                 "safe_for_action": safe_for_action,
                 "safety": safety.value,
                 "frame_count": len(request.frames),
@@ -534,25 +661,27 @@ class VoiceSTTRuntime:
                 "latency_ms": latency_ms,
                 "safety": safety.value,
                 "safe_for_action": safe_for_action,
+                **stt_metadata,
             },
         )
 
     def reset(self) -> VoiceSTTResult:
-        self._adapter.close()
-        self._partial_model = None
-        self._final_model = None
-        self._status = VoiceSTTRuntimeStatus.CREATED
-        self._last_text = None
-        self._last_latency_ms = None
-        self._last_safety = None
-        self._last_error = None
-        return self._result(
-            operation=VoiceSTTOperation.RESET,
-            status=self._status,
-            transcript=None,
-            candidate=None,
-            message="STT runtime reset",
-        )
+        with self._lock:
+            self._adapter.close()
+            self._partial_model = None
+            self._final_model = None
+            self._status = VoiceSTTRuntimeStatus.CREATED
+            self._last_text = None
+            self._last_latency_ms = None
+            self._last_safety = None
+            self._last_error = None
+            return self._result(
+                operation=VoiceSTTOperation.RESET,
+                status=self._status,
+                transcript=None,
+                candidate=None,
+                message="STT runtime reset",
+            )
 
     def snapshot(self) -> VoiceSTTSnapshot:
         return VoiceSTTSnapshot(
@@ -589,6 +718,24 @@ class VoiceSTTRuntime:
             transcript=None,
             candidate=None,
             message="STT returned empty transcript",
+        )
+
+    def _rejected_result(
+        self,
+        *,
+        operation: VoiceSTTOperation,
+        message: str,
+        metadata: dict[str, object],
+    ) -> VoiceSTTResult:
+        self._status = VoiceSTTRuntimeStatus.READY
+        self._last_error = None
+        return self._result(
+            operation=operation,
+            status=self._status,
+            transcript=None,
+            candidate=None,
+            message=message,
+            metadata=metadata,
         )
 
     def _result(
@@ -670,6 +817,72 @@ def _safety_for_transcript(
         return VoiceSTTTranscriptSafety.SAFE_FOR_ACTION
 
     return VoiceSTTTranscriptSafety.SAFE_FOR_DIALOGUE
+
+
+def _coerce_transcription_result(
+    result: tuple[str, float, str] | tuple[str, float, str, dict[str, object]],
+) -> tuple[str, float, str, dict[str, object]]:
+    if len(result) == 3:
+        text, confidence, model_name = result
+        return text, confidence, model_name, {}
+    text, confidence, model_name, metadata = result
+    return text, confidence, model_name, metadata
+
+
+def _stt_hallucination_reason(
+    *,
+    text: str,
+    metadata: dict[str, object],
+    policy: VoiceSTTPolicy,
+) -> str | None:
+    normalized = _normalize_stt_text(text)
+    if len(normalized.replace(" ", "")) < policy.min_transcript_chars:
+        return "too_short"
+
+    if normalized in policy.known_silence_hallucinations:
+        return "known_silence_hallucination"
+
+    for phrase in policy.known_silence_hallucinations:
+        if normalized.startswith(phrase) and len(normalized.split()) <= 6:
+            return "known_silence_hallucination"
+
+    no_speech_prob = _metadata_float(metadata, "max_no_speech_prob")
+    if (
+        no_speech_prob is not None
+        and no_speech_prob > policy.max_no_speech_prob
+    ):
+        return "high_no_speech_probability"
+
+    compression_ratio = _metadata_float(metadata, "max_compression_ratio")
+    if (
+        compression_ratio is not None
+        and compression_ratio > policy.max_compression_ratio
+    ):
+        return "high_compression_ratio"
+
+    avg_logprob = _metadata_float(metadata, "min_avg_logprob")
+    if avg_logprob is not None and avg_logprob < policy.min_avg_logprob:
+        return "low_avg_logprob"
+
+    return None
+
+
+def _metadata_float(
+    metadata: dict[str, object],
+    key: str,
+) -> float | None:
+    value = metadata.get(key)
+    if isinstance(value, int | float):
+        return float(value)
+    return None
+
+
+def _normalize_stt_text(text: str) -> str:
+    cleaned = text.strip().lower()
+    cleaned = cleaned.replace("'", " ")
+    cleaned = re.sub(r"[^a-z0-9\s]", " ", cleaned)
+    cleaned = re.sub(r"\s+", " ", cleaned)
+    return cleaned.strip()
 
 
 def _frames_to_temp_wav(

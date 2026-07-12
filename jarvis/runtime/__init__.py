@@ -17,6 +17,12 @@ from jarvis.runtime.final_daily_driver_gate import (
     JarvisFinalDailyDriverGateStatus,
     summarize_final_daily_driver_report,
 )
+from jarvis.runtime.http_bridge import (
+    JarvisHttpBridgeConfig,
+    JarvisHttpBridgeRuntime,
+    JarvisHttpBridgeTurnResult,
+    create_jarvis_http_server,
+)
 from jarvis.runtime.phase_adapters import (
     JarvisConnectedRuntimePlan,
     JarvisPhaseAdapterSnapshot,
@@ -75,6 +81,10 @@ __all__ = [
     "JarvisFinalDailyDriverGateReport",
     "JarvisFinalDailyDriverGateStatus",
     "summarize_final_daily_driver_report",
+    "JarvisHttpBridgeConfig",
+    "JarvisHttpBridgeRuntime",
+    "JarvisHttpBridgeTurnResult",
+    "create_jarvis_http_server",
     "ModuleBackedPhaseRuntime",
     "PhaseRuntimeHealth",
     "create_phase1_events_runtime",

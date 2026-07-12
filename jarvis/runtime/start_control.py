@@ -300,6 +300,9 @@ class VoiceLauncherOrganController:
     _status: JarvisOrganStatus = JarvisOrganStatus.CREATED
     _thread: threading.Thread | None = None
     _last_error: str | None = None
+    _last_launcher_reason: str | None = None
+    _last_launcher_status: str | None = None
+    _stop_requested: bool = False
 
     def start(self) -> JarvisOrganReport:
         started = time.perf_counter()
@@ -313,12 +316,33 @@ class VoiceLauncherOrganController:
             )
 
         self._status = JarvisOrganStatus.STARTING
+        self._stop_requested = False
 
         def _run() -> None:
             try:
-                _call_if_present(self.launcher, "run")
-                if self._status != JarvisOrganStatus.STOPPED:
+                result = _call_if_present(self.launcher, "run")
+                result_status = _extract_status(result)
+                result_reason = _extract_reason(result)
+                self._last_launcher_status = (
+                    result_status.value if result_status is not None else None
+                )
+                self._last_launcher_reason = result_reason
+                if self._stop_requested:
                     self._status = JarvisOrganStatus.STOPPED
+                elif result_status == JarvisOrganStatus.RUNNING:
+                    self._status = JarvisOrganStatus.RUNNING
+                elif result_status == JarvisOrganStatus.DEGRADED:
+                    self._status = JarvisOrganStatus.DEGRADED
+                    self._last_error = result_reason or "voice launcher degraded"
+                elif result_status == JarvisOrganStatus.FAILED:
+                    self._status = JarvisOrganStatus.FAILED
+                    self._last_error = result_reason or "voice launcher failed"
+                else:
+                    self._status = JarvisOrganStatus.FAILED
+                    self._last_error = _launcher_exit_message(
+                        status=result_status,
+                        reason=result_reason,
+                    )
             except Exception as exc:
                 self._status = JarvisOrganStatus.FAILED
                 self._last_error = str(exc)
@@ -329,7 +353,8 @@ class VoiceLauncherOrganController:
             daemon=True,
         )
         self._thread.start()
-        self._status = JarvisOrganStatus.RUNNING
+        if self._status == JarvisOrganStatus.STARTING:
+            self._status = JarvisOrganStatus.RUNNING
 
         return self._report(
             operation=JarvisStartControlOperation.START_ALL,
@@ -340,6 +365,7 @@ class VoiceLauncherOrganController:
     def stop(self) -> JarvisOrganReport:
         started = time.perf_counter()
         self._status = JarvisOrganStatus.STOPPING
+        self._stop_requested = True
 
         try:
             _call_if_present(self.launcher, "request_stop")
@@ -372,6 +398,12 @@ class VoiceLauncherOrganController:
             status = JarvisOrganStatus.RUNNING
         else:
             status = self._status
+            if status == JarvisOrganStatus.STOPPED and not self._stop_requested:
+                status = JarvisOrganStatus.FAILED
+                self._last_error = _launcher_exit_message(
+                    status=JarvisOrganStatus.STOPPED,
+                    reason=self._last_launcher_reason,
+                )
 
         return JarvisOrganHealth(
             kind=self.kind,
@@ -381,7 +413,11 @@ class VoiceLauncherOrganController:
             message="voice launcher health checked",
             latency_ms=(time.perf_counter() - started) * 1000.0,
             created_at=utc_now(),
-            metadata={"last_error": self._last_error},
+            metadata={
+                "last_error": self._last_error,
+                "launcher_status": self._last_launcher_status,
+                "launcher_reason": self._last_launcher_reason,
+            },
         )
 
     def _report(
@@ -400,7 +436,11 @@ class VoiceLauncherOrganController:
             message=message,
             latency_ms=(time.perf_counter() - started) * 1000.0,
             created_at=utc_now(),
-            metadata={"last_error": self._last_error},
+            metadata={
+                "last_error": self._last_error,
+                "launcher_status": self._last_launcher_status,
+                "launcher_reason": self._last_launcher_reason,
+            },
         )
 
 
@@ -634,7 +674,18 @@ class JarvisStartControlRuntime:
     def health(self) -> JarvisStartControlResult:
         started = time.perf_counter()
         health = tuple(organ.health() for organ in self._organs)
-        failed_required = any(item.failed_required for item in health)
+        unexpected_required_stop = (
+            self._started
+            and not self._stop_requested
+            and any(
+                item.criticality == JarvisOrganCriticality.REQUIRED
+                and item.status == JarvisOrganStatus.STOPPED
+                for item in health
+            )
+        )
+        failed_required = any(item.failed_required for item in health) or (
+            unexpected_required_stop
+        )
         degraded = any(
             item.status == JarvisOrganStatus.DEGRADED for item in health
         )
@@ -804,3 +855,29 @@ def _extract_status(value: object | None) -> JarvisOrganStatus | None:
             return None
 
     return None
+
+
+def _extract_reason(value: object | None) -> str | None:
+    if value is None:
+        return None
+
+    reason = getattr(value, "reason", None)
+    if isinstance(reason, str) and reason.strip():
+        return reason.strip()
+
+    message = getattr(value, "message", None)
+    if isinstance(message, str) and message.strip():
+        return message.strip()
+
+    return None
+
+
+def _launcher_exit_message(
+    *,
+    status: JarvisOrganStatus | None,
+    reason: str | None,
+) -> str:
+    status_text = status.value if status is not None else "unknown"
+    if reason is None:
+        return f"voice launcher exited unexpectedly status={status_text}"
+    return f"voice launcher exited unexpectedly status={status_text}: {reason}"

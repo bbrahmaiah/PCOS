@@ -170,6 +170,24 @@ def test_voice_cognition_routes_final_transcript_to_live_response() -> None:
     assert result.safety == VoiceCognitionTranscriptSafety.SAFE_FOR_DIALOGUE
 
 
+def test_voice_cognition_companion_policy_routes_no_wake_final() -> None:
+    runtime = VoiceCognitionResponseRuntime(
+        response_generator=DerivedFakeResponseGenerator(),
+        policy=VoiceCognitionPolicy(require_wake_word_when_sleeping=False),
+    )
+
+    result = runtime.think_from_transcript(
+        VoiceCognitionRequest(
+            transcript=_transcript("explain control systems briefly."),
+        )
+    )
+
+    assert result.status == VoiceCognitionStatus.THINKING
+    assert result.response is not None
+    assert "explain control systems briefly." in result.response.text
+    assert result.metadata["wake_reason"] == "user_continued"
+
+
 def test_voice_cognition_context_is_compacted() -> None:
     long_text = "memory " * 200
     runtime = VoiceCognitionResponseRuntime(

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
+from threading import Event
 
 from jarvis.runtime import (
     JarvisOrganKind,
@@ -50,14 +51,20 @@ class FakeVoiceLauncher:
     started: bool = False
     stopped: bool = False
 
+    def __post_init__(self) -> None:
+        self._stop = Event()
+
     def run(self) -> None:
         self.started = True
+        self._stop.wait(timeout=2.0)
 
     def request_stop(self) -> None:
         self.stopped = True
+        self._stop.set()
 
     def stop(self) -> None:
         self.stopped = True
+        self._stop.set()
 
 
 def _phase_runtimes() -> dict[JarvisOrganKind, object]:

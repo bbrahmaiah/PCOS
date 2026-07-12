@@ -1,11 +1,13 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from jarvis.voice import (
     VoiceDailyDriverGateReport,
     VoiceDailyDriverGateStatus,
     VoiceDailyDriverProfile,
+    VoiceLiveSpineReport,
+    VoiceLiveSpineStatus,
     VoiceRuntimeLauncher,
     VoiceRuntimeLauncherConfig,
     VoiceRuntimeLauncherEvent,
@@ -46,6 +48,7 @@ def _session_result(
 def _session_snapshot(
     *,
     running: bool = False,
+    metadata: dict[str, object] | None = None,
 ) -> VoiceSessionLoopSnapshot:
     return VoiceSessionLoopSnapshot(
         status=VoiceSessionLoopStatus.LISTENING
@@ -71,6 +74,7 @@ def _session_snapshot(
         last_latency_ms=1.0,
         last_error=None,
         created_at=utc_now(),
+        metadata=metadata or {},
     )
 
 
@@ -103,7 +107,12 @@ class FakeSessionLoop:
     stopped: bool = False
     fail_start: bool = False
     fail_run: bool = False
+    stop_after_run_calls: int | None = None
+    run_event: VoiceSessionLoopEvent | None = VoiceSessionLoopEvent.PLAYBACK_FINISHED
     run_calls: int = 0
+    snapshot_calls: int = 0
+    live_snapshot_calls: int = 0
+    snapshot_metadata: dict[str, object] = field(default_factory=dict)
 
     def start(self) -> VoiceSessionLoopResult:
         self.started = True
@@ -128,6 +137,16 @@ class FakeSessionLoop:
         max_seconds: float | None = None,
     ) -> VoiceSessionLoopResult:
         self.run_calls += 1
+        if (
+            self.stop_after_run_calls is not None
+            and self.run_calls >= self.stop_after_run_calls
+        ):
+            return _session_result(
+                status=VoiceSessionLoopStatus.STOPPED,
+                operation=VoiceSessionLoopOperation.RUN,
+                event=VoiceSessionLoopEvent.STOPPED,
+                message="run_stopped",
+            )
         if self.fail_run:
             return _session_result(
                 status=VoiceSessionLoopStatus.FAILED,
@@ -138,7 +157,7 @@ class FakeSessionLoop:
         return _session_result(
             status=VoiceSessionLoopStatus.LISTENING,
             operation=VoiceSessionLoopOperation.RUN,
-            event=VoiceSessionLoopEvent.PLAYBACK_FINISHED,
+            event=self.run_event,
             message="run_ok",
         )
 
@@ -152,7 +171,32 @@ class FakeSessionLoop:
         )
 
     def snapshot(self) -> VoiceSessionLoopSnapshot:
-        return _session_snapshot(running=self.started and not self.stopped)
+        self.snapshot_calls += 1
+        return _session_snapshot(
+            running=self.started and not self.stopped,
+            metadata=self.snapshot_metadata,
+        )
+
+    def live_snapshot(self) -> VoiceSessionLoopSnapshot:
+        self.live_snapshot_calls += 1
+        return _session_snapshot(
+            running=self.started and not self.stopped,
+            metadata=self.snapshot_metadata,
+        )
+
+
+@dataclass
+class FakeSpineMonitor:
+    calls: int = 0
+
+    def inspect(self, snapshot: VoiceSessionLoopSnapshot) -> VoiceLiveSpineReport:
+        self.calls += 1
+        return VoiceLiveSpineReport(
+            status=VoiceLiveSpineStatus.HEALTHY,
+            message="healthy",
+            checks={"checked": True, "running": snapshot.running},
+            created_at=utc_now(),
+        )
 
 
 def test_voice_runtime_launcher_config_validation() -> None:
@@ -162,6 +206,13 @@ def test_voice_runtime_launcher_config_validation() -> None:
         pass
     else:
         raise AssertionError("expected invalid bounded_cycles to fail")
+
+    try:
+        VoiceRuntimeLauncherConfig(live_spine_monitor_every_cycles=0)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("expected invalid spine monitor interval to fail")
 
 
 def test_voice_runtime_launcher_boot_runs_daily_driver_gate() -> None:
@@ -266,6 +317,46 @@ def test_voice_runtime_launcher_fails_when_session_run_fails() -> None:
     assert result.reason == "voice session failed during run"
 
 
+def test_voice_runtime_launcher_run_forever_preserves_session_failure() -> None:
+    loop = FakeSessionLoop(fail_run=True)
+    launcher = VoiceRuntimeLauncher(
+        session_loop=loop,
+        daily_driver_gate=FakeGate(),
+        config=VoiceRuntimeLauncherConfig(
+            run_forever=True,
+            idle_sleep_seconds=0.0,
+        ),
+    )
+
+    result = launcher.run()
+
+    assert result.status == VoiceRuntimeLauncherStatus.FAILED
+    assert result.reason == "voice session failed during run"
+    assert result.session_result is not None
+    assert result.session_result.status == VoiceSessionLoopStatus.FAILED
+    assert loop.stopped is True
+
+
+def test_voice_runtime_launcher_run_forever_exits_when_session_stops() -> None:
+    loop = FakeSessionLoop(stop_after_run_calls=1)
+    launcher = VoiceRuntimeLauncher(
+        session_loop=loop,
+        daily_driver_gate=FakeGate(),
+        config=VoiceRuntimeLauncherConfig(
+            run_forever=True,
+            idle_sleep_seconds=0.0,
+        ),
+    )
+
+    result = launcher.run()
+
+    assert result.status == VoiceRuntimeLauncherStatus.STOPPED
+    assert result.session_result is not None
+    assert result.session_result.status == VoiceSessionLoopStatus.STOPPED
+    assert loop.run_calls == 1
+    assert loop.stopped is True
+
+
 def test_voice_runtime_launcher_stop_stops_session() -> None:
     loop = FakeSessionLoop()
     launcher = VoiceRuntimeLauncher(
@@ -295,6 +386,84 @@ def test_voice_runtime_launcher_snapshot_tracks_state() -> None:
     assert snapshot.booted is True
     assert snapshot.boot_count == 1
     assert snapshot.session_snapshot is not None
+
+
+def test_voice_runtime_launcher_records_live_spine_report() -> None:
+    loop = FakeSessionLoop(
+        snapshot_metadata={
+            "perception": {"packets": 1},
+            "fsm_violations": 0,
+            "playback_status": "ready",
+        }
+    )
+    launcher = VoiceRuntimeLauncher(
+        session_loop=loop,
+        daily_driver_gate=FakeGate(),
+        config=VoiceRuntimeLauncherConfig(run_forever=False),
+    )
+
+    result = launcher.run()
+    snapshot = launcher.snapshot()
+
+    assert result.status == VoiceRuntimeLauncherStatus.RUNNING
+    assert "live_spine" in result.metadata
+    assert snapshot.metadata["live_spine_monitor_enabled"] is True
+    live_spine = snapshot.metadata["live_spine"]
+    assert isinstance(live_spine, dict)
+    assert live_spine["status"] == VoiceLiveSpineStatus.HEALTHY.value
+
+
+def test_voice_runtime_launcher_throttles_spine_monitor_on_quiet_cycles() -> None:
+    loop = FakeSessionLoop(
+        stop_after_run_calls=5,
+        run_event=None,
+        snapshot_metadata={
+            "perception": {"packets": 1},
+            "fsm_violations": 0,
+            "playback_status": "ready",
+        },
+    )
+    monitor = FakeSpineMonitor()
+    launcher = VoiceRuntimeLauncher(
+        session_loop=loop,
+        daily_driver_gate=FakeGate(),
+        spine_monitor=monitor,
+        config=VoiceRuntimeLauncherConfig(
+            run_forever=True,
+            idle_sleep_seconds=0.0,
+            live_spine_monitor_every_cycles=50,
+        ),
+    )
+
+    result = launcher.run()
+
+    assert result.status == VoiceRuntimeLauncherStatus.STOPPED
+    assert loop.run_calls == 5
+    assert monitor.calls == 2
+    assert loop.live_snapshot_calls == 2
+    assert loop.snapshot_calls == 0
+
+
+def test_voice_runtime_launcher_live_snapshot_is_lightweight() -> None:
+    loop = FakeSessionLoop(
+        snapshot_metadata={
+            "perception": {"packets": 1},
+            "fsm_violations": 0,
+            "playback_status": "ready",
+        }
+    )
+    launcher = VoiceRuntimeLauncher(
+        session_loop=loop,
+        daily_driver_gate=FakeGate(),
+        config=VoiceRuntimeLauncherConfig(run_forever=False),
+    )
+
+    launcher.boot()
+    snapshot = launcher.live_snapshot()
+
+    assert snapshot.session_snapshot is not None
+    assert loop.live_snapshot_calls == 1
+    assert loop.snapshot_calls == 0
 
 
 def test_voice_runtime_launcher_enum_values_are_stable() -> None:

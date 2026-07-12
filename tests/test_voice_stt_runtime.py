@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+import sys
+from dataclasses import dataclass, field
+from types import SimpleNamespace
 
 import pytest
 
@@ -29,10 +31,12 @@ class DualLaneFakeSTTAdapter:
     final_text: str = "Jarvis explain PID control."
     partial_confidence: float = 0.65
     final_confidence: float = 0.92
+    metadata: dict[str, object] = field(default_factory=dict)
     fail_prepare: bool = False
     fail_transcribe: bool = False
     prepared: bool = False
     closed: bool = False
+    prepare_prewarm_values: list[bool] = field(default_factory=list)
 
     def prepare(
         self,
@@ -42,6 +46,7 @@ class DualLaneFakeSTTAdapter:
         if self.fail_prepare:
             raise RuntimeError("prepare failed")
         self.prepared = True
+        self.prepare_prewarm_values.append(policy.prewarm_on_prepare)
         partial = VoiceSTTModelInfo(
             provider="fake",
             model_name=policy.partial_model_name,
@@ -67,7 +72,7 @@ class DualLaneFakeSTTAdapter:
         request: VoiceSTTRequest,
         config: VoiceRuntimeConfig,
         policy: VoiceSTTPolicy,
-    ) -> tuple[str, float, str]:
+    ) -> tuple[str, float, str] | tuple[str, float, str, dict[str, object]]:
         if self.fail_transcribe:
             raise RuntimeError("transcribe failed")
 
@@ -76,16 +81,33 @@ class DualLaneFakeSTTAdapter:
                 self.partial_text,
                 self.partial_confidence,
                 policy.partial_model_name,
+                self.metadata,
             )
 
         return (
             self.final_text,
             self.final_confidence,
             policy.final_model_name,
+            self.metadata,
         )
 
     def close(self) -> None:
         self.closed = True
+
+
+class CountingWhisperModel:
+    created_models: list[str] = []
+
+    def __init__(
+        self,
+        model_name: str,
+        *,
+        device: str,
+        compute_type: str,
+    ) -> None:
+        self.created_models.append(model_name)
+        self.device = device
+        self.compute_type = compute_type
 
 
 def _frame() -> VoiceInputFrame:
@@ -115,6 +137,36 @@ def test_stt_policy_validation() -> None:
         VoiceSTTPolicy(min_action_confidence=2.0)
 
 
+def test_stt_policy_defaults_to_small_for_partial_and_final() -> None:
+    policy = VoiceSTTPolicy()
+
+    assert policy.partial_model_name == "small"
+    assert policy.final_model_name == "small"
+
+
+def test_faster_whisper_adapter_reuses_identical_model_names(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from jarvis.voice.stt_runtime import FasterWhisperSTTAdapter
+
+    CountingWhisperModel.created_models = []
+    monkeypatch.setitem(
+        sys.modules,
+        "faster_whisper",
+        SimpleNamespace(WhisperModel=CountingWhisperModel),
+    )
+    adapter = FasterWhisperSTTAdapter()
+
+    partial, final = adapter.prepare(
+        VoiceRuntimeConfig(),
+        VoiceSTTPolicy(partial_model_name="small", final_model_name="small"),
+    )
+
+    assert CountingWhisperModel.created_models == ["small"]
+    assert partial.model_name == "small"
+    assert final.model_name == "small"
+
+
 def test_dual_lane_stt_prepares_both_models() -> None:
     adapter = DualLaneFakeSTTAdapter()
     runtime = VoiceSTTRuntime(adapter=adapter)
@@ -128,6 +180,22 @@ def test_dual_lane_stt_prepares_both_models() -> None:
     assert snapshot.final_model is not None
     assert snapshot.partial_model.mode == VoiceSTTMode.FAST_PARTIAL
     assert snapshot.final_model.mode == VoiceSTTMode.ACCURATE_FINAL
+
+
+def test_stt_warm_models_forces_prewarm_policy() -> None:
+    adapter = DualLaneFakeSTTAdapter()
+    runtime = VoiceSTTRuntime(
+        adapter=adapter,
+        policy=VoiceSTTPolicy(prewarm_on_prepare=False),
+    )
+
+    prepared = runtime.prepare()
+    warmed = runtime.warm_models()
+
+    assert prepared.status == VoiceSTTRuntimeStatus.READY
+    assert warmed.status == VoiceSTTRuntimeStatus.READY
+    assert adapter.prepare_prewarm_values == [False, True]
+    assert warmed.metadata["prewarmed"] is True
 
 
 def test_stt_prepare_failure_is_safe() -> None:
@@ -236,6 +304,88 @@ def test_empty_results_degrade_after_threshold() -> None:
 
     assert first.status == VoiceSTTRuntimeStatus.READY
     assert second.status == VoiceSTTRuntimeStatus.DEGRADED
+
+
+def test_stt_rejects_known_silence_hallucination() -> None:
+    runtime = VoiceSTTRuntime(
+        adapter=DualLaneFakeSTTAdapter(final_text="Thanks for watching.")
+    )
+
+    result = runtime.transcribe_final((_frame(),))
+
+    assert result.status == VoiceSTTRuntimeStatus.READY
+    assert result.transcript is None
+    assert result.message == "STT transcript rejected by hallucination policy"
+    assert result.metadata["rejection_reason"] == "known_silence_hallucination"
+
+
+@pytest.mark.parametrize("text", ["Bless you.", "service.", "God."])
+def test_stt_rejects_latest_live_log_hallucinations(text: str) -> None:
+    runtime = VoiceSTTRuntime(adapter=DualLaneFakeSTTAdapter(final_text=text))
+
+    result = runtime.transcribe_final((_frame(),))
+
+    assert result.status == VoiceSTTRuntimeStatus.READY
+    assert result.transcript is None
+    assert result.metadata["rejection_reason"] == "known_silence_hallucination"
+
+
+def test_stt_rejects_high_no_speech_probability() -> None:
+    runtime = VoiceSTTRuntime(
+        adapter=DualLaneFakeSTTAdapter(
+            final_text="That was good.",
+            metadata={"max_no_speech_prob": 0.91},
+        )
+    )
+
+    result = runtime.transcribe_final((_frame(),))
+
+    assert result.status == VoiceSTTRuntimeStatus.READY
+    assert result.transcript is None
+    assert result.metadata["rejection_reason"] == "known_silence_hallucination"
+
+
+def test_stt_rejects_high_no_speech_probability_for_non_blacklisted_text() -> None:
+    runtime = VoiceSTTRuntime(
+        adapter=DualLaneFakeSTTAdapter(
+            final_text="random background sentence",
+            metadata={"max_no_speech_prob": 0.91},
+        )
+    )
+
+    result = runtime.transcribe_final((_frame(),))
+
+    assert result.status == VoiceSTTRuntimeStatus.READY
+    assert result.transcript is None
+    assert result.metadata["rejection_reason"] == "high_no_speech_probability"
+
+
+def test_stt_rejects_too_short_text() -> None:
+    runtime = VoiceSTTRuntime(adapter=DualLaneFakeSTTAdapter(final_text="x"))
+
+    result = runtime.transcribe_final((_frame(),))
+
+    assert result.status == VoiceSTTRuntimeStatus.READY
+    assert result.transcript is None
+    assert result.metadata["rejection_reason"] == "too_short"
+
+
+def test_stt_keeps_whisper_quality_metadata_on_valid_transcript() -> None:
+    runtime = VoiceSTTRuntime(
+        adapter=DualLaneFakeSTTAdapter(
+            metadata={
+                "max_no_speech_prob": 0.02,
+                "min_avg_logprob": -0.15,
+                "max_compression_ratio": 1.1,
+            }
+        )
+    )
+
+    result = runtime.transcribe_final((_frame(),))
+
+    assert result.transcript is not None
+    assert result.transcript.metadata["max_no_speech_prob"] == 0.02
+    assert result.metadata["max_compression_ratio"] == 1.1
 
 
 def test_transcription_failure_is_safe() -> None:

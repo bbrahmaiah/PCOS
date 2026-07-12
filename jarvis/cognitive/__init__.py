@@ -67,6 +67,17 @@ from jarvis.cognitive.integration import (
     CognitiveIntegrationStatus,
     make_cognitive_integration_event,
 )
+from jarvis.cognitive.mission_context import (
+    MissionContextInput,
+    MissionContextInterruptionPolicy,
+    MissionContextResult,
+    MissionContextRuntime,
+    MissionContextSnapshot,
+    MissionContextState,
+    MissionContextStatus,
+    MissionContextUrgency,
+    mission_context_input_from_request,
+)
 from jarvis.cognitive.personality import (
     BehaviorDirective,
     BehaviorIntent,
@@ -131,6 +142,15 @@ __all__ = [
     "CognitiveIntegrationSource",
     "CognitiveIntegrationStatus",
     "make_cognitive_integration_event",
+    "MissionContextInput",
+    "MissionContextInterruptionPolicy",
+    "MissionContextResult",
+    "MissionContextRuntime",
+    "MissionContextSnapshot",
+    "MissionContextState",
+    "MissionContextStatus",
+    "MissionContextUrgency",
+    "mission_context_input_from_request",
     "CognitiveSessionGoalRequest",
     "CognitiveSessionOperation",
     "CognitiveSessionResponseRequest",

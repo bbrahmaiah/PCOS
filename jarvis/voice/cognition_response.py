@@ -19,7 +19,11 @@ from jarvis.live import (
     LiveSessionMode,
     LiveSessionRunner,
     LiveSessionRunnerConfig,
+    LiveSessionRunnerResult,
     LiveSessionRunnerStatus,
+    LiveSessionStateRuntime,
+    LiveWakeEngagementPolicy,
+    LiveWakeEngagementRuntime,
 )
 from jarvis.voice.contracts import (
     VoiceTranscript,
@@ -92,6 +96,8 @@ class VoiceOllamaGeneratorConfig:
     temperature: float = 0.35
     num_predict: int = 180
     keep_alive: str = "10m"
+    prewarm_on_prepare: bool = True
+    stream_response: bool = False
     metadata: dict[str, object] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
@@ -121,6 +127,7 @@ class VoiceCognitionPolicy:
     max_context_item_chars: int = 420
     max_response_sentences: int = 3
     require_final_for_response: bool = True
+    require_wake_word_when_sleeping: bool = True
     metadata: dict[str, object] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
@@ -302,6 +309,9 @@ class VoiceOllamaResponseGenerator(LiveResponseGenerator):
         return self._prewarmed
 
     def prewarm(self) -> None:
+        if not self._config.prewarm_on_prepare:
+            return
+
         payload = {
             "model": self._config.model,
             "prompt": "Ready.",
@@ -327,14 +337,23 @@ class VoiceOllamaResponseGenerator(LiveResponseGenerator):
         payload = {
             "model": self._config.model,
             "prompt": prompt,
-            "stream": False,
+            "stream": self._config.stream_response,
             "keep_alive": self._config.keep_alive,
             "options": {
                 "temperature": self._config.temperature,
                 "num_predict": self._config.num_predict,
             },
         }
-        text = self._call_ollama(payload)
+        streamed = self._config.stream_response
+        stream_chunk_count = 0
+        first_token_latency_ms: float | None = None
+        if streamed:
+            text, stream_chunk_count, first_token_latency_ms = self._stream_ollama(
+                payload,
+                started=started,
+            )
+        else:
+            text = self._call_ollama(payload)
         latency_ms = (time.perf_counter() - started) * 1000.0
 
         return LiveResponseDraft(
@@ -347,6 +366,9 @@ class VoiceOllamaResponseGenerator(LiveResponseGenerator):
                 "latency_ms": latency_ms,
                 "voice_cognition": True,
                 "prewarmed": self._prewarmed,
+                "streamed": streamed,
+                "stream_chunk_count": stream_chunk_count,
+                "first_token_latency_ms": first_token_latency_ms,
             },
         )
 
@@ -377,6 +399,53 @@ class VoiceOllamaResponseGenerator(LiveResponseGenerator):
             raise RuntimeError("Ollama returned an empty response.")
 
         return text
+
+    def _stream_ollama(
+        self,
+        payload: dict[str, object],
+        *,
+        started: float,
+    ) -> tuple[str, int, float | None]:
+        body = json.dumps(payload).encode("utf-8")
+        req = http_request.Request(
+            url=f"{self._config.base_url.rstrip('/')}/api/generate",
+            data=body,
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+
+        chunks: list[str] = []
+        first_token_latency_ms: float | None = None
+
+        try:
+            with http_request.urlopen(
+                req,
+                timeout=self._config.timeout_seconds,
+            ) as response:
+                for raw_line in response:
+                    line = raw_line.decode("utf-8").strip()
+                    if not line:
+                        continue
+                    item = json.loads(line)
+                    part = str(item.get("response", ""))
+                    if part:
+                        if first_token_latency_ms is None:
+                            first_token_latency_ms = (
+                                time.perf_counter() - started
+                            ) * 1000.0
+                        chunks.append(part)
+                    if item.get("done") is True:
+                        break
+        except URLError as exc:
+            raise RuntimeError(
+                "Ollama request failed. Confirm Ollama is running."
+            ) from exc
+
+        text = "".join(chunks).strip()
+        if not text:
+            raise RuntimeError("Ollama returned an empty streamed response.")
+
+        return text, len(chunks), first_token_latency_ms
 
 
 class VoiceCognitionResponseRuntime:
@@ -449,6 +518,16 @@ class VoiceCognitionResponseRuntime:
                 real_stt_enabled=True,
                 real_tts_enabled=True,
             )
+            live_state = LiveSessionStateRuntime(config=session_config)
+            wake = LiveWakeEngagementRuntime(
+                live_state=live_state,
+                policy=LiveWakeEngagementPolicy(
+                    wake_word=session_config.wake_word,
+                    require_wake_word_when_sleeping=(
+                        self._policy.require_wake_word_when_sleeping
+                    ),
+                ),
+            )
             self._runner = LiveSessionRunner(
                 config=LiveSessionRunnerConfig(
                     session_config=session_config,
@@ -457,6 +536,8 @@ class VoiceCognitionResponseRuntime:
                     auto_recover=False,
                 ),
                 response_generator=self._response_generator,
+                live_state=live_state,
+                wake=wake,
             )
 
         result = self._runner.start()
@@ -624,7 +705,7 @@ class VoiceCognitionResponseRuntime:
                 context_latency_ms=context_latency_ms,
                 response_latency_ms=response_latency_ms,
                 created_at=utc_now(),
-                metadata={"runner_status": result.status.value},
+                metadata=_runner_diagnostic_metadata(result),
             )
 
         self._responses += 1
@@ -648,7 +729,7 @@ class VoiceCognitionResponseRuntime:
             response_latency_ms=response_latency_ms,
             created_at=utc_now(),
             metadata={
-                "runner_status": result.status.value,
+                **_runner_diagnostic_metadata(result),
                 "response_id": str(response.response_id),
                 "within_total_budget": (
                     latency_ms <= self._latency_budget.total_budget_ms
@@ -882,6 +963,27 @@ def _compact_text(text: str, max_chars: int) -> str:
     return normalized[: max_chars - 1].rstrip() + "…"
 
 
+def _runner_diagnostic_metadata(
+    result: LiveSessionRunnerResult,
+) -> dict[str, object]:
+    metadata: dict[str, object] = {
+        "runner_status": result.status.value,
+        "runner_reason": result.reason,
+    }
+
+    if result.wake_result is not None:
+        metadata.update(
+            {
+                "wake_status": result.wake_result.status.value,
+                "wake_decision": result.wake_result.decision.value,
+                "wake_reason": result.wake_result.reason.value,
+                "wake_engaged": result.wake_result.engaged,
+            }
+        )
+
+    return metadata
+
+
 def _build_ollama_prompt(
     *,
     request: LiveResponseGenerationRequest,
@@ -911,8 +1013,12 @@ You are not a chatbot.
 You are a calm, concise, loyal, technically sharp executive assistant.
 You must respond naturally for spoken conversation.
 Keep the response to at most {max_sentences} short sentences unless asked.
+Prefer one sentence for tiny follow-ups or status checks.
 Be fast, direct, and useful.
 Ask one clarifying question if the instruction is incomplete.
+If the user interrupts with a smaller question, answer that question first.
+If the user asks whether you can hear them, answer from the fact that this
+transcript reached you; do not claim you lack audio awareness.
 Do not claim an action was performed unless the runtime actually did it.
 Do not invent memory, files, screen state, tool results, or system status.
 Do not mention transcripts, prompts, runtime internals, or boundaries unless asked.

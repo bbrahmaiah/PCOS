@@ -47,7 +47,7 @@ def test_get_voice_runtime_profile_accepts_enum_and_string() -> None:
     fast_from_string = get_voice_runtime_profile("fast")
 
     assert fast_from_enum == fast_from_string
-    assert fast_from_enum.stt_model == "tiny"
+    assert fast_from_enum.stt_model == "small"
 
 
 def test_get_voice_runtime_profile_rejects_unknown_name() -> None:

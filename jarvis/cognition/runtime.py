@@ -35,6 +35,10 @@ from jarvis.cognition.streaming import (
     StreamingTokenPipeline,
     StreamingTokenPipelineResult,
 )
+from jarvis.cognitive.mission_context import (
+    MissionContextRuntime,
+    mission_context_input_from_request,
+)
 from jarvis.runtime.observability.structured_logger import get_logger
 
 
@@ -51,6 +55,7 @@ class CognitionRuntimeConfig:
     """
 
     name: str = "cognition_runtime"
+    enable_mission_context: bool = True
     enable_memory_enrichment: bool = True
     enable_action_planning: bool = True
     remember_user_turns: bool = False
@@ -78,6 +83,7 @@ class CognitionRuntimeComponents:
     response_planner: ResponsePlanner
     action_planner: ToolActionPlanner
     spoken_policy: SpokenDialoguePolicy
+    mission_context: MissionContextRuntime | None = None
     streaming_pipeline: StreamingTokenPipeline | None = None
 
 
@@ -127,6 +133,9 @@ class CognitionRuntimeSnapshot:
     last_error: str | None
     session_turn_count: int
     memory_item_count: int
+    mission_context_update_count: int = 0
+    mission_context_urgency: str | None = None
+    mission_context_policy: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -169,6 +178,9 @@ class CognitionRuntime:
         self._config.validate()
 
         self._components = components
+
+        if self._components.mission_context is None:
+            self._components.mission_context = MissionContextRuntime()
 
         if self._components.streaming_pipeline is None:
             self._components.streaming_pipeline = StreamingTokenPipeline(
@@ -364,6 +376,11 @@ class CognitionRuntime:
 
         session_snapshot = self._components.session_store.snapshot()
         memory_snapshot = self._components.memory_store.snapshot()
+        mission_snapshot = (
+            self._components.mission_context.snapshot()
+            if self._components.mission_context is not None
+            else None
+        )
 
         with self._lock:
             return CognitionRuntimeSnapshot(
@@ -379,6 +396,21 @@ class CognitionRuntime:
                 last_error=self._last_error,
                 session_turn_count=session_snapshot.turn_count,
                 memory_item_count=memory_snapshot.item_count,
+                mission_context_update_count=(
+                    mission_snapshot.update_count
+                    if mission_snapshot is not None
+                    else 0
+                ),
+                mission_context_urgency=(
+                    mission_snapshot.state.urgency.value
+                    if mission_snapshot is not None
+                    else None
+                ),
+                mission_context_policy=(
+                    mission_snapshot.state.interruption_policy.value
+                    if mission_snapshot is not None
+                    else None
+                ),
             )
 
     def reset(self) -> None:
@@ -399,6 +431,8 @@ class CognitionRuntime:
 
         self._components.session_store.reset()
         self._components.memory_store.clear()
+        if self._components.mission_context is not None:
+            self._components.mission_context.clear()
 
         if self._components.streaming_pipeline is not None:
             self._components.streaming_pipeline.reset()
@@ -425,6 +459,17 @@ class CognitionRuntime:
             and enriched_request.policy.allow_memory_lookup
         ):
             enriched_request = self._components.memory_store.enrich_request(
+                enriched_request,
+            )
+
+        if (
+            self._config.enable_mission_context
+            and self._components.mission_context is not None
+        ):
+            self._components.mission_context.update(
+                mission_context_input_from_request(enriched_request)
+            )
+            enriched_request = self._components.mission_context.enrich_request(
                 enriched_request,
             )
 
@@ -599,6 +644,7 @@ def create_cognition_runtime(
         response_planner=ResponsePlanner(),
         action_planner=ToolActionPlanner(),
         spoken_policy=SpokenDialoguePolicy(),
+        mission_context=MissionContextRuntime(),
     )
 
     return CognitionRuntime(

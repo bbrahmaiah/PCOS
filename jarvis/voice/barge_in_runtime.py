@@ -71,6 +71,9 @@ class VoiceInterruptedSpeechContext:
 class VoiceBargeInPolicy:
     min_confidence: float = 0.55
     emergency_stop_min_confidence: float = 0.20
+    min_semantic_barge_in_stability: float = 0.62
+    min_question_words: int = 3
+    min_correction_words: int = 2
     require_assistant_speaking: bool = True
     max_stop_latency_ms: int = 200
     stop_phrases: tuple[str, ...] = (
@@ -108,6 +111,30 @@ class VoiceBargeInPolicy:
         "compare",
         "tell me",
     )
+    wake_words: tuple[str, ...] = ("jarvis", "jervis", "jarves", "bob")
+    known_silence_hallucinations: tuple[str, ...] = (
+        "thank you",
+        "thank you bye bye",
+        "bye bye",
+        "buh bye",
+        "goodbye",
+        "see you",
+        "see you next time",
+        "we ll see you next time",
+        "tick",
+        "ticks",
+        "happy holidays",
+        "good luck",
+        "good luck yall",
+        "good job",
+        "i ll be right back",
+        "i ll be right back bye",
+        "ill be right back",
+        "ill be right back bye",
+        "wait thank you",
+        "wait thank you bye bye",
+    )
+    assistant_echo_min_overlap: float = 0.72
     metadata: dict[str, object] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
@@ -115,10 +142,18 @@ class VoiceBargeInPolicy:
             raise ValueError("min_confidence must be 0..1.")
         if not 0.0 <= self.emergency_stop_min_confidence <= 1.0:
             raise ValueError("emergency_stop_min_confidence must be 0..1.")
+        if not 0.0 <= self.min_semantic_barge_in_stability <= 1.0:
+            raise ValueError("min_semantic_barge_in_stability must be 0..1.")
+        if self.min_question_words < 1:
+            raise ValueError("min_question_words must be positive.")
+        if self.min_correction_words < 1:
+            raise ValueError("min_correction_words must be positive.")
         if self.max_stop_latency_ms <= 0:
             raise ValueError("max_stop_latency_ms must be positive.")
         if not self.stop_phrases:
             raise ValueError("stop_phrases cannot be empty.")
+        if not 0.0 <= self.assistant_echo_min_overlap <= 1.0:
+            raise ValueError("assistant_echo_min_overlap must be 0..1.")
 
 
 @dataclass(frozen=True, slots=True)
@@ -284,6 +319,54 @@ class VoiceBargeInRuntime:
                 metadata={
                     "confidence": request.transcript.confidence,
                     "kind": request.transcript.kind.value,
+                },
+            )
+
+        if _looks_like_assistant_echo(
+            transcript_text=request.transcript.text,
+            active_response_text=request.active_response_text,
+            policy=self._policy,
+        ):
+            self._ignored += 1
+            self._status = VoiceBargeInRuntimeStatus.IGNORED
+            return self._result(
+                operation=VoiceBargeInOperation.EVALUATE_TRANSCRIPT,
+                status=self._status,
+                disposition=VoiceBargeInDisposition.IGNORE,
+                signal=None,
+                interrupted_context=None,
+                playback_result=None,
+                message="barge-in ignored as assistant playback echo",
+                started=started,
+                metadata={
+                    "candidate_disposition": decision.value,
+                    "confidence": request.transcript.confidence,
+                    "kind": request.transcript.kind.value,
+                    "echo_guard": True,
+                },
+            )
+
+        if not _semantic_barge_in_is_stable(
+            transcript=request.transcript,
+            disposition=decision,
+            policy=self._policy,
+        ):
+            self._ignored += 1
+            self._status = VoiceBargeInRuntimeStatus.IGNORED
+            return self._result(
+                operation=VoiceBargeInOperation.EVALUATE_TRANSCRIPT,
+                status=self._status,
+                disposition=VoiceBargeInDisposition.IGNORE,
+                signal=None,
+                interrupted_context=None,
+                playback_result=None,
+                message="semantic barge-in ignored until transcript is stable",
+                started=started,
+                metadata={
+                    "candidate_disposition": decision.value,
+                    "confidence": request.transcript.confidence,
+                    "kind": request.transcript.kind.value,
+                    "perception": request.transcript.metadata.get("perception"),
                 },
             )
 
@@ -515,6 +598,9 @@ def _classify_barge_in(
     if not normalized:
         return VoiceBargeInDisposition.IGNORE
 
+    if _is_known_silence_hallucination(normalized, policy):
+        return VoiceBargeInDisposition.IGNORE
+
     if _contains_phrase(normalized, policy.cancel_phrases):
         if confidence >= policy.emergency_stop_min_confidence:
             return VoiceBargeInDisposition.CANCEL_RESPONSE
@@ -531,12 +617,88 @@ def _classify_barge_in(
         return VoiceBargeInDisposition.IGNORE
 
     if _contains_phrase(normalized, policy.correction_markers):
+        if len(normalized.split()) < policy.min_correction_words:
+            return VoiceBargeInDisposition.IGNORE
         return VoiceBargeInDisposition.USER_CORRECTION
 
     if _looks_like_direct_question(normalized, policy.question_markers):
+        if len(normalized.split()) < policy.min_question_words:
+            return VoiceBargeInDisposition.IGNORE
         return VoiceBargeInDisposition.NEW_QUESTION
 
     return VoiceBargeInDisposition.IGNORE
+
+
+def _semantic_barge_in_is_stable(
+    *,
+    transcript: VoiceTranscript,
+    disposition: VoiceBargeInDisposition,
+    policy: VoiceBargeInPolicy,
+) -> bool:
+    if disposition in {
+        VoiceBargeInDisposition.STOP_PLAYBACK,
+        VoiceBargeInDisposition.CANCEL_RESPONSE,
+        VoiceBargeInDisposition.PAUSE_PLAYBACK,
+    }:
+        return True
+
+    perception = transcript.metadata.get("perception")
+    if not isinstance(perception, dict):
+        return transcript.confidence >= policy.min_confidence
+
+    state = str(perception.get("intent_state") or "")
+    if state in {"noise", "capturing", "stabilizing"}:
+        return False
+
+    stability = perception.get("stability")
+    if isinstance(stability, int | float):
+        return float(stability) >= policy.min_semantic_barge_in_stability
+
+    return transcript.confidence >= policy.min_confidence
+
+
+def _looks_like_assistant_echo(
+    *,
+    transcript_text: str,
+    active_response_text: str | None,
+    policy: VoiceBargeInPolicy,
+) -> bool:
+    if active_response_text is None:
+        return False
+
+    transcript = _normalize(transcript_text)
+    response = _normalize(active_response_text)
+    if not transcript or not response:
+        return False
+
+    if _contains_phrase(transcript, policy.wake_words):
+        return False
+
+    if _phrase_match(response, transcript):
+        return True
+
+    transcript_words = transcript.split()
+    response_words = set(response.split())
+    if len(transcript_words) < 3 or not response_words:
+        return False
+
+    overlap = sum(1 for word in transcript_words if word in response_words)
+    return (overlap / len(transcript_words)) >= policy.assistant_echo_min_overlap
+
+
+def _is_known_silence_hallucination(
+    normalized: str,
+    policy: VoiceBargeInPolicy,
+) -> bool:
+    if normalized in {_normalize(item) for item in policy.known_silence_hallucinations}:
+        return True
+    if normalized.startswith("thank you") and len(normalized.split()) <= 5:
+        return True
+    if normalized.startswith("good luck") and len(normalized.split()) <= 5:
+        return True
+    if normalized.startswith("see you") and len(normalized.split()) <= 5:
+        return True
+    return False
 
 
 def _make_signal_from_transcript(

@@ -179,6 +179,44 @@ tests/test_demo.py:3: AssertionError
     assert BuildWatchEventKind.MEMORY_UPDATED in event_kinds
 
 
+def test_build_watch_handles_timeout_without_output(
+    tmp_path: Path,
+) -> None:
+    _write(tmp_path / "pyproject.toml", "[tool.pytest.ini_options]\n")
+    _write(tmp_path / "tests" / "test_demo.py", "def test_demo(): pass\n")
+
+    adapter = FakeTestExecutionAdapter(
+        exit_code=None,
+        stdout="",
+        stderr="",
+        timed_out=True,
+    )
+    engine = BuildWatchEngine(test_runner=RunnerEngine(executor=adapter))
+
+    snapshot = engine.check_once(
+        BuildWatchRequest(
+            project_root=tmp_path,
+            timeout_seconds=1.0,
+            remember=False,
+        )
+    )
+
+    assert snapshot.status in {
+        BuildWatchStatus.FAILING,
+        BuildWatchStatus.DEGRADED,
+    }
+    assert snapshot.decision == BuildWatchDecision.SUGGEST_FIX
+    assert snapshot.test_result is not None
+    assert snapshot.test_result.status == RunStatus.TIMEOUT
+    assert snapshot.error_report is not None
+    assert snapshot.fix_report is not None
+
+    event_kinds = {event.kind for event in snapshot.events}
+
+    assert BuildWatchEventKind.ERROR_ANALYZED in event_kinds
+    assert BuildWatchEventKind.FIX_SUGGESTED in event_kinds
+
+
 def test_build_watch_blocks_when_no_test_workflow(
     tmp_path: Path,
 ) -> None:

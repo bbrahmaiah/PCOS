@@ -1,15 +1,18 @@
 from __future__ import annotations
 
+import importlib
+import io
 import shutil
 import subprocess
 import tempfile
+import threading
 import time
 import wave
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import StrEnum
 from pathlib import Path
-from typing import Protocol
+from typing import Any, Protocol
 
 from jarvis.live import LiveResponse
 from jarvis.voice.contracts import (
@@ -207,6 +210,11 @@ class PiperCliTTSAdapter:
     It never creates conversational content.
     """
 
+    def __init__(self) -> None:
+        self._lock = threading.RLock()
+        self._python_voice: Any | None = None
+        self._python_voice_key: tuple[str, str | None] | None = None
+
     def prepare(
         self,
         config: VoiceRuntimeConfig,
@@ -248,6 +256,7 @@ class PiperCliTTSAdapter:
                     if policy.piper_config_path is not None
                     else None
                 ),
+                "python_api": True,
             },
         )
 
@@ -258,6 +267,80 @@ class PiperCliTTSAdapter:
         config: VoiceRuntimeConfig,
         policy: VoiceTTSPolicy,
     ) -> VoiceTTSAudioData:
+        try:
+            return self._synthesize_with_python_api(request, plan, policy)
+        except Exception as python_exc:
+            try:
+                return self._synthesize_with_cli(request, plan, policy)
+            except Exception as cli_exc:
+                raise RuntimeError(
+                    "Piper synthesis failed; "
+                    f"python_api={python_exc}; cli_fallback={cli_exc}"
+                ) from cli_exc
+
+    def close(self) -> None:
+        with self._lock:
+            self._python_voice = None
+            self._python_voice_key = None
+
+    def _synthesize_with_python_api(
+        self,
+        request: VoiceTTSRequest,
+        plan: VoiceTTSChunkPlan,
+        policy: VoiceTTSPolicy,
+    ) -> VoiceTTSAudioData:
+        del request
+        started = time.perf_counter()
+
+        with self._lock:
+            voice = self._load_python_voice(policy)
+            output = io.BytesIO()
+            with wave.open(output, "wb") as wav_file:
+                voice.synthesize_wav(plan.text, wav_file)
+
+        audio = output.getvalue()
+        sample_rate, duration_ms = _read_wav_info_from_bytes(audio)
+        latency_ms = (time.perf_counter() - started) * 1000.0
+
+        return VoiceTTSAudioData(
+            audio=audio,
+            sample_rate_hz=sample_rate,
+            duration_ms=duration_ms,
+            audio_format=VoiceTTSAudioFormat.WAV,
+            latency_ms=latency_ms,
+            metadata={
+                "provider": "piper_python",
+                "chunk_index": plan.index,
+            },
+        )
+
+    def _load_python_voice(self, policy: VoiceTTSPolicy) -> Any:
+        if policy.piper_model_path is None:
+            raise RuntimeError("piper_model_path is required.")
+
+        key = (
+            str(policy.piper_model_path),
+            str(policy.piper_config_path) if policy.piper_config_path else None,
+        )
+        if self._python_voice is not None and self._python_voice_key == key:
+            return self._python_voice
+
+        voice_module = importlib.import_module("piper.voice")
+        voice_class = voice_module.PiperVoice
+        self._python_voice = voice_class.load(
+            policy.piper_model_path,
+            config_path=policy.piper_config_path,
+        )
+        self._python_voice_key = key
+        return self._python_voice
+
+    def _synthesize_with_cli(
+        self,
+        request: VoiceTTSRequest,
+        plan: VoiceTTSChunkPlan,
+        policy: VoiceTTSPolicy,
+    ) -> VoiceTTSAudioData:
+        del request
         executable = shutil.which(policy.piper_executable)
         if executable is None:
             raise RuntimeError("Piper executable unavailable.")
@@ -317,9 +400,6 @@ class PiperCliTTSAdapter:
             )
         finally:
             output_path.unlink(missing_ok=True)
-
-    def close(self) -> None:
-        return None
 
 
 class VoiceTTSRuntime:
@@ -480,6 +560,7 @@ class VoiceTTSRuntime:
                     message="TTS synthesis failed",
                     started=started,
                     first_chunk_latency_ms=first_chunk_latency_ms,
+                    metadata={"error": self._last_error},
                 )
 
             chunk_latency_ms = (time.perf_counter() - chunk_started) * 1000.0
@@ -718,6 +799,14 @@ def _split_long_text(
 
 def _read_wav_info(path: Path) -> tuple[int, int]:
     with wave.open(str(path), "rb") as wav:
+        sample_rate = wav.getframerate()
+        frames = wav.getnframes()
+        duration_ms = int((frames / sample_rate) * 1000)
+    return sample_rate, max(1, duration_ms)
+
+
+def _read_wav_info_from_bytes(audio: bytes) -> tuple[int, int]:
+    with wave.open(io.BytesIO(audio), "rb") as wav:
         sample_rate = wav.getframerate()
         frames = wav.getnframes()
         duration_ms = int((frames / sample_rate) * 1000)
