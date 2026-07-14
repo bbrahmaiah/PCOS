@@ -1,0 +1,36 @@
+cff-version: 1.2.0
+
+message: "If you use PCOS or reference this work, please cite it using the metadata below."
+
+title: "PCOS: Personal Cognitive Operating System"
+
+abstract: >
+  Reference implementation accompanying the paper
+  "Cognitive Operating Systems: A Systems Architecture
+  for Persistent Human-AI Collaboration".
+
+type: software
+
+authors:
+  - family-names: "Thumbeti"
+    given-names: "Bala Brahmaiah"
+
+version: "1.0.0"
+
+date-released: 2026-07-14
+
+license: MIT
+
+repository-code: "https://github.com/bbrahmaiah/PCOS"
+
+url: "https://github.com/bbrahmaiah/PCOS"
+
+keywords:
+  - Cognitive Operating Systems
+  - COS
+  - PCOS
+  - Artificial Intelligence
+  - Human-AI Collaboration
+  - AI Systems Architecture
+  - AI Safety
+  - Cognitive Computing
