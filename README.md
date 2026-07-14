@@ -11,7 +11,7 @@
 
 This repository contains **PCOS (Personal Cognitive Operating System)**, the reference implementation of the **Cognitive Operating Systems (COS)** architecture introduced in the research paper:
 
-### Cognitive Operating Systems: A Systems Architecture for Persistent Human-AI Collaboration
+### Cognitive Operating Systems: An Architectural Abstraction for Persistent Human-AI Collaboration
 
 **Author:** Bala Brahmaiah Thumbeti  
 **Affiliation:** Mohan Babu University, Tirupati, Andhra Pradesh, India  
