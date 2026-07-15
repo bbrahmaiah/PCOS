@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21369321.svg)](https://doi.org/10.5281/zenodo.21369321)
+
 # PCOS
 ### Personal Cognitive Operating System
 
