@@ -21,7 +21,7 @@ This repository contains **PCOS (Personal Cognitive Operating System)**, the ref
 
 **Repository:** https://github.com/bbrahmaiah/PCOS
 
-**Status:** Ready for arXiv Submission (2026)
+**Status:** Public Research Preprint (Zenodo DOI Published)
 
 ## Abstract
 
@@ -280,7 +280,7 @@ See LICENSE for details.
 
 ```bibtex
 @misc{thumbeti2026cos,
-  title={Cognitive Operating Systems: A Systems Architecture for Persistent Human-AI Collaboration},
+  title={Cognitive Operating Systems: An Architectural Abstraction for Persistent Human-AI Collaboration},
   author={Thumbeti, Bala Brahmaiah},
   year={2026},
   note={Preprint}
