@@ -284,6 +284,10 @@ See LICENSE for details.
   author={Thumbeti, Bala Brahmaiah},
   year={2026},
   note={Preprint}
+  publisher = {Zenodo},
+  version = {v1.0.0},
+  doi = {10.5281/zenodo.21369321},
+  url = {https://doi.org/10.5281/zenodo.21369321}
 }
 ```
 
